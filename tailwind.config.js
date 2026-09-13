@@ -4,10 +4,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        sidebar: "#FFFFFF",
-        sidebarBorder: "#E7E9EE",
-        content: "#FAFBFC",
-        accent: "#0056D2",
+        sidebar: "#0B1730",
+        sidebarBorder: "#1C2B48",
+        content: "#F3F6FB",
+        accent: "#2563EB",
         badgeBg: "#E4EEFC",
         amber: "#F5A623",
         amberBg: "#FEF6E7",
