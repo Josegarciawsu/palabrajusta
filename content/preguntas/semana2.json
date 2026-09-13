@@ -1,0 +1,52 @@
+[
+  {
+    "tipo": "completar",
+    "pregunta": "En Utah, el homicidio intencional o consciente (purposely/knowingly) se clasifica como ______, no como \"murder de segundo grado\".",
+    "respuesta": "Murder (felonía de primer grado)"
+  },
+  {
+    "tipo": "completar",
+    "pregunta": "El fraude que SÍ anula el consentimiento sexual, porque engaña sobre la naturaleza misma del acto, se llama fraud in the ______.",
+    "respuesta": "factum"
+  },
+  {
+    "tipo": "completar",
+    "pregunta": "En Utah, un menor de 16-17 años puede consentir legalmente con una pareja hasta ______ años mayor.",
+    "respuesta": "7"
+  },
+  {
+    "tipo": "completar",
+    "pregunta": "Rehusarse a devolver un auto rentado, después de haberlo tenido legítimamente, convierte la posesión en ______.",
+    "respuesta": "apropiación ilícita (conversion)"
+  },
+  {
+    "tipo": "completar",
+    "pregunta": "No devolver una cartera con identificación que se encontró constituye ______.",
+    "respuesta": "apropiación indebida (wrongful taking)"
+  },
+  {
+    "tipo": "completar",
+    "pregunta": "El elemento central de burglary es la ______ al momento de entrar, no que el delito planeado se consume.",
+    "respuesta": "intención"
+  },
+  {
+    "tipo": "completar",
+    "pregunta": "En Utah, el límite legal de alcohol en sangre (BAC) es ______%, el más bajo de EE. UU.",
+    "respuesta": "0.05"
+  },
+  {
+    "tipo": "completar",
+    "pregunta": "La prueba en la que el oficial observa el movimiento involuntario del ojo se llama ______ (HGN).",
+    "respuesta": "Horizontal Gaze Nystagmus / nistagmo horizontal del ojo"
+  },
+  {
+    "tipo": "completar",
+    "pregunta": "Un arma falsa que la víctima cree real puede elevar un robo al nivel agravado bajo el concepto de ______.",
+    "respuesta": "simulated weapon / arma simulada"
+  },
+  {
+    "tipo": "completar",
+    "pregunta": "Entrar sin autorización pero sin intención de cometer un delito adicional es solo ______, no burglary.",
+    "respuesta": "trespassing / allanamiento simple"
+  }
+]

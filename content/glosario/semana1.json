@@ -1,0 +1,548 @@
+[
+  {
+    "seccion": "proposito-judicial",
+    "en": "Procedural fairness / procedural justice",
+    "es": "justicia o equidad procesal",
+    "definicion": "La percepción y realidad de que los procedimientos legales son neutrales, respetuosos, transparentes y aplicados de forma consistente. Concierne la justicia del proceso, no solamente quién gana."
+  },
+  {
+    "seccion": "proposito-judicial",
+    "en": "Accountability",
+    "es": "rendición de cuentas / responsabilidad",
+    "definicion": "La obligación de los tribunales y funcionarios públicos de explicar sus decisiones, seguir las reglas y responder por su conducta."
+  },
+  {
+    "seccion": "proposito-judicial",
+    "en": "Judicial Council",
+    "es": "Consejo Judicial",
+    "definicion": "Órgano de formulación de políticas y administrativo responsable de funciones específicas de gobernanza y administración dentro de un sistema judicial. En Utah, ejerce la autoridad asignada por la Constitución de Utah, los estatutos, y el Código de Administración Judicial."
+  },
+  {
+    "seccion": "proposito-judicial",
+    "en": "Translation theory",
+    "es": "teoría de la traducción e interpretación",
+    "definicion": "El estudio de cómo se transfieren el significado, la intención, el registro, la cultura y la función de un idioma de origen a un idioma de destino. La interpretación judicial prioriza una transferencia completa, precisa e imparcial del significado."
+  },
+  {
+    "seccion": "proposito-judicial",
+    "en": "Simultaneous interpreting",
+    "es": "interpretación simultánea",
+    "definicion": "El intérprete transmite el mensaje mientras el orador sigue hablando, usualmente con un breve retraso. Común en procedimientos dirigidos a un acusado con dominio limitado del inglés (LEP)."
+  },
+  {
+    "seccion": "proposito-judicial",
+    "en": "Consecutive interpreting",
+    "es": "interpretación consecutiva",
+    "definicion": "El orador hace pausas después de cada segmento para que el intérprete reproduzca el mensaje completo. Común en el testimonio de testigos e intercambios entre abogado y cliente."
+  },
+  {
+    "seccion": "proposito-judicial",
+    "en": "Sight translation",
+    "es": "traducción a la vista",
+    "definicion": "La transmisión oral de un documento escrito de un idioma a otro. Es interpretación de un texto escrito, no una traducción escrita."
+  },
+  {
+    "seccion": "fundamentos-ley-delitos",
+    "en": "Crime",
+    "es": "delito",
+    "definicion": "Un acto u omisión prohibido por el derecho penal y sancionable por el gobierno. Un fiscal presenta el caso penal en representación del estado o de Estados Unidos; una persona privada reporta la conducta y puede ser víctima o testigo."
+  },
+  {
+    "seccion": "fundamentos-ley-delitos",
+    "en": "Criminal law",
+    "es": "derecho penal",
+    "definicion": "Ley que rige los delitos contra el público. El gobierno procesa y debe probar la culpabilidad más allá de toda duda razonable en el juicio."
+  },
+  {
+    "seccion": "fundamentos-ley-delitos",
+    "en": "Civil law",
+    "es": "derecho civil",
+    "definicion": "Ley que rige disputas privadas, como contratos, lesiones, divorcio o deudas. Un demandante (plaintiff) inicia la acción y ordinariamente busca dinero u otro remedio civil."
+  },
+  {
+    "seccion": "fundamentos-ley-delitos",
+    "en": "Incarceration",
+    "es": "encarcelamiento / reclusión",
+    "definicion": "El estado general de confinamiento en cárcel o prisión. La cárcel (jail) comúnmente aloja a personas antes del juicio o cumpliendo sentencias locales más cortas; la prisión (prison) comúnmente aloja a personas cumpliendo sentencias más largas tras una condena."
+  },
+  {
+    "seccion": "fundamentos-ley-delitos",
+    "en": "Flight risk",
+    "es": "riesgo de fuga",
+    "definicion": "El riesgo de que un acusado no se presente a los procedimientos judiciales requeridos o de otra forma evada la jurisdicción del tribunal."
+  },
+  {
+    "seccion": "fundamentos-ley-delitos",
+    "en": "Probation",
+    "es": "libertad condicional bajo supervisión",
+    "definicion": "Una sentencia o disposición que permite a una persona permanecer en la comunidad sujeta a condiciones y supervisión ordenadas por el tribunal. Las violaciones pueden conllevar sanciones o revocación."
+  },
+  {
+    "seccion": "fundamentos-ley-delitos",
+    "en": "Garnishment",
+    "es": "embargo de salario o fondos",
+    "definicion": "Un proceso civil de ejecución que ordena a un empleador o institución financiera retener dinero para satisfacer un fallo (judgment)."
+  },
+  {
+    "seccion": "estandares-carga-prueba",
+    "en": "Burden of proof",
+    "es": "carga de la prueba",
+    "definicion": "La responsabilidad de probar hechos en disputa. En un juicio penal, la fiscalía tiene la carga; el acusado no tiene que probar su inocencia."
+  },
+  {
+    "seccion": "estandares-carga-prueba",
+    "en": "Beyond a reasonable doubt",
+    "es": "más allá de toda duda razonable",
+    "definicion": "El estándar de prueba ordinario más alto, requerido para una condena penal. No es prueba más allá de toda duda imaginable."
+  },
+  {
+    "seccion": "estandares-carga-prueba",
+    "en": "Preponderance of the evidence",
+    "es": "preponderancia de la prueba",
+    "definicion": "El estándar civil usual: un hecho es más probablemente cierto que no cierto. El \"51%\" es un atajo pedagógico, no un cálculo literal que se le exija al jurado."
+  },
+  {
+    "seccion": "estandares-carga-prueba",
+    "en": "Probable cause",
+    "es": "causa probable",
+    "definicion": "Un umbral relativamente bajo que requiere hechos que respalden una creencia razonable de que se cometió un delito y de que el acusado lo cometió. No es el estándar del juicio."
+  },
+  {
+    "seccion": "estandares-carga-prueba",
+    "en": "Proximate cause",
+    "es": "causa próxima",
+    "definicion": "Un concepto de causalidad civil que conecta la conducta con un daño legalmente atribuible. Pregunta si la conducta estuvo suficientemente conectada con la lesión, incluyendo la previsibilidad — no simplemente cuál evento ocurrió más cerca en el tiempo."
+  },
+  {
+    "seccion": "estandares-carga-prueba",
+    "en": "Acquittal",
+    "es": "absolución",
+    "definicion": "Un fallo o veredicto de no culpable. Establece que la responsabilidad penal no fue probada más allá de toda duda razonable; no constituye necesariamente una determinación afirmativa de inocencia fáctica."
+  },
+  {
+    "seccion": "resolver-sin-juicio",
+    "en": "Plea bargaining",
+    "es": "negociación de culpabilidad / negociación de una declaración",
+    "definicion": "Negociaciones en un caso penal que pueden producir un acuerdo de culpabilidad, como declararse culpable de cargos reducidos o una recomendación de sentencia."
+  },
+  {
+    "seccion": "resolver-sin-juicio",
+    "en": "Plea agreement",
+    "es": "acuerdo de culpabilidad / acuerdo de declaración",
+    "definicion": "El acuerdo penal resultante. El juez debe determinar si acepta la declaración y asegurarse de que sea informada y voluntaria."
+  },
+  {
+    "seccion": "resolver-sin-juicio",
+    "en": "Settlement",
+    "es": "acuerdo extrajudicial / convenio",
+    "definicion": "Una resolución negociada de una disputa civil, que a menudo involucra un pago, la renuncia a reclamos, u otros términos."
+  },
+  {
+    "seccion": "jurisdiccion",
+    "en": "Jurisdiction",
+    "es": "jurisdicción / competencia",
+    "definicion": "La autoridad legal de un tribunal sobre la materia, las partes, y la ubicación geográfica relacionada con un caso."
+  },
+  {
+    "seccion": "jurisdiccion",
+    "en": "Federal jurisdiction",
+    "es": "jurisdicción federal",
+    "definicion": "Autoridad basada en la Constitución de EE. UU. y los estatutos federales. Los tribunales federales son tribunales de jurisdicción limitada por materia; no pueden conocer todo tipo de disputa."
+  },
+  {
+    "seccion": "jurisdiccion",
+    "en": "State jurisdiction",
+    "es": "jurisdicción estatal",
+    "definicion": "Autoridad de los tribunales estatales sobre asuntos regidos principalmente por la ley estatal. Los tribunales estatales de primera instancia pueden ser de jurisdicción general o limitada."
+  },
+  {
+    "seccion": "jurisdiccion",
+    "en": "Court of limited jurisdiction",
+    "es": "tribunal de jurisdicción limitada",
+    "definicion": "Un tribunal autorizado a conocer solamente categorías específicas o casos de menor gravedad, como muchos tribunales de justicia o municipales."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Judge",
+    "es": "juez/jueza",
+    "definicion": "Funcionario judicial neutral que decide sobre cuestiones de derecho y admisibilidad, gestiona los procedimientos, instruye al jurado, y adjudica un juicio sin jurado (bench trial)."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Jury",
+    "es": "jurado",
+    "definicion": "El juzgador de los hechos que evalúa la evidencia admitida y emite un veredicto cuando aplica el derecho a un juicio por jurado y no se ha renunciado a él."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Prosecutor",
+    "es": "fiscal",
+    "definicion": "Abogado del gobierno que representa al estado o a Estados Unidos — no es el abogado personal de la víctima."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Defense attorney",
+    "es": "abogado defensor",
+    "definicion": "Representa al acusado, protege sus derechos constitucionales, pone a prueba la evidencia de la fiscalía, y aboga dentro de las reglas éticas."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Public defender",
+    "es": "defensor público",
+    "definicion": "Abogado de la defensa financiado o contratado por el gobierno, designado para un acusado indigente que califica."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Indigent",
+    "es": "indigente / sin recursos",
+    "definicion": "Incapaz de pagar representación legal bajo el estándar de elegibilidad aplicable."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Pro se",
+    "es": "por derecho propio / sin abogado",
+    "definicion": "Representarse a uno mismo en un tribunal."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Court clerk",
+    "es": "secretario judicial",
+    "definicion": "Mantiene el expediente, recibe presentaciones, administra los objetos de prueba e información del caso, y puede tomar juramentos según la práctica."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Bailiff",
+    "es": "alguacil / oficial de sala",
+    "definicion": "Mantiene la seguridad y el orden, anuncia al juez, escolta a los acusados bajo custodia, y puede comunicarse entre el tribunal y el jurado."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Court reporter",
+    "es": "taquígrafo judicial",
+    "definicion": "Crea el registro textual de los procedimientos. La interpretación al inglés del intérprete pasa a formar parte de ese registro cuando se interpreta un testimonio."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Pretrial services",
+    "es": "servicios previos al juicio",
+    "definicion": "Evalúa el riesgo relevante y provee información o recomendaciones relacionadas con la liberación bajo la ley y política vigentes."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Probation officer",
+    "es": "oficial de libertad condicional",
+    "definicion": "Supervisa a las personas sentenciadas a libertad condicional y reporta presuntas violaciones; no impone la sentencia de forma independiente."
+  },
+  {
+    "seccion": "actores-sala",
+    "en": "Guardian ad litem",
+    "es": "tutor ad lítem / abogado del menor",
+    "definicion": "Defensor designado por el tribunal para representar el interés superior de un menor u otra persona protegida, según lo define su nombramiento y la ley aplicable."
+  },
+  {
+    "seccion": "evidencia-registro",
+    "en": "Admissibility of evidence",
+    "es": "admisibilidad de la prueba",
+    "definicion": "Si la evidencia puede legalmente considerarse bajo las reglas de evidencia. El juez decide la admisibilidad; el juzgador de los hechos decide el peso apropiado."
+  },
+  {
+    "seccion": "evidencia-registro",
+    "en": "Exhibit",
+    "es": "prueba material / objeto o documento marcado como prueba",
+    "definicion": "Un objeto marcado para identificación o admitido como evidencia, como una fotografía, documento, arma de fuego, o parafernalia de drogas. El contrabando físico en sí no siempre necesita presentarse en la sala."
+  },
+  {
+    "seccion": "evidencia-registro",
+    "en": "Chain of custody",
+    "es": "cadena de custodia",
+    "definicion": "Documentación y testimonio que muestra cómo se recolectó, preservó, transfirió, almacenó, y protegió de alteración la evidencia física."
+  },
+  {
+    "seccion": "evidencia-registro",
+    "en": "Codified law",
+    "es": "ley codificada",
+    "definicion": "Ley organizada y promulgada en un código o estatuto escrito."
+  },
+  {
+    "seccion": "evidencia-registro",
+    "en": "Common law",
+    "es": "derecho consuetudinario / jurisprudencial",
+    "definicion": "Ley desarrollada a través de decisiones judiciales, en lugar de únicamente a través de estatutos promulgados."
+  },
+  {
+    "seccion": "evidencia-registro",
+    "en": "Statute",
+    "es": "ley / estatuto",
+    "definicion": "Una ley formalmente promulgada por un órgano legislativo."
+  },
+  {
+    "seccion": "evidencia-registro",
+    "en": "Ballot initiative",
+    "es": "iniciativa popular",
+    "definicion": "Un proceso mediante el cual los votantes proponen o promulgan una medida, sujeto a los procedimientos constitucionales y estatutarios del estado."
+  },
+  {
+    "seccion": "evidencia-registro",
+    "en": "Jury instructions",
+    "es": "instrucciones al jurado",
+    "definicion": "La explicación autorizada del juez sobre la ley que el jurado debe aplicar. Los intérpretes deben transmitirlas con precisión y consistencia."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "Complaint",
+    "es": "denuncia / querella formal",
+    "definicion": "Un documento formal de cargos o escrito de demanda. El significado exacto varía según la jurisdicción y el contexto; en Utah, las felonías comúnmente se procesan mediante information o indictment."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "Information",
+    "es": "acusación formal presentada por el fiscal",
+    "definicion": "Un documento de cargos presentado por un fiscal sin una acusación de gran jurado."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "Indictment",
+    "es": "acusación formal emitida por un gran jurado",
+    "definicion": "Un cargo formal emitido por un gran jurado después de que encuentra causa probable."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "Preliminary hearing",
+    "es": "audiencia preliminar",
+    "definicion": "Una audiencia pública y contradictoria en la que un juez determina si la causa probable respalda continuar con los cargos de felonía. No es un juicio en miniatura sobre la culpabilidad."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "Grand jury",
+    "es": "gran jurado",
+    "definicion": "Un cuerpo que escucha la evidencia presentada por el fiscal y decide si la causa probable respalda una acusación (indictment). Los procedimientos son generalmente secretos, y la defensa ordinariamente no participa."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "True bill / no bill",
+    "es": "acusación aprobada / acusación rechazada",
+    "definicion": "Un true bill significa que el gran jurado aprobó una acusación; un no bill significa que no lo hizo."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "Trial in absentia",
+    "es": "juicio en ausencia",
+    "definicion": "Un juicio realizado sin el acusado presente. Se permite solo bajo circunstancias constitucionales y procesales limitadas; no es un sinónimo rutinario de no comparecer."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "Initial appearance",
+    "es": "comparecencia inicial",
+    "definicion": "El acusado se presenta por primera vez ante un funcionario judicial, se le informa de los cargos y sus derechos, y pueden abordarse cuestiones de liberación y representación legal."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "Release on recognizance (OR)",
+    "es": "libertad bajo palabra",
+    "definicion": "Liberación previa al juicio basada en la promesa de comparecer, sin depositar una fianza monetaria, a menudo sujeta a condiciones."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "Arraignment",
+    "es": "lectura de cargos y presentación de declaración",
+    "definicion": "El procedimiento en el que se informa formalmente al acusado del cargo y presenta su declaración."
+  },
+  {
+    "seccion": "inicio-caso-penal",
+    "en": "Nolo contendere / no contest",
+    "es": "no impugno / no contest",
+    "definicion": "Una declaración que acepta la condena sin admitir las alegaciones fácticas. En Utah, las declaraciones de culpable y de no contest tienen el mismo efecto que una condena, aunque las consecuencias colaterales pueden depender del contexto."
+  },
+  {
+    "seccion": "mociones-previas",
+    "en": "Motion",
+    "es": "moción / solicitud formal",
+    "definicion": "Una solicitud formal pidiendo al tribunal que emita una orden."
+  },
+  {
+    "seccion": "mociones-previas",
+    "en": "Motion to continue",
+    "es": "moción para aplazar / continuar",
+    "definicion": "Una solicitud para trasladar una audiencia o plazo a una fecha posterior. Usualmente requiere una razón legalmente suficiente o causa justificada."
+  },
+  {
+    "seccion": "mociones-previas",
+    "en": "Discovery",
+    "es": "descubrimiento / intercambio de pruebas",
+    "definicion": "El proceso para divulgar evidencia e información bajo las reglas procesales. Una moción para compeler (motion to compel) puede buscar material que debió divulgarse pero no se hizo."
+  },
+  {
+    "seccion": "mociones-previas",
+    "en": "Motion to suppress",
+    "es": "moción para excluir o suprimir prueba",
+    "definicion": "Una solicitud para excluir evidencia obtenida en violación de protecciones constitucionales o estatutarias. La parte que presenta la moción debe identificar el fundamento legal y fáctico."
+  },
+  {
+    "seccion": "mociones-previas",
+    "en": "Exclusionary rule",
+    "es": "regla de exclusión",
+    "definicion": "Una doctrina que puede impedir que evidencia obtenida ilegalmente se use en el caso de la fiscalía, sujeta a excepciones y requisitos procesales."
+  },
+  {
+    "seccion": "mociones-previas",
+    "en": "Ineffective assistance of counsel",
+    "es": "asistencia ineficaz de abogado",
+    "definicion": "Un reclamo constitucional que generalmente requiere probar que el desempeño del abogado fue deficiente y que esa deficiencia perjudicó la defensa, bajo el marco establecido en Strickland v. Washington."
+  },
+  {
+    "seccion": "secuencia-juicio",
+    "en": "Voir dire",
+    "es": "selección e interrogatorio del jurado",
+    "definicion": "Interrogar a los posibles jurados para identificar sesgos y seleccionar un jurado justo e imparcial."
+  },
+  {
+    "seccion": "secuencia-juicio",
+    "en": "Sequestered jury",
+    "es": "jurado aislado",
+    "definicion": "Un jurado mantenido apartado de información o contacto externo bajo orden del tribunal."
+  },
+  {
+    "seccion": "secuencia-juicio",
+    "en": "Opening statement",
+    "es": "declaración inicial",
+    "definicion": "La vista previa de cada parte sobre lo que espera que muestre la evidencia; no es evidencia en sí."
+  },
+  {
+    "seccion": "secuencia-juicio",
+    "en": "Presentation of evidence",
+    "es": "presentación de pruebas",
+    "definicion": "Se presentan testigos y objetos de prueba; la fiscalía o el demandante ordinariamente presenta primero."
+  },
+  {
+    "seccion": "secuencia-juicio",
+    "en": "Rebuttal evidence",
+    "es": "prueba de refutación",
+    "definicion": "Evidencia que responde a asuntos planteados por la parte contraria."
+  },
+  {
+    "seccion": "secuencia-juicio",
+    "en": "Closing argument",
+    "es": "alegato final",
+    "definicion": "Argumentos sobre cómo la evidencia admitida y la ley deberían llevar a un resultado."
+  },
+  {
+    "seccion": "secuencia-juicio",
+    "en": "Deliberations",
+    "es": "deliberaciones",
+    "definicion": "La discusión privada de los jurados antes de llegar a un veredicto."
+  },
+  {
+    "seccion": "secuencia-juicio",
+    "en": "Verdict",
+    "es": "veredicto",
+    "definicion": "La decisión formal del jurado o juzgador de los hechos."
+  },
+  {
+    "seccion": "secuencia-juicio",
+    "en": "Hung jury",
+    "es": "jurado sin veredicto / jurado estancado",
+    "definicion": "Un jurado incapaz de llegar al grado de acuerdo requerido para emitir un veredicto."
+  },
+  {
+    "seccion": "secuencia-juicio",
+    "en": "Mistrial",
+    "es": "juicio nulo",
+    "definicion": "La terminación de un juicio sin un veredicto final válido, debido a un problema fundamental, incluyendo algunos casos de jurado estancado."
+  },
+  {
+    "seccion": "sentencia-violaciones",
+    "en": "Sentencing",
+    "es": "imposición de sentencia",
+    "definicion": "El procedimiento en el que el tribunal impone el castigo penal legal tras una condena."
+  },
+  {
+    "seccion": "sentencia-violaciones",
+    "en": "Mitigating circumstance",
+    "es": "circunstancia atenuante",
+    "definicion": "Un hecho que respalda una sentencia menos severa, sin necesariamente excusar el delito."
+  },
+  {
+    "seccion": "sentencia-violaciones",
+    "en": "Aggravating circumstance",
+    "es": "circunstancia agravante",
+    "definicion": "Un hecho que respalda una sentencia más severa. \"Egregious\" significa excepcionalmente grave o impactante."
+  },
+  {
+    "seccion": "sentencia-violaciones",
+    "en": "Probation violation hearing",
+    "es": "audiencia por violación de libertad condicional",
+    "definicion": "Una audiencia para determinar si se violaron las condiciones de la libertad condicional y qué consecuencia, si alguna, debería seguir. No es un nuevo juicio penal, y el estándar probatorio aplicable es generalmente menor que más allá de toda duda razonable."
+  },
+  {
+    "seccion": "adulto-menor",
+    "en": "Conviction (adulto) / Adjudication (menor)",
+    "es": "condena / adjudicación",
+    "definicion": "Determinación formal de responsabilidad en el tribunal de adultos frente al equivalente en el tribunal de menores."
+  },
+  {
+    "seccion": "adulto-menor",
+    "en": "Guilty (adulto) / Delinquent (menor)",
+    "es": "culpable / responsable de acto delictivo",
+    "definicion": "Terminología paralela entre corte de adultos y de menores."
+  },
+  {
+    "seccion": "adulto-menor",
+    "en": "Sentence (adulto) / Disposition (menor)",
+    "es": "sentencia / medida o resolución",
+    "definicion": "Terminología paralela entre corte de adultos y de menores."
+  },
+  {
+    "seccion": "adulto-menor",
+    "en": "Defendant (adulto) / Minor or juvenile (menor)",
+    "es": "acusado / menor",
+    "definicion": "Terminología paralela entre corte de adultos y de menores."
+  },
+  {
+    "seccion": "adulto-menor",
+    "en": "Status offense",
+    "es": "infracción por condición de menor",
+    "definicion": "Conducta prohibida debido a la edad de la persona, como el ausentismo escolar (truancy) o algunas violaciones de toque de queda; la misma conducta no sería un delito si la cometiera un adulto."
+  },
+  {
+    "seccion": "conducta-interprete",
+    "en": "Convey the message",
+    "es": "transmitir fielmente el mensaje",
+    "definicion": "Transmitir el significado, tono, registro e intención completos del idioma de origen al idioma de destino sin agregar, omitir, o explicar."
+  },
+  {
+    "seccion": "conducta-interprete",
+    "en": "Register",
+    "es": "registro lingüístico",
+    "definicion": "El nivel y estilo del lenguaje — formal, informal, técnico, vulgar, titubeante, o incoherente. Se debe preservar tan fielmente como lo permita el idioma de destino."
+  },
+  {
+    "seccion": "conducta-interprete",
+    "en": "Colorful language",
+    "es": "lenguaje fuerte, vulgar o expresivo",
+    "definicion": "Una etiqueta educada para profanidad, insultos, o lenguaje vívido. El intérprete debe interpretarlo con precisión en lugar de suavizarlo o censurarlo."
+  },
+  {
+    "seccion": "conducta-interprete",
+    "en": "Courtroom decorum",
+    "es": "decoro de la sala",
+    "definicion": "Estándares de conducta respetuosa y ordenada en el tribunal. El juez controla el decoro; el intérprete no edita independientemente las palabras de un hablante."
+  },
+  {
+    "seccion": "conducta-interprete",
+    "en": "Conflict of interest",
+    "es": "conflicto de intereses",
+    "definicion": "Un conflicto que puede afectar la lealtad, independencia, o representación. El abogado puede solicitar retirarse cuando un conflicto ético impide continuar la representación."
+  },
+  {
+    "seccion": "conducta-interprete",
+    "en": "Irreconcilable conflict",
+    "es": "conflicto irreconciliable",
+    "definicion": "Una ruptura grave que puede respaldar una solicitud para retirarse o sustituir al abogado; el desacuerdo por sí solo no siempre requiere el retiro."
+  },
+  {
+    "seccion": "conducta-interprete",
+    "en": "Perjury",
+    "es": "perjurio",
+    "definicion": "Hacer a sabiendas una declaración materialmente falsa bajo juramento. Un abogado no puede presentar a sabiendas un testimonio perjuro."
+  }
+]

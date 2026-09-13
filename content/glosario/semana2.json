@@ -1,0 +1,344 @@
+[
+  {
+    "seccion": "clasificacion-delitos",
+    "en": "Crimes against persons",
+    "es": "Delitos contra las personas",
+    "definicion": "Delitos cuyo daño recae sobre una persona."
+  },
+  {
+    "seccion": "clasificacion-delitos",
+    "en": "Property crimes",
+    "es": "Delitos contra la propiedad",
+    "definicion": "Delitos relacionados con bienes."
+  },
+  {
+    "seccion": "clasificacion-delitos",
+    "en": "Public order crimes",
+    "es": "Delitos contra el orden público",
+    "definicion": "Delitos que afectan el orden público."
+  },
+  {
+    "seccion": "clasificacion-delitos",
+    "en": "Morality crimes",
+    "es": "Delitos de moralidad",
+    "definicion": "Delitos sujetos a debate moral/social."
+  },
+  {
+    "seccion": "homicidio-murder-manslaughter",
+    "en": "Purposely",
+    "es": "Con el propósito de / dolosamente",
+    "definicion": "Actuar con el propósito directo de un resultado."
+  },
+  {
+    "seccion": "homicidio-murder-manslaughter",
+    "en": "Knowingly",
+    "es": "A sabiendas / conscientemente",
+    "definicion": "Saber que un resultado es casi seguro, sin ser el objetivo directo."
+  },
+  {
+    "seccion": "homicidio-murder-manslaughter",
+    "en": "Premeditation",
+    "es": "Premeditación",
+    "definicion": "Oportunidad de reflexión antes del acto."
+  },
+  {
+    "seccion": "homicidio-murder-manslaughter",
+    "en": "Aggravated murder",
+    "es": "Asesinato agravado",
+    "definicion": "Asesinato con circunstancias agravantes (delito capital en Utah)."
+  },
+  {
+    "seccion": "homicidio-murder-manslaughter",
+    "en": "Murder",
+    "es": "Asesinato",
+    "definicion": "Causar la muerte de otro intencional o conscientemente."
+  },
+  {
+    "seccion": "homicidio-murder-manslaughter",
+    "en": "Manslaughter",
+    "es": "Homicidio no premeditado",
+    "definicion": "Homicidio sin premeditación."
+  },
+  {
+    "seccion": "homicidio-murder-manslaughter",
+    "en": "Negligent homicide",
+    "es": "Homicidio culposo",
+    "definicion": "Homicidio por negligencia."
+  },
+  {
+    "seccion": "homicidio-murder-manslaughter",
+    "en": "Lesser included offense",
+    "es": "Delito menor incluido",
+    "definicion": "Delito menor cuyos elementos están incluidos en uno mayor."
+  },
+  {
+    "seccion": "homicidio-murder-manslaughter",
+    "en": "Wrongful death",
+    "es": "Muerte injusta (acción civil)",
+    "definicion": "Acción civil por muerte causada por negligencia o dolo."
+  },
+  {
+    "seccion": "manslaughter-felony-murder",
+    "en": "Voluntary manslaughter",
+    "es": "Homicidio voluntario atenuado",
+    "definicion": "Homicidio intencional bajo provocación adecuada."
+  },
+  {
+    "seccion": "manslaughter-felony-murder",
+    "en": "Involuntary manslaughter",
+    "es": "Homicidio involuntario",
+    "definicion": "Homicidio no intencional, por temeridad o negligencia."
+  },
+  {
+    "seccion": "manslaughter-felony-murder",
+    "en": "Felony murder rule",
+    "es": "Regla del homicidio en la comisión de un delito grave",
+    "definicion": "Cargo de homicidio por muerte durante un delito peligroso."
+  },
+  {
+    "seccion": "rape-sexual-assault",
+    "en": "Rape",
+    "es": "Violación",
+    "definicion": "Categoría de sexual assault sin consentimiento."
+  },
+  {
+    "seccion": "rape-sexual-assault",
+    "en": "Sexual assault",
+    "es": "Agresión sexual",
+    "definicion": "Categoría más amplia de contacto sexual no consentido."
+  },
+  {
+    "seccion": "rape-sexual-assault",
+    "en": "Fraud in the factum",
+    "es": "Fraude en la naturaleza del acto",
+    "definicion": "Fraude sobre la naturaleza del acto (anula el consentimiento)."
+  },
+  {
+    "seccion": "rape-sexual-assault",
+    "en": "Fraud in the inducement",
+    "es": "Fraude en la inducción",
+    "definicion": "Fraude para persuadir (no anula el consentimiento)."
+  },
+  {
+    "seccion": "rape-sexual-assault",
+    "en": "Statute of limitations",
+    "es": "Plazo de prescripción",
+    "definicion": "Plazo legal para presentar cargos."
+  },
+  {
+    "seccion": "rape-sexual-assault",
+    "en": "Statutory rape",
+    "es": "Estupro / violación estatutaria",
+    "definicion": "Relación sexual con un menor bajo la edad de consentimiento."
+  },
+  {
+    "seccion": "rape-sexual-assault",
+    "en": "Close-in-age exemption",
+    "es": "Excepción de cercanía de edad (\"Romeo y Julieta\")",
+    "definicion": "Excepción por cercanía de edad entre las partes."
+  },
+  {
+    "seccion": "assault-battery",
+    "en": "Battery",
+    "es": "Agresión física / vías de hecho",
+    "definicion": "Contacto físico dañino u ofensivo, no consentido."
+  },
+  {
+    "seccion": "assault-battery",
+    "en": "Assault",
+    "es": "Amenaza de agresión",
+    "definicion": "Poner a alguien en temor de un contacto físico."
+  },
+  {
+    "seccion": "assault-battery",
+    "en": "Constructive touching",
+    "es": "Contacto constructivo",
+    "definicion": "Contacto indirecto puesto en movimiento por el agresor."
+  },
+  {
+    "seccion": "assault-battery",
+    "en": "Aggravated battery",
+    "es": "Agresión física agravada",
+    "definicion": "Battery con arma mortal o lesión grave."
+  },
+  {
+    "seccion": "assault-battery",
+    "en": "Deadly weapon",
+    "es": "Arma mortal",
+    "definicion": "Objeto capaz de causar la muerte."
+  },
+  {
+    "seccion": "assault-battery",
+    "en": "Mayhem",
+    "es": "Mutilación / lesión grave agravada",
+    "definicion": "Término usado en algunos estados para battery agravado con lesión grave."
+  },
+  {
+    "seccion": "kidnapping",
+    "en": "Kidnapping",
+    "es": "Secuestro",
+    "definicion": "Trasladar a alguien contra su voluntad."
+  },
+  {
+    "seccion": "kidnapping",
+    "en": "False imprisonment",
+    "es": "Privación ilegal de la libertad",
+    "definicion": "Retener a alguien sin trasladarlo."
+  },
+  {
+    "seccion": "theft-larceny",
+    "en": "Larceny",
+    "es": "Hurto",
+    "definicion": "Tomar y quedarse con algo que está en posesión de otro."
+  },
+  {
+    "seccion": "theft-larceny",
+    "en": "Theft",
+    "es": "Hurto (categoría general)",
+    "definicion": "Categoría general que consolida varias formas de apropiación de bienes ajenos, sin uso de fuerza contra la víctima."
+  },
+  {
+    "seccion": "theft-larceny",
+    "en": "Embezzlement",
+    "es": "Malversación",
+    "definicion": "Apropiarse indebidamente de bienes bajo custodia legítima."
+  },
+  {
+    "seccion": "theft-larceny",
+    "en": "Wrongful taking",
+    "es": "Apropiación indebida",
+    "definicion": "No devolver un bien perdido cuyo dueño es identificable."
+  },
+  {
+    "seccion": "theft-larceny",
+    "en": "Conversion",
+    "es": "Apropiación ilícita",
+    "definicion": "Ejercer sobre un bien un derecho de control incompatible con los términos bajo los que se recibió."
+  },
+  {
+    "seccion": "theft-larceny",
+    "en": "False pretenses",
+    "es": "Estafa por falsas representaciones",
+    "definicion": "Engañar a alguien sobre un hecho material para que ceda voluntariamente un bien."
+  },
+  {
+    "seccion": "theft-larceny",
+    "en": "Material fact",
+    "es": "Hecho material",
+    "definicion": "Hecho cuyo peso probatorio pudo influir en la decisión de la víctima."
+  },
+  {
+    "seccion": "robbery",
+    "en": "Robbery",
+    "es": "Robo con violencia o intimidación",
+    "definicion": "Toma de propiedad mediante fuerza o temor, en presencia de la víctima."
+  },
+  {
+    "seccion": "robbery",
+    "en": "Aggravated robbery",
+    "es": "Robo agravado",
+    "definicion": "Robo con arma peligrosa o lesión grave (Utah: primer grado)."
+  },
+  {
+    "seccion": "robbery",
+    "en": "Simulated weapon",
+    "es": "Arma simulada",
+    "definicion": "Arma falsa o representación de un arma."
+  },
+  {
+    "seccion": "burglary",
+    "en": "Burglary",
+    "es": "Allanamiento con intención delictiva",
+    "definicion": "Entrar o permanecer con intención de cometer un delito."
+  },
+  {
+    "seccion": "burglary",
+    "en": "Trespassing",
+    "es": "Allanamiento simple / invasión de propiedad",
+    "definicion": "Entrar sin autorización, sin intención delictiva adicional."
+  },
+  {
+    "seccion": "forgery-uttering",
+    "en": "Forgery",
+    "es": "Falsificación de documentos",
+    "definicion": "Alteración material no autorizada de un documento."
+  },
+  {
+    "seccion": "forgery-uttering",
+    "en": "Uttering",
+    "es": "Circulación de documento falsificado",
+    "definicion": "Poseer o intentar hacer circular un documento falsificado."
+  },
+  {
+    "seccion": "arson",
+    "en": "Arson",
+    "es": "Incendio provocado",
+    "definicion": "Incendio ilegal de una estructura."
+  },
+  {
+    "seccion": "disorderly-conduct",
+    "en": "Disorderly conduct",
+    "es": "Conducta desordenada / alteración del orden público",
+    "definicion": "Conducta que genera inconveniente o alarma pública."
+  },
+  {
+    "seccion": "disorderly-conduct",
+    "en": "Fighting words",
+    "es": "Palabras provocadoras / incitadoras",
+    "definicion": "Palabras que incitan una ruptura inmediata de la paz."
+  },
+  {
+    "seccion": "disorderly-conduct",
+    "en": "Affray",
+    "es": "Riña mutua",
+    "definicion": "Pelea mutua sin origen claro."
+  },
+  {
+    "seccion": "dui",
+    "en": "Blood alcohol concentration (BAC)",
+    "es": "Concentración de alcohol en sangre",
+    "definicion": "Nivel de alcohol en la sangre."
+  },
+  {
+    "seccion": "dui",
+    "en": "Field sobriety test",
+    "es": "Prueba de sobriedad en campo",
+    "definicion": "Prueba física de sobriedad en el lugar."
+  },
+  {
+    "seccion": "dui",
+    "en": "Horizontal Gaze Nystagmus (HGN)",
+    "es": "Prueba de nistagmo horizontal del ojo",
+    "definicion": "Prueba de movimiento ocular para detectar intoxicación."
+  },
+  {
+    "seccion": "drogas",
+    "en": "Controlled substance",
+    "es": "Sustancia controlada",
+    "definicion": "Droga regulada bajo la ley penal."
+  },
+  {
+    "seccion": "drogas",
+    "en": "Drug paraphernalia",
+    "es": "Parafernalia relacionada con drogas",
+    "definicion": "Objetos relacionados con el consumo/preparación de drogas."
+  },
+  {
+    "seccion": "prostitution-pandering",
+    "en": "Prostitution",
+    "es": "Prostitución",
+    "definicion": "Ofrecer o realizar un acto sexual a cambio de algo de valor."
+  },
+  {
+    "seccion": "prostitution-pandering",
+    "en": "Pandering",
+    "es": "Proxenetismo",
+    "definicion": "Facilitar que otra persona se involucre en un acto sexual por dinero."
+  },
+  {
+    "seccion": "prostitution-pandering",
+    "en": "Human sexual trafficking",
+    "es": "Trata de personas con fines sexuales",
+    "definicion": "Trata de personas con fines de explotación sexual."
+  }
+]

@@ -1,0 +1,404 @@
+[
+  {
+    "seccion": "investigation-reports",
+    "en": "Investigation report",
+    "es": "Reporte / informe de investigación",
+    "definicion": "Documento que registra los hallazgos de una investigación (policial, forense, etc.)."
+  },
+  {
+    "seccion": "subpoenas",
+    "en": "Subpoena ad testificandum",
+    "es": "Citación a testificar",
+    "definicion": "Orden de comparecer a testificar oralmente."
+  },
+  {
+    "seccion": "subpoenas",
+    "en": "Subpoena duces tecum",
+    "es": "Citación a presentar documentos",
+    "definicion": "Orden de producir documentos o evidencia tangible."
+  },
+  {
+    "seccion": "autenticacion",
+    "en": "Authenticate",
+    "es": "Autenticar",
+    "definicion": "Demostrar que un documento es lo que dice ser."
+  },
+  {
+    "seccion": "autenticacion",
+    "en": "Certify",
+    "es": "Certificar",
+    "definicion": "Dar fe formal de la autenticidad de un documento."
+  },
+  {
+    "seccion": "autenticacion",
+    "en": "Custodian of records",
+    "es": "Custodio de registros",
+    "definicion": "Persona que certifica registros institucionales."
+  },
+  {
+    "seccion": "autenticacion",
+    "en": "Lay the foundation",
+    "es": "Sentar las bases / fundamentar",
+    "definicion": "Establecer las bases para admitir una prueba."
+  },
+  {
+    "seccion": "mociones-evidencia",
+    "en": "Motion in limine",
+    "es": "Moción previa al juicio",
+    "definicion": "Solicitud previa al juicio sobre admisibilidad de prueba."
+  },
+  {
+    "seccion": "search-warrants",
+    "en": "Probable cause",
+    "es": "Causa probable",
+    "definicion": "Estándar legal de causa suficiente para actuar (arrestar, registrar)."
+  },
+  {
+    "seccion": "search-warrants",
+    "en": "Affidavit",
+    "es": "Declaración jurada / afidávit",
+    "definicion": "Declaración jurada por escrito."
+  },
+  {
+    "seccion": "search-warrants",
+    "en": "Search warrant",
+    "es": "Orden de cateo / de registro",
+    "definicion": "Orden judicial que autoriza un registro."
+  },
+  {
+    "seccion": "search-warrants",
+    "en": "Indicia of occupancy",
+    "es": "Indicios de ocupación",
+    "definicion": "Evidencia que vincula a alguien con un lugar."
+  },
+  {
+    "seccion": "search-warrants",
+    "en": "Expectation of privacy",
+    "es": "Expectativa de privacidad",
+    "definicion": "Expectativa razonable de privacidad."
+  },
+  {
+    "seccion": "search-warrants",
+    "en": "Affiant",
+    "es": "Declarante / jurante",
+    "definicion": "Persona que hace y firma una declaración jurada."
+  },
+  {
+    "seccion": "search-warrants",
+    "en": "Jurat",
+    "es": "Fe notarial de juramento",
+    "definicion": "Bloque de certificación notarial al final de un affidavit."
+  },
+  {
+    "seccion": "search-warrants",
+    "en": "Notarize",
+    "es": "Notariar / dar fe notarial",
+    "definicion": "Certificar identidad y presenciar un juramento como notario."
+  },
+  {
+    "seccion": "search-warrants",
+    "en": "Declaration (28 U.S.C. § 1746)",
+    "es": "Declaración bajo pena de perjurio",
+    "definicion": "Declaración bajo pena de perjurio, sin necesidad de notario."
+  },
+  {
+    "seccion": "excepciones-warrant",
+    "en": "Plain view",
+    "es": "A simple vista",
+    "definicion": "Evidencia visible sin necesidad de registro adicional."
+  },
+  {
+    "seccion": "excepciones-warrant",
+    "en": "Exigent circumstances",
+    "es": "Circunstancias exigentes",
+    "definicion": "Emergencia que exime del requisito de warrant."
+  },
+  {
+    "seccion": "excepciones-warrant",
+    "en": "On the lam",
+    "es": "Prófugo / huyendo de la ley",
+    "definicion": "Estar huyendo de la justicia."
+  },
+  {
+    "seccion": "exclusionary-rule",
+    "en": "Exclusionary rule",
+    "es": "Regla de exclusión",
+    "definicion": "Regla que excluye evidencia obtenida ilegalmente."
+  },
+  {
+    "seccion": "standing",
+    "en": "Standing (to challenge)",
+    "es": "Legitimación procesal",
+    "definicion": "Legitimación para impugnar un acto."
+  },
+  {
+    "seccion": "transcripts-depositions",
+    "en": "Transcript",
+    "es": "Transcripción",
+    "definicion": "Transcripción literal de un procedimiento judicial."
+  },
+  {
+    "seccion": "transcripts-depositions",
+    "en": "Deposition",
+    "es": "Deposición",
+    "definicion": "Declaración bajo juramento fuera de la corte, en discovery."
+  },
+  {
+    "seccion": "transcripts-depositions",
+    "en": "Deponent",
+    "es": "Deponente",
+    "definicion": "Persona que declara en una deposición."
+  },
+  {
+    "seccion": "transcripts-depositions",
+    "en": "Perjury",
+    "es": "Perjurio",
+    "definicion": "Falso testimonio intencional bajo juramento."
+  },
+  {
+    "seccion": "transcripts-depositions",
+    "en": "Preservation of testimony",
+    "es": "Preservación de testimonio",
+    "definicion": "Uso de la deposición para conservar un testimonio."
+  },
+  {
+    "seccion": "impeachment-objections",
+    "en": "Impeachment (of a witness)",
+    "es": "Impugnación de credibilidad",
+    "definicion": "Cuestionar la credibilidad de un testigo."
+  },
+  {
+    "seccion": "impeachment-objections",
+    "en": "Cross-examination",
+    "es": "Contrainterrogatorio",
+    "definicion": "Interrogatorio por la parte contraria."
+  },
+  {
+    "seccion": "sidebar",
+    "en": "Sidebar",
+    "es": "Conferencia en el estrado",
+    "definicion": "Conferencia breve juez–abogados, fuera del alcance del jurado."
+  },
+  {
+    "seccion": "testigos-cooperantes",
+    "en": "Cooperating witness",
+    "es": "Testigo cooperante",
+    "definicion": "Testigo que colabora con la fiscalía."
+  },
+  {
+    "seccion": "testigos-cooperantes",
+    "en": "Turn state's evidence",
+    "es": "Convertirse en testigo de la fiscalía",
+    "definicion": "Cooperar con la fiscalía declarando contra coacusados."
+  },
+  {
+    "seccion": "testigos-cooperantes",
+    "en": "Proffer agreement",
+    "es": "Acuerdo de propuesta / proffer",
+    "definicion": "Acuerdo sobre condiciones para ofrecer información."
+  },
+  {
+    "seccion": "documentos-acusacion",
+    "en": "Criminal complaint",
+    "es": "Denuncia penal",
+    "definicion": "Documento formal que acusa a alguien de un delito."
+  },
+  {
+    "seccion": "documentos-acusacion",
+    "en": "Information / Indictment",
+    "es": "Acusación formal / auto de acusación",
+    "definicion": "Formas alternativas de formular cargos."
+  },
+  {
+    "seccion": "documentos-acusacion",
+    "en": "Initial appearance",
+    "es": "Comparecencia inicial",
+    "definicion": "Primera audiencia: se informan cargos y derechos."
+  },
+  {
+    "seccion": "documentos-acusacion",
+    "en": "Arraignment",
+    "es": "Lectura de cargos / declaración de culpabilidad",
+    "definicion": "Audiencia donde se presenta la declaración (plea)."
+  },
+  {
+    "seccion": "documentos-acusacion",
+    "en": "Nolo contendere / no contest",
+    "es": "No contesto",
+    "definicion": "Declaración de no disputar los cargos."
+  },
+  {
+    "seccion": "documentos-acusacion",
+    "en": "Statute",
+    "es": "Estatuto / ley",
+    "definicion": "Ley promulgada por el legislador."
+  },
+  {
+    "seccion": "plea-agreements",
+    "en": "Plea bargaining",
+    "es": "Negociación de culpabilidad",
+    "definicion": "Proceso de negociación entre fiscalía y defensa."
+  },
+  {
+    "seccion": "plea-agreements",
+    "en": "Plea agreement",
+    "es": "Acuerdo de culpabilidad",
+    "definicion": "Acuerdo resultante de la negociación."
+  },
+  {
+    "seccion": "plea-agreements",
+    "en": "Change of plea hearing",
+    "es": "Audiencia de cambio de declaración",
+    "definicion": "Audiencia donde se presenta el cambio de declaración."
+  },
+  {
+    "seccion": "civil-settlements",
+    "en": "Settlement",
+    "es": "Acuerdo / transacción civil",
+    "definicion": "Acuerdo civil sin llegar a juicio."
+  },
+  {
+    "seccion": "civil-settlements",
+    "en": "Stipulation",
+    "es": "Estipulación",
+    "definicion": "Constancia de acuerdo entre las partes sobre un punto."
+  },
+  {
+    "seccion": "civil-settlements",
+    "en": "Waiver (of a right)",
+    "es": "Renuncia (a un derecho)",
+    "definicion": "Renuncia voluntaria a un derecho."
+  },
+  {
+    "seccion": "derechos-victimas",
+    "en": "Victim impact statement",
+    "es": "Declaración de impacto de la víctima",
+    "definicion": "Declaración de la víctima sobre el efecto del delito."
+  },
+  {
+    "seccion": "derechos-victimas",
+    "en": "Procedural justice",
+    "es": "Justicia procesal",
+    "definicion": "Percepción de trato justo durante el proceso."
+  },
+  {
+    "seccion": "derechos-victimas",
+    "en": "Right of allocution",
+    "es": "Derecho de alocución",
+    "definicion": "Derecho del acusado a dirigirse al juez antes de la sentencia."
+  },
+  {
+    "seccion": "factores-agravantes",
+    "en": "Aggravating factors",
+    "es": "Factores agravantes",
+    "definicion": "Circunstancias que agravan la pena."
+  },
+  {
+    "seccion": "factores-agravantes",
+    "en": "Mitigating factors",
+    "es": "Factores atenuantes",
+    "definicion": "Circunstancias que atenúan la pena."
+  },
+  {
+    "seccion": "factores-agravantes",
+    "en": "Sentencing",
+    "es": "Audiencia de sentencia",
+    "definicion": "Etapa de imposición de la pena."
+  },
+  {
+    "seccion": "jurisdiccion-estatal-federal",
+    "en": "Dual sovereignty doctrine",
+    "es": "Doctrina de la doble soberanía",
+    "definicion": "Doctrina que permite procesar el mismo hecho a nivel estatal y federal."
+  },
+  {
+    "seccion": "jurisdiccion-estatal-federal",
+    "en": "Supremacy Clause",
+    "es": "Cláusula de Supremacía",
+    "definicion": "Cláusula que da prevalencia a la ley federal en caso de conflicto."
+  },
+  {
+    "seccion": "jurisdiccion-estatal-federal",
+    "en": "Double jeopardy",
+    "es": "Doble incriminación / doble riesgo",
+    "definicion": "Prohibición de ser juzgado dos veces por el mismo delito (misma soberanía)."
+  },
+  {
+    "seccion": "jurisdiccion-estatal-federal",
+    "en": "Concurrent jurisdiction",
+    "es": "Jurisdicción concurrente",
+    "definicion": "Competencia compartida entre dos sistemas legales."
+  },
+  {
+    "seccion": "jurisdiccion-estatal-federal",
+    "en": "Felon in possession",
+    "es": "Posesión por delincuente convicto",
+    "definicion": "Delito de posesión de arma/munición por persona con condena previa."
+  },
+  {
+    "seccion": "jurisdiccion-estatal-federal",
+    "en": "Probation",
+    "es": "Libertad supervisada / probación",
+    "definicion": "Libertad condicional/supervisada en la comunidad."
+  },
+  {
+    "seccion": "apendice",
+    "en": "A point",
+    "es": "Un punto / una décima de gramo",
+    "definicion": "0.1 gramo"
+  },
+  {
+    "seccion": "apendice",
+    "en": "A hit",
+    "es": "Una dosis; cantidad variable",
+    "definicion": "Una dosis o consumo"
+  },
+  {
+    "seccion": "apendice",
+    "en": "A dime bag",
+    "es": "Bolsa de diez dólares; peso variable",
+    "definicion": "Producto vendido por $10"
+  },
+  {
+    "seccion": "apendice",
+    "en": "A dub / dub sack",
+    "es": "Bolsa de veinte dólares; peso variable",
+    "definicion": "Producto vendido por $20"
+  },
+  {
+    "seccion": "apendice",
+    "en": "A teener / a sixteenth",
+    "es": "Aproximadamente 1.75 gramos",
+    "definicion": "1/16 de onza"
+  },
+  {
+    "seccion": "apendice",
+    "en": "An eight ball",
+    "es": "Aproximadamente 3.5 gramos",
+    "definicion": "1/8 de onza"
+  },
+  {
+    "seccion": "apendice",
+    "en": "A quarter",
+    "es": "Aproximadamente 7 gramos",
+    "definicion": "1/4 de onza"
+  },
+  {
+    "seccion": "apendice",
+    "en": "A half",
+    "es": "Aproximadamente 14 gramos",
+    "definicion": "1/2 onza"
+  },
+  {
+    "seccion": "apendice",
+    "en": "An ounce / an O / a zip",
+    "es": "Aproximadamente 28.35 gramos",
+    "definicion": "Una onza"
+  },
+  {
+    "seccion": "apendice",
+    "en": "A key / a kilo",
+    "es": "1,000 gramos",
+    "definicion": "Un kilogramo"
+  }
+]
