@@ -2,13 +2,15 @@ import { useState, useMemo } from "react";
 
 // ---- Design tokens: clean, accessible learning interface ----
 const C = {
-  bg: "#f6f7fb",
+  bg: "#f3f6fb",
   card: "#ffffff",
-  border: "#e4e7ec",
-  text: "#182230",
-  muted: "#667085",
-  label: "#98a2b3",
-  accent: "#0056d2",
+  border: "#dfe5ef",
+  text: "#132238",
+  muted: "#5d6b7e",
+  label: "#8b98aa",
+  accent: "#2563eb",
+  navy: "#0b1730",
+  sky: "#eaf1ff",
 };
 
 const serif = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
@@ -3008,16 +3010,16 @@ function NavButton({ active, onClick, children }) {
   return (
     <button
       onClick={onClick}
-      className="md:w-full text-left px-4 py-2.5 rounded-xl transition-all whitespace-nowrap shrink-0"
+      className="pj-nav-button md:w-full text-left px-4 py-2.5 rounded-xl transition-all whitespace-nowrap shrink-0"
       style={{
         fontFamily: sans,
         fontSize: 13,
         fontWeight: active ? 600 : 500,
-        color: active ? "#ffffff" : C.muted,
-        backgroundColor: active ? C.accent : "transparent",
-        border: "none",
+        color: active ? "#ffffff" : "#b9c5d8",
+        backgroundColor: active ? "rgba(255,255,255,0.14)" : "transparent",
+        border: active ? "1px solid rgba(255,255,255,0.13)" : "1px solid transparent",
         cursor: "pointer",
-        boxShadow: active ? "0 6px 18px rgba(0, 86, 210, 0.2)" : "none",
+        boxShadow: active ? "0 8px 24px rgba(0,0,0,0.18)" : "none",
       }}
     >
       {children}
@@ -3030,48 +3032,46 @@ function WeekView({ week }) {
   const [openSection, setOpenSection] = useState(null);
 
   return (
-    <div>
-      <h1
-        className="flex items-center gap-2"
-        style={{ fontFamily: serif, color: C.text, fontSize: 30, margin: 0 }}
-      >
-        <span
-          className="flex items-center justify-center rounded-full"
-          style={{ width: 44, height: 44, backgroundColor: "#ffffff", flexShrink: 0 }}
-        >
-          <img
-            src={LOGO_URI}
-            alt=""
-            style={{ width: 32, height: 32, opacity: 0.9 }}
-          />
-        </span>
-        Semana {week}
-      </h1>
-      <p style={{ fontFamily: sans, color: C.muted, fontSize: 14, marginTop: 4 }}>
-        {content
-          ? `${content.sections.reduce((n, s) => n + s.terms.length, 0)} términos · toca un tema para ver sus definiciones`
-          : "Aún no hay contenido cargado para esta semana."}
-      </p>
+    <div className="pj-page">
+      <header className="pj-hero">
+        <div className="pj-hero-copy">
+          <span className="pj-eyebrow">PROGRAMA DE CERTIFICACIÓN · UTAH</span>
+          <h1 style={{ fontFamily: serif }}>Semana {week}</h1>
+          <p>
+            {content
+              ? "Domina el vocabulario, los conceptos y el lenguaje preciso de esta sesión."
+              : "Aún no hay contenido cargado para esta semana."}
+          </p>
+        </div>
+        {content && (
+          <div className="pj-hero-stats" aria-label="Resumen de la semana">
+            <div><strong>{content.sections.length}</strong><span>temas</span></div>
+            <div><strong>{content.sections.reduce((n, s) => n + s.terms.length, 0)}</strong><span>términos</span></div>
+          </div>
+        )}
+      </header>
 
       {content ? (
-        <section className="mt-6">
+        <section className="pj-study-section mt-6">
           <h2
             style={{
               fontFamily: serif,
-              color: C.accent,
-              fontSize: 17,
-              margin: "0 0 8px 0",
+              color: C.text,
+              fontSize: 19,
+              fontWeight: 700,
+              letterSpacing: "-0.3px",
+              margin: "0 0 14px 0",
             }}
           >
             Temario de la clase
           </h2>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-3">
             {content.sections.map((s, i) => {
               const isOpen = openSection === s.title;
               return (
                 <div
                   key={s.title}
-                  className="rounded"
+                  className={`pj-topic-card ${isOpen ? "is-open" : ""}`}
                   style={{
                     backgroundColor: C.card,
                     border: `1px solid ${C.border}`,
@@ -3079,14 +3079,22 @@ function WeekView({ week }) {
                 >
                   <button
                     onClick={() => setOpenSection(isOpen ? null : s.title)}
-                    className="w-full px-3 py-2 flex items-baseline gap-3 text-left"
+                    className="w-full px-4 py-4 flex items-center gap-3 text-left"
                     style={{ background: "none", border: "none", cursor: "pointer" }}
                   >
                     <span
                       style={{
                         fontFamily: serif,
-                        fontSize: 13,
-                        color: C.accent,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: "#ffffff",
+                        background: C.accent,
+                        width: 28,
+                        height: 28,
+                        borderRadius: 9,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                         flexShrink: 0,
                       }}
                     >
@@ -3095,20 +3103,21 @@ function WeekView({ week }) {
                     <span
                       style={{
                         fontFamily: sans,
-                        fontSize: 13,
+                        fontSize: 14,
+                        fontWeight: 600,
                         color: C.text,
                         flex: 1,
                       }}
                     >
                       {s.title}
                     </span>
-                    <span style={{ fontFamily: sans, fontSize: 11, color: C.label }}>
-                      {s.terms.length} términos
+                    <span className="pj-count-pill" style={{ fontFamily: sans }}>
+                      {s.terms.length}
                     </span>
                   </button>
                   {isOpen && (
                     <div
-                      className="px-3 pb-3 flex flex-col gap-2"
+                      className="pj-topic-content px-4 pb-4 flex flex-col gap-2"
                       style={{ borderTop: `1px solid ${C.border}` }}
                     >
                       {s.terms.map((t) => (
@@ -4393,12 +4402,12 @@ export default function App() {
     >
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');`}</style>
       <aside
-        className="w-full md:w-64 shrink-0 p-3 md:p-5 flex flex-col md:sticky md:top-0 md:h-screen"
+        className="pj-sidebar w-full md:w-64 shrink-0 p-3 md:p-5 flex flex-col md:sticky md:top-0 md:h-screen"
         style={{
-          backgroundColor: "rgba(255,255,255,0.92)",
-          borderBottom: `1px solid ${C.border}`,
-          borderRight: `1px solid ${C.border}`,
-          boxShadow: "8px 0 30px rgba(16, 24, 40, 0.035)",
+          backgroundColor: C.navy,
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          borderRight: "1px solid rgba(255,255,255,0.08)",
+          boxShadow: "12px 0 36px rgba(11, 23, 48, 0.12)",
           backdropFilter: "blur(14px)",
         }}
       >
@@ -4408,9 +4417,9 @@ export default function App() {
             style={{
               width: 46,
               height: 46,
-              backgroundColor: "#f2f6ff",
-              border: "1px solid #dbe7ff",
-              boxShadow: "0 6px 16px rgba(0, 86, 210, 0.1)",
+              backgroundColor: "#ffffff",
+              border: "1px solid rgba(255,255,255,0.25)",
+              boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
               flexShrink: 0,
             }}
           >
@@ -4425,7 +4434,7 @@ export default function App() {
               style={{
                 fontFamily: brand,
                 fontWeight: 700,
-                color: C.text,
+                color: "#ffffff",
                 fontSize: 16,
                 letterSpacing: "-0.2px",
                 margin: 0,
@@ -4436,7 +4445,7 @@ export default function App() {
             <p
               style={{
                 fontFamily: sans,
-                color: C.label,
+                color: "#8190a8",
                 fontSize: 11,
                 margin: "1px 0 0 0",
               }}
@@ -4459,7 +4468,7 @@ export default function App() {
 
           <div
             className="hidden md:block my-2"
-            style={{ borderTop: `1px solid ${C.border}` }}
+            style={{ borderTop: "1px solid rgba(255,255,255,0.09)" }}
           />
 
           <NavButton
@@ -4477,7 +4486,7 @@ export default function App() {
 
           <div
             className="hidden md:block my-2"
-            style={{ borderTop: `1px solid ${C.border}` }}
+            style={{ borderTop: "1px solid rgba(255,255,255,0.09)" }}
           />
 
           <NavButton
@@ -4507,8 +4516,8 @@ export default function App() {
         </div>
       </aside>
 
-      <main className="flex-1 w-full min-w-0 px-4 py-6 md:px-10 md:py-10 lg:px-14">
-        <div style={{ width: "100%", maxWidth: 980, margin: "0 auto" }}>
+      <main className="pj-main flex-1 w-full min-w-0 px-4 py-6 md:px-10 md:py-10 lg:px-14">
+        <div style={{ width: "100%", maxWidth: 1040, margin: "0 auto" }}>
         {section.startsWith("semana-") && (
           <WeekView week={Number(section.split("-")[1])} />
         )}
