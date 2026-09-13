@@ -2,7 +2,7 @@
   {
     "seccion": "proposito-judicial",
     "en": "Procedural fairness / procedural justice",
-    "es": "justicia o equidad procesal",
+    "es": "justicia procesal",
     "definicion": "La percepción y realidad de que los procedimientos legales son neutrales, respetuosos, transparentes y aplicados de forma consistente. Concierne la justicia del proceso, no solamente quién gana."
   },
   {
@@ -39,7 +39,7 @@
     "seccion": "proposito-judicial",
     "en": "Sight translation",
     "es": "traducción a la vista",
-    "definicion": "La transmisión oral de un documento escrito de un idioma a otro. Es interpretación de un texto escrito, no una traducción escrita."
+    "definicion": "El intérprete lee un texto escrito en un idioma e inmediatamente pronuncia una traducción oral en otro idioma"
   },
   {
     "seccion": "fundamentos-ley-delitos",
@@ -104,7 +104,7 @@
   {
     "seccion": "estandares-carga-prueba",
     "en": "Probable cause",
-    "es": "causa probable",
+    "es": "datos de prueba / indicios razonables",
     "definicion": "Un umbral relativamente bajo que requiere hechos que respalden una creencia razonable de que se cometió un delito y de que el acusado lo cometió. No es el estándar del juicio."
   },
   {
@@ -546,3 +546,4 @@
     "definicion": "Hacer a sabiendas una declaración materialmente falsa bajo juramento. Un abogado no puede presentar a sabiendas un testimonio perjuro."
   }
 ]
+
