@@ -54,7 +54,7 @@ export default function App() {
   };
 
   return (
-    <div className="app-shell flex min-h-screen font-sans bg-content">
+    <div className="app-shell flex flex-col md:flex-row min-h-screen font-sans bg-content">
       <Sidebar view={view} onNavigate={setView} />
       <main className="app-main flex-1 min-w-0 px-3 py-4 sm:p-5 md:p-10 lg:p-12 overflow-y-auto">
         <div className="mx-auto w-full max-w-[1080px]">{renderView()}</div>
