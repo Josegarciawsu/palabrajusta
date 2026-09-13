@@ -131,9 +131,9 @@ export default function Sidebar({ view, onNavigate }) {
         <SidebarContent view={view} onNavigate={onNavigate} />
       </div>
 
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-sidebar border-b border-white/10 sticky top-0 z-40 shadow-lg">
+      <div className="mobile-header md:hidden flex items-center justify-between px-3.5 py-2.5 bg-sidebar border-b border-white/10 sticky top-0 z-40 shadow-lg">
         <div className="flex items-center gap-2">
-          <Logo size={30} />
+          <span className="grid place-items-center w-9 h-9 rounded-xl bg-white"><Logo size={27} /></span>
           <p className="font-serif text-base text-white">Palabra Justa</p>
         </div>
         <button

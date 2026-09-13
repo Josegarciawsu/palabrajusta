@@ -52,7 +52,7 @@ export default function TarjetasView({ learnedTerms, toggleLearned }) {
     <div>
       <h1 className="text-[26px] font-serif mb-5 text-gray-900">Tarjetas</h1>
 
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-5">
         <select
           value={semanaFiltro}
           onChange={(e) => {
@@ -77,7 +77,7 @@ export default function TarjetasView({ learnedTerms, toggleLearned }) {
         </button>
       </div>
 
-      <div className="max-w-md">
+      <div className="w-full max-w-md">
         <div
           className="flip-card w-full h-56 cursor-pointer"
           onClick={() => setFlipped(!flipped)}
@@ -107,7 +107,7 @@ export default function TarjetasView({ learnedTerms, toggleLearned }) {
           >
             <Check size={14} /> {learned ? "Aprendido" : "Marcar aprendido"}
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={prev}
               className="px-3 py-2 rounded-lg text-sm border border-gray-200 text-gray-600"

@@ -76,7 +76,7 @@ export default function GlosarioView() {
       </div>
 
       {/* Índice A-Z */}
-      <div className="sticky top-0 z-10 bg-content/95 backdrop-blur-sm py-2 mb-2 flex flex-wrap gap-1 border-b border-gray-200">
+      <div className="alphabet-bar sticky top-[60px] md:top-0 z-10 bg-content/95 backdrop-blur-sm py-2 mb-2 flex flex-nowrap md:flex-wrap gap-1 border-b border-gray-200 overflow-x-auto">
         {alfabeto.map((letra) => {
           const disponible = letras.includes(letra);
           return (
@@ -84,7 +84,7 @@ export default function GlosarioView() {
               key={letra}
               disabled={!disponible}
               onClick={() => jumpTo(letra)}
-              className={`w-6 h-6 text-[11px] rounded flex items-center justify-center ${
+              className={`w-8 h-8 md:w-6 md:h-6 text-[11px] rounded-lg md:rounded flex items-center justify-center flex-shrink-0 ${
                 disponible
                   ? "text-accent hover:bg-badgeBg font-medium"
                   : "text-gray-300 cursor-default"

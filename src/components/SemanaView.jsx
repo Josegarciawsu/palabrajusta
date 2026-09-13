@@ -51,7 +51,7 @@ export default function SemanaView({ semana }) {
           <div key={s.id || s.titulo} className={`topic-card ${open === i ? "topic-card-open" : ""}`}>
             <button
               onClick={() => setOpen(open === i ? -1 : i)}
-              className="w-full text-left px-4 md:px-5 py-4 flex items-center gap-3.5"
+              className="w-full min-h-14 text-left px-3.5 md:px-5 py-3.5 md:py-4 flex items-center gap-3"
             >
               <span className="grid place-items-center w-8 h-8 rounded-[10px] bg-blue-50 text-sm text-accent font-semibold flex-shrink-0 tabular-nums">
                 {i + 1}
@@ -71,7 +71,7 @@ export default function SemanaView({ semana }) {
               <div className="accordion-inner">
                 <div className="bg-slate-50/70 border-t border-slate-100">
                   {s.contenido && (
-                    <p className="text-sm text-gray-600 leading-relaxed px-4 pt-3 pl-12 pr-6">
+                    <p className="text-sm text-gray-600 leading-relaxed px-4 pt-4 md:pl-12 md:pr-6">
                       {s.contenido}
                     </p>
                   )}
@@ -79,7 +79,7 @@ export default function SemanaView({ semana }) {
                     {(s.terminos || []).map((t) => (
                       <div
                         key={t.en}
-                        className="px-4 pl-12 py-2.5 flex flex-col sm:flex-row sm:items-baseline gap-x-4 gap-y-0.5"
+                        className="px-4 py-3 md:pl-12 flex flex-col sm:flex-row sm:items-baseline gap-x-4 gap-y-1"
                       >
                         <div className="sm:w-[46%] flex-shrink-0">
                           <span className="text-[13.5px] font-medium text-gray-900">{t.es}</span>
@@ -101,7 +101,7 @@ export default function SemanaView({ semana }) {
           <p className="font-medium text-gray-900 text-sm mb-2">{semana.apendice.titulo}</p>
           <div className="border border-gray-200 rounded-lg bg-white divide-y divide-gray-100">
             {semana.apendice.terminos.map((t) => (
-              <div key={t.en} className="px-4 py-2 flex justify-between text-sm gap-4">
+              <div key={t.en} className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between text-sm gap-1 sm:gap-4">
                 <span className="text-gray-700 italic">{t.en}</span>
                 <span className="text-gray-500 text-right">{t.es}</span>
               </div>
