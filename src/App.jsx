@@ -1,62 +1,6162 @@
-// src/App.jsx
-import { useState } from "react";
-import Sidebar from "./components/Sidebar.jsx";
-import SplashScreen from "./components/SplashScreen.jsx";
-import ResumenView from "./components/ResumenView.jsx";
-import SemanaView from "./components/SemanaView.jsx";
-import GlosarioView from "./components/GlosarioView.jsx";
-import TarjetasView from "./components/TarjetasView.jsx";
-import RelacionarView from "./components/RelacionarView.jsx";
-import QuizView from "./components/QuizView.jsx";
-import CasoView from "./components/CasoView.jsx";
-import RecursosView from "./components/RecursosView.jsx";
-import { useSplashVisit } from "./hooks/useSplashVisit.js";
-import { useProgress } from "./hooks/useProgress.js";
-import { semanasPorId } from "./data/index.js";
+import { useState, useMemo, useEffect } from "react";
+import {
+  BookOpen,
+  Scale,
+  ScrollText,
+  Library,
+  Eye,
+  ListChecks,
+  Layers,
+  Zap,
+  ClipboardCheck,
+  AlertTriangle,
+} from "lucide-react";
 
-export default function App() {
-  const { showSplash, dismiss } = useSplashVisit();
-  const { quizScores, learnedTerms, recordQuizScore, toggleLearned } =
-    useProgress();
-  const [view, setView] = useState("resumen");
+// ---- Tokens (Wasatch palette) ----
+const C = {
+  bg: "#F3EEE4",
+  card: "#FBF9F4",
+  border: "#E2DBC9",
+  text: "#1E2430",
+  muted: "#5C6470",
+  label: "#676D64",
+  accent: "#0050D3",
+  highlight: "#C0392B",
+  success: "#146B44",
+};
 
-  if (showSplash) {
-    return <SplashScreen onDone={dismiss} />;
+const serif = "Georgia, 'Times New Roman', serif";
+const sans = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+const brand = "'Libre Baskerville', Georgia, serif";
+const mono = "'JetBrains Mono', 'Courier New', monospace";
+
+const LOGO_URI = "data:image/png;base64,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";
+
+
+const WEEKS = Array.from({ length: 8 }, (_, i) => i + 1);
+
+// Contenido real de la Clase 1 (Utah Court Interpreting - Class 1 Study Guide)
+const WEEK1_SECTIONS = [
+  {
+    title: "Judicial purpose and interpretation theory",
+    terms: [
+      {
+        term: "Procedural fairness / procedural justice",
+        es: "justicia o equidad procesal",
+        definition:
+          "The perception and reality that legal procedures are neutral, respectful, transparent, and consistently applied. It concerns the fairness of the process, not merely who wins.",
+      },
+      {
+        term: "Accountability",
+        es: "rendición de cuentas / responsabilidad",
+        definition:
+          "The obligation of courts and public officials to explain decisions, follow rules, and answer for their conduct.",
+      },
+      {
+        term: "Judicial Council",
+        es: "Consejo Judicial",
+        definition:
+          "A policymaking and administrative body responsible for specified governance and administrative functions within a judicial system. In Utah, exercises authority assigned by the Utah Constitution, statutes, and the Code of Judicial Administration.",
+      },
+      {
+        term: "Translation theory",
+        es: "teoría de la traducción e interpretación",
+        definition:
+          "The study of how meaning, intent, register, culture, and function are transferred from a source language to a target language. Court interpreting prioritizes complete, accurate, impartial transfer of meaning.",
+      },
+    ],
+  },
+  {
+    title: "Core modes / Modalidades principales",
+    terms: [
+      {
+        term: "Simultaneous interpreting",
+        es: "interpretación simultánea",
+        definition:
+          "The interpreter renders the message while the speaker continues speaking, usually with a short delay. Common for proceedings addressed to an LEP defendant.",
+      },
+      {
+        term: "Consecutive interpreting",
+        es: "interpretación consecutiva",
+        definition:
+          "The speaker pauses after segments so the interpreter can reproduce the complete message. Common for witness testimony and attorney-client exchanges.",
+      },
+      {
+        term: "Sight translation",
+        es: "traducción a la vista",
+        definition:
+          "The oral rendering of a written document from one language into another. It is interpretation of written text, not a written translation.",
+      },
+    ],
+  },
+  {
+    title: "Foundations: law, crimes, custody, and consequences",
+    terms: [
+      {
+        term: "Crime",
+        es: "delito",
+        definition:
+          "An act or omission prohibited by criminal law and punishable by the government. A prosecutor files the case on behalf of the state or United States.",
+      },
+      {
+        term: "Criminal law",
+        es: "derecho penal",
+        definition:
+          "Law governing offenses against the public. The government prosecutes and must prove guilt beyond a reasonable doubt at trial.",
+      },
+      {
+        term: "Civil law",
+        es: "derecho civil",
+        definition:
+          "Law governing private disputes, such as contracts, injuries, divorce, or debt. A plaintiff initiates the action and ordinarily seeks money or another civil remedy.",
+      },
+      {
+        term: "Incarceration",
+        es: "encarcelamiento / reclusión",
+        definition:
+          "The general state of confinement in jail or prison. Jail commonly holds people pretrial or serving shorter sentences; prison commonly holds people serving longer sentences after conviction.",
+      },
+      {
+        term: "Flight risk",
+        es: "riesgo de fuga",
+        definition:
+          "The risk that a defendant will fail to appear for required court proceedings or otherwise evade the court's jurisdiction.",
+      },
+      {
+        term: "Probation",
+        es: "libertad condicional bajo supervisión",
+        definition:
+          "A sentence or disposition allowing a person to remain in the community subject to court-ordered conditions and supervision. Violations may lead to sanctions or revocation.",
+      },
+      {
+        term: "Garnishment",
+        es: "embargo de salario o fondos",
+        definition:
+          "A civil enforcement process ordering an employer or financial institution to withhold money to satisfy a judgment.",
+      },
+    ],
+  },
+  {
+    title: "Standards and burdens of proof",
+    terms: [
+      {
+        term: "Burden of proof",
+        es: "carga de la prueba",
+        definition:
+          "The responsibility to prove disputed facts. In a criminal trial, the prosecution bears the burden; the defendant does not have to prove innocence.",
+      },
+      {
+        term: "Beyond a reasonable doubt",
+        es: "más allá de toda duda razonable",
+        definition:
+          "The highest ordinary standard of proof, required for a criminal conviction. It is not proof beyond every imaginable doubt.",
+      },
+      {
+        term: "Preponderance of the evidence",
+        es: "preponderancia de la prueba",
+        definition:
+          "The usual civil standard: a fact is more likely true than not true. \u201c51%\u201d is a teaching shortcut, not a literal calculation required of jurors.",
+      },
+      {
+        term: "Probable cause",
+        es: "causa probable",
+        definition:
+          "A relatively low threshold requiring facts that support a reasonable belief that a crime was committed and that the accused committed it. It is not the trial standard.",
+      },
+      {
+        term: "Proximate cause",
+        es: "causa próxima",
+        definition:
+          "A civil causation concept connecting conduct to a legally attributable harm. Asks whether the conduct was sufficiently connected to the injury, including foreseeability.",
+      },
+      {
+        term: "Acquittal",
+        es: "absolución",
+        definition:
+          "A judgment or verdict of not guilty. It establishes that criminal liability was not proven beyond a reasonable doubt; it does not necessarily constitute an affirmative finding of factual innocence.",
+      },
+    ],
+  },
+  {
+    title: "Resolving cases without trial",
+    terms: [
+      {
+        term: "Plea bargaining",
+        es: "negociación de culpabilidad / negociación de una declaración",
+        definition:
+          "Negotiations in a criminal case that may produce a plea agreement, such as a plea to reduced charges or a sentencing recommendation.",
+      },
+      {
+        term: "Plea agreement",
+        es: "acuerdo de culpabilidad / acuerdo de declaración",
+        definition:
+          "The resulting criminal agreement. The judge must determine whether to accept a plea and ensure it is knowing and voluntary.",
+      },
+      {
+        term: "Settlement",
+        es: "acuerdo extrajudicial / convenio",
+        definition:
+          "A negotiated resolution of a civil dispute, often involving payment, release of claims, or other terms.",
+      },
+    ],
+  },
+  {
+    title: "State court, federal court, and jurisdiction",
+    terms: [
+      {
+        term: "Jurisdiction",
+        es: "jurisdicción / competencia",
+        definition:
+          "A court's legal authority over the subject matter, the parties, and the geographic location connected to a case.",
+      },
+      {
+        term: "Federal jurisdiction",
+        es: "jurisdicción federal",
+        definition:
+          "Authority based on the U.S. Constitution and federal statutes. Federal courts are courts of limited subject-matter jurisdiction.",
+      },
+      {
+        term: "State jurisdiction",
+        es: "jurisdicción estatal",
+        definition:
+          "Authority of state courts over matters governed primarily by state law. State trial courts may be courts of general or limited jurisdiction.",
+      },
+      {
+        term: "Court of limited jurisdiction",
+        es: "tribunal de jurisdicción limitada",
+        definition:
+          "A court authorized to hear only specified categories or lower-level cases, such as many justice or municipal courts.",
+      },
+    ],
+  },
+  {
+    title: "Courtroom actors",
+    terms: [
+      {
+        term: "Judge",
+        es: "juez/jueza",
+        definition:
+          "Neutral judicial officer who rules on law and admissibility, manages proceedings, instructs the jury, and adjudicates a bench trial.",
+      },
+      {
+        term: "Jury",
+        es: "jurado",
+        definition:
+          "Fact finder that evaluates admitted evidence and returns a verdict when the right to jury trial applies and is not waived.",
+      },
+      {
+        term: "Prosecutor",
+        es: "fiscal",
+        definition:
+          "Government attorney representing the state or United States \u2014 not the victim's personal attorney.",
+      },
+      {
+        term: "Defense attorney",
+        es: "abogado defensor",
+        definition:
+          "Represents the accused, protects constitutional rights, tests the prosecution's evidence, and advocates within ethical rules.",
+      },
+      {
+        term: "Public defender",
+        es: "defensor público",
+        definition:
+          "Government-funded or contracted defense lawyer appointed for an indigent defendant who qualifies.",
+      },
+      {
+        term: "Indigent",
+        es: "indigente / sin recursos",
+        definition:
+          "Unable to afford legal representation under the applicable eligibility standard.",
+      },
+      {
+        term: "Pro se",
+        es: "por derecho propio / sin abogado",
+        definition: "Representing oneself in court.",
+      },
+      {
+        term: "Court clerk",
+        es: "secretario judicial",
+        definition:
+          "Maintains the record, receives filings, manages exhibits and case information, and may administer oaths depending on practice.",
+      },
+      {
+        term: "Bailiff",
+        es: "alguacil / oficial de sala",
+        definition:
+          "Maintains security and order, announces the judge, escorts in-custody defendants, and may communicate between court and jury.",
+      },
+      {
+        term: "Court reporter",
+        es: "taquígrafo judicial",
+        definition:
+          "Creates the verbatim record of proceedings. The interpreter's English rendering becomes part of that record when testimony is interpreted.",
+      },
+      {
+        term: "Pretrial services",
+        es: "servicios previos al juicio",
+        definition:
+          "Assesses relevant risk and provides release-related information or recommendations under governing law and policy.",
+      },
+      {
+        term: "Probation officer",
+        es: "oficial de libertad condicional",
+        definition:
+          "Supervises people sentenced to probation and reports alleged violations; does not independently impose the sentence.",
+      },
+      {
+        term: "Guardian ad litem",
+        es: "tutor ad litem / abogado del menor",
+        definition:
+          "Court-appointed advocate for the best interests of a child or other protected person, as defined by the appointment and governing law.",
+      },
+    ],
+  },
+  {
+    title: "Evidence, record, and courtroom language",
+    terms: [
+      {
+        term: "Admissibility of evidence",
+        es: "admisibilidad de la prueba",
+        definition:
+          "Whether evidence may legally be considered under the rules of evidence. The judge decides admissibility; the fact finder decides appropriate weight.",
+      },
+      {
+        term: "Exhibit",
+        es: "prueba material / objeto o documento marcado como prueba",
+        definition:
+          "An item marked for identification or admitted into evidence, such as a photograph, document, firearm, or drug paraphernalia.",
+      },
+      {
+        term: "Chain of custody",
+        es: "cadena de custodia",
+        definition:
+          "Documentation and testimony showing how physical evidence was collected, preserved, transferred, stored, and protected from alteration.",
+      },
+      {
+        term: "Codified law",
+        es: "ley codificada",
+        definition: "Law organized and enacted in a written code or statute.",
+      },
+      {
+        term: "Common law",
+        es: "derecho consuetudinario / jurisprudencial",
+        definition:
+          "Law developed through judicial decisions rather than solely through enacted statutes.",
+      },
+      {
+        term: "Statute",
+        es: "ley / estatuto",
+        definition: "A law formally enacted by a legislative body.",
+      },
+      {
+        term: "Ballot initiative",
+        es: "iniciativa popular",
+        definition:
+          "A process through which voters propose or enact a measure, subject to state constitutional and statutory procedures.",
+      },
+      {
+        term: "Jury instructions",
+        es: "instrucciones al jurado",
+        definition:
+          "The judge's authoritative explanation of the law the jury must apply. Interpreters should render them precisely and consistently.",
+      },
+    ],
+  },
+  {
+    title: "Beginning a criminal case",
+    terms: [
+      {
+        term: "Complaint",
+        es: "denuncia / querella formal",
+        definition:
+          "A written charging document or pleading. Exact meaning varies by jurisdiction; in Utah felonies are commonly prosecuted by information or indictment.",
+      },
+      {
+        term: "Information",
+        es: "acusación formal presentada por el fiscal",
+        definition:
+          "A charging document filed by a prosecutor without a grand-jury indictment.",
+      },
+      {
+        term: "Indictment",
+        es: "acusación formal emitida por un gran jurado",
+        definition:
+          "A formal charge returned by a grand jury after it finds probable cause.",
+      },
+      {
+        term: "Preliminary hearing",
+        es: "audiencia preliminar",
+        definition:
+          "A public adversarial hearing in which a judge determines whether probable cause supports continuing felony charges. It is not a miniature trial on guilt.",
+      },
+      {
+        term: "Grand jury",
+        es: "gran jurado",
+        definition:
+          "A body that hears evidence presented by the prosecutor and decides whether probable cause supports an indictment. Proceedings are generally secret.",
+      },
+      {
+        term: "True bill / no bill",
+        es: "acusación aprobada / acusación rechazada",
+        definition:
+          "A true bill means the grand jury approved an indictment; a no bill means it did not.",
+      },
+      {
+        term: "Trial in absentia",
+        es: "juicio en ausencia",
+        definition:
+          "A trial conducted without the defendant. Permitted only under limited constitutional and procedural circumstances.",
+      },
+      {
+        term: "Initial appearance",
+        es: "comparecencia inicial",
+        definition:
+          "The defendant first appears before a judicial officer, is informed of charges and rights, and release and counsel issues may be addressed.",
+      },
+      {
+        term: "Release on recognizance (OR)",
+        es: "libertad bajo palabra",
+        definition:
+          "Pretrial release based on the promise to appear, without posting monetary bail, often subject to conditions.",
+      },
+      {
+        term: "Arraignment",
+        es: "lectura de cargos y presentación de declaración",
+        definition:
+          "The proceeding at which the defendant is formally informed of the charge and enters a plea.",
+      },
+      {
+        term: "Nolo contendere / no contest",
+        es: "no impugno / no contest",
+        definition:
+          "A plea accepting conviction without admitting the factual allegations. In Utah, guilty and no-contest pleas have the same effect as convictions.",
+      },
+    ],
+  },
+  {
+    title: "Pretrial motions and constitutional issues",
+    terms: [
+      {
+        term: "Motion",
+        es: "moción / solicitud formal",
+        definition: "A formal request asking the court to issue an order.",
+      },
+      {
+        term: "Motion to continue",
+        es: "moción para aplazar / continuar",
+        definition:
+          "A request to move a hearing or deadline to a later date. Usually requires a legally sufficient reason or good cause.",
+      },
+      {
+        term: "Discovery",
+        es: "descubrimiento / intercambio de pruebas",
+        definition:
+          "The process for disclosing evidence and information under procedural rules.",
+      },
+      {
+        term: "Motion to suppress",
+        es: "moción para excluir o suprimir prueba",
+        definition:
+          "A request to exclude evidence obtained in violation of constitutional or statutory protections.",
+      },
+      {
+        term: "Exclusionary rule",
+        es: "regla de exclusión",
+        definition:
+          "A doctrine that can prevent illegally obtained evidence from being used in the prosecution's case, subject to exceptions.",
+      },
+      {
+        term: "Ineffective assistance of counsel",
+        es: "asistencia ineficaz de abogado",
+        definition:
+          "A constitutional claim generally requiring proof that counsel's performance was deficient and that the deficiency prejudiced the defense.",
+      },
+    ],
+  },
+  {
+    title: "Trial sequence",
+    terms: [
+      {
+        term: "Voir dire",
+        es: "selección e interrogatorio del jurado",
+        definition:
+          "Questioning prospective jurors to identify bias and select a fair and impartial jury.",
+      },
+      {
+        term: "Sequestered jury",
+        es: "jurado aislado",
+        definition:
+          "A jury kept apart from outside information or contact under a court order.",
+      },
+      {
+        term: "Opening statement",
+        es: "declaración inicial",
+        definition:
+          "Each side's preview of what it expects the evidence to show; it is not evidence.",
+      },
+      {
+        term: "Presentation of evidence",
+        es: "presentación de pruebas",
+        definition:
+          "Witnesses and exhibits are offered; the prosecution or plaintiff ordinarily presents first.",
+      },
+      {
+        term: "Rebuttal evidence",
+        es: "prueba de refutación",
+        definition: "Evidence responding to matters raised by the opposing side.",
+      },
+      {
+        term: "Closing argument",
+        es: "alegato final",
+        definition:
+          "Arguments about how the admitted evidence and law should lead to a result.",
+      },
+      {
+        term: "Deliberations",
+        es: "deliberaciones",
+        definition: "Private discussion by jurors before reaching a verdict.",
+      },
+      {
+        term: "Verdict",
+        es: "veredicto",
+        definition: "The formal decision of the jury or fact finder.",
+      },
+      {
+        term: "Hung jury",
+        es: "jurado sin veredicto / jurado estancado",
+        definition:
+          "A jury unable to reach the degree of agreement required to return a verdict.",
+      },
+      {
+        term: "Mistrial",
+        es: "juicio nulo",
+        definition:
+          "Termination of a trial without a valid final verdict because of a fundamental problem, including some hung juries.",
+      },
+    ],
+  },
+  {
+    title: "Sentencing and probation violations",
+    terms: [
+      {
+        term: "Sentencing",
+        es: "imposición de sentencia",
+        definition:
+          "The proceeding at which the court imposes the lawful criminal punishment after conviction.",
+      },
+      {
+        term: "Mitigating circumstance",
+        es: "circunstancia atenuante",
+        definition:
+          "A fact supporting a less severe sentence, without necessarily excusing the offense.",
+      },
+      {
+        term: "Aggravating circumstance",
+        es: "circunstancia agravante",
+        definition: "A fact supporting a more severe sentence.",
+      },
+      {
+        term: "Probation violation hearing",
+        es: "audiencia por violación de libertad condicional",
+        definition:
+          "A hearing to determine whether probation conditions were violated and what consequence, if any, should follow. Not a new criminal trial.",
+      },
+    ],
+  },
+  {
+    title: "Adult and juvenile terminology",
+    terms: [
+      {
+        term: "Conviction (adult) / Adjudication (juvenile)",
+        es: "condena / adjudicación",
+        definition:
+          "The adult and juvenile-court equivalents for a finding that the allegations were proven.",
+      },
+      {
+        term: "Guilty (adult) / Delinquent (juvenile)",
+        es: "culpable / responsable de acto delictivo",
+        definition:
+          "The adult and juvenile-court equivalents for the finding itself.",
+      },
+      {
+        term: "Sentence (adult) / Disposition (juvenile)",
+        es: "sentencia / medida o resolución",
+        definition:
+          "The adult and juvenile-court equivalents for the court's resulting order.",
+      },
+      {
+        term: "Defendant (adult) / Minor or juvenile (juvenile)",
+        es: "acusado / menor",
+        definition: "The adult and juvenile-court equivalents for the accused person.",
+      },
+      {
+        term: "Status offense",
+        es: "infracción por condición de menor",
+        definition:
+          "Conduct prohibited because of the person's age, such as truancy or some curfew violations; not an offense if committed by an adult.",
+      },
+    ],
+  },
+  {
+    title: "Interpreter conduct and accurate delivery",
+    terms: [
+      {
+        term: "Convey the message",
+        es: "transmitir fielmente el mensaje",
+        definition:
+          "Render the complete meaning, tone, register, and intent from the source language into the target language without additions, omissions, or explanations.",
+      },
+      {
+        term: "Register",
+        es: "registro lingüístico",
+        definition:
+          "The level and style of language \u2014 formal, informal, technical, vulgar, hesitant, or incoherent. Preserve it as closely as the target language allows.",
+      },
+      {
+        term: "Colorful language",
+        es: "lenguaje fuerte, vulgar o expresivo",
+        definition:
+          "A polite label for profanity, insults, or vivid language. The interpreter must interpret it accurately rather than soften or censor it.",
+      },
+      {
+        term: "Courtroom decorum",
+        es: "decoro de la sala",
+        definition:
+          "Standards of respectful and orderly conduct in court. The judge controls decorum; the interpreter does not independently edit a speaker's words.",
+      },
+      {
+        term: "Conflict of interest",
+        es: "conflicto de intereses",
+        definition:
+          "A conflict that may impair loyalty, independence, or representation.",
+      },
+      {
+        term: "Irreconcilable conflict",
+        es: "conflicto irreconciliable",
+        definition:
+          "A serious breakdown that may support a request to withdraw or substitute counsel; disagreement alone does not always require withdrawal.",
+      },
+      {
+        term: "Perjury",
+        es: "perjurio",
+        definition:
+          "Knowingly making a materially false statement under oath. A lawyer may not knowingly present perjured testimony.",
+      },
+    ],
+  },
+];
+
+const WEEK1_SELFTEST = [
+  "Name and define the principal modes of court interpreting.",
+  "Explain the difference between burden of proof and standard of proof.",
+  "Interpret: probable cause, arraignment, indictment, preponderance, acquittal.",
+  "Why is an acquittal not identical to a declaration of innocence?",
+  "What does the prosecutor represent? What does the defense attorney protect?",
+  "Distinguish initial appearance, preliminary hearing, and arraignment.",
+  "What should an interpreter do when a witness uses profanity, speaks incoherently, or makes an apparent mistake?",
+  "Explain adult sentence versus juvenile disposition.",
+];
+
+const WEEK2_SECTIONS = [
+  {
+    title: "General Framework of Crime",
+    terms: [
+      {
+        term: "Crime",
+        es: "delito",
+        definition:
+          "An act causing harm to society, not necessarily physical; falls into four categories: persons, property, public order, and morality crimes.",
+      },
+      {
+        term: "Harm",
+        es: "daño",
+        definition:
+          "The injury a crime causes to society; not necessarily physical — can include an invasion of rights, as in kidnapping.",
+      },
+    ],
+  },
+  {
+    title: "Homicide: murder and manslaughter",
+    terms: [
+      {
+        term: "Homicide",
+        es: "homicidio",
+        definition:
+          "The general term for the killing of a human being, which may or may not be criminal.",
+      },
+      {
+        term: "Murder",
+        es: "asesinato",
+        definition:
+          "An unlawful killing of a human being committed with a purposeful or knowing mental state.",
+      },
+      {
+        term: "Manslaughter",
+        es: "homicidio no premeditado",
+        definition:
+          "An unlawful killing without the mental state required for murder; can be voluntary or involuntary.",
+      },
+      {
+        term: "Purposely (mental state)",
+        es: "con propósito",
+        definition:
+          "Acting with the conscious intent to cause the result.",
+      },
+      {
+        term: "Knowingly (mental state)",
+        es: "a sabiendas",
+        definition:
+          "Acting with awareness that the result is practically certain to occur, even without directly seeking it.",
+      },
+      {
+        term: "Recklessly (mental state)",
+        es: "con imprudencia temeraria",
+        definition:
+          "Consciously disregarding a substantial and unjustifiable risk.",
+      },
+      {
+        term: "Negligently (mental state)",
+        es: "con negligencia",
+        definition:
+          "Failing to perceive a substantial and unjustifiable risk that a reasonable person would have perceived.",
+      },
+      {
+        term: "Murder",
+        es: "asesinato",
+        definition:
+          "In Utah, killing another person purposely or knowingly (Utah Code 76-5-203); a single first-degree felony tier — Utah does not divide murder into first and second degree as some other states do.",
+      },
+      {
+        term: "Aggravated murder",
+        es: "asesinato agravado",
+        definition:
+          "Murder committed under a specific statutory aggravating circumstance, such as multiple victims, a victim who is a peace officer, or a killing during a kidnapping, rape, or robbery (Utah Code 76-5-202); Utah's only capital offense.",
+      },
+      {
+        term: "Manslaughter (voluntary)",
+        es: "homicidio voluntario atenuado",
+        definition:
+          "In Utah, a murder that is reduced to manslaughter through the affirmative defense of extreme emotional distress for which there is a reasonable explanation (Utah Code 76-5-205) — the equivalent of 'heat of passion.'",
+      },
+      {
+        term: "Manslaughter (reckless / involuntary)",
+        es: "homicidio involuntario",
+        definition:
+          "Killing another person while acting recklessly, consciously disregarding a known risk, without intent to kill (Utah Code 76-5-205).",
+      },
+      {
+        term: "Negligent homicide",
+        es: "homicidio por negligencia",
+        definition:
+          "Killing another person through criminal negligence — failing to perceive a substantial risk a reasonable person would have perceived (Utah Code 76-5-205.5); a lower-level misdemeanor, not a felony.",
+      },
+      {
+        term: "Felony murder rule",
+        es: "regla del homicidio en delito grave",
+        definition:
+          "A death occurring during the commission of an inherently dangerous felony is automatically charged as murder.",
+      },
+      {
+        term: "Lesser included offense",
+        es: "delito menor incluido",
+        definition:
+          "A less serious offense whose elements are entirely contained within a greater charged offense.",
+      },
+      {
+        term: "Proximate cause",
+        es: "causa próxima",
+        definition:
+          "A causation concept connecting a defendant's conduct to the resulting death or harm.",
+      },
+      {
+        term: "Motive",
+        es: "motivo",
+        definition:
+          "The reason behind a criminal act; generally irrelevant to criminal liability.",
+      },
+    ],
+  },
+  {
+    title: "Rape and Sexual Assault",
+    terms: [
+      {
+        term: "Sexual assault",
+        es: "agresión sexual",
+        definition:
+          "A broad category of non-consensual sexual contact, including but not limited to rape.",
+      },
+      {
+        term: "Rape",
+        es: "violación",
+        definition:
+          "A category of sexual assault involving non-consensual sexual intercourse.",
+      },
+      {
+        term: "Fraud in the factum",
+        es: "fraude en el hecho mismo",
+        definition:
+          "Deceiving the victim about the nature of the act itself; negates consent.",
+      },
+      {
+        term: "Fraud in the inducement",
+        es: "fraude para inducir el consentimiento",
+        definition:
+          "Deceiving the victim to obtain consent to an act they understood; generally does not negate consent.",
+      },
+      {
+        term: "Statutory rape",
+        es: "violación estatutaria",
+        definition:
+          "Sexual intercourse with a minor who cannot legally consent, regardless of apparent willingness.",
+      },
+      {
+        term: "Consent",
+        es: "consentimiento",
+        definition:
+          "Voluntary agreement to a sexual act; can be withdrawn at any time, and withdrawal is clearest when verbal.",
+      },
+    ],
+  },
+  {
+    title: "Assault and Battery",
+    terms: [
+      {
+        term: "Battery",
+        es: "agresión física con contacto",
+        definition:
+          "Harmful or offensive, non-consensual physical contact with another person.",
+      },
+      {
+        term: "Assault",
+        es: "amenaza de agresión",
+        definition:
+          "Intentionally placing another person in fear of imminent harmful contact, without necessarily touching them.",
+      },
+      {
+        term: "Constructive touching",
+        es: "contacto constructivo",
+        definition:
+          "Indirect contact caused by setting an object or force in motion.",
+      },
+      {
+        term: "Aggravated battery",
+        es: "agresión agravada",
+        definition:
+          "Battery committed with a deadly weapon or resulting in serious injury.",
+      },
+      {
+        term: "Attempted battery",
+        es: "intento de agresión física",
+        definition:
+          "Acting with purpose to cause harmful contact that ultimately fails.",
+      },
+      {
+        term: "Threatened battery",
+        es: "amenaza de agresión física",
+        definition:
+          "Placing the victim in fear of imminent physical injury.",
+      },
+    ],
+  },
+  {
+    title: "Kidnapping",
+    terms: [
+      {
+        term: "Kidnapping",
+        es: "secuestro",
+        definition:
+          "Unlawfully moving another person a significant distance against their will.",
+      },
+      {
+        term: "False imprisonment",
+        es: "privación ilegal de la libertad",
+        definition:
+          "Unlawfully confining another person without significant movement.",
+      },
+    ],
+  },
+  {
+    title: "Property Crimes: Theft family",
+    terms: [
+      {
+        term: "Larceny",
+        es: "hurto",
+        definition:
+          "Taking property from another person's possession with intent to keep it.",
+      },
+      {
+        term: "Theft",
+        es: "hurto / robo (categoría general)",
+        definition:
+          "The modern, consolidated term covering larceny, embezzlement, and false pretenses in most states.",
+      },
+      {
+        term: "Embezzlement",
+        es: "malversación",
+        definition:
+          "Wrongfully assuming ownership of property one lawfully controls.",
+      },
+      {
+        term: "Conversion",
+        es: "apropiación indebida",
+        definition:
+          "Assuming ownership of property one has a right to control only temporarily.",
+      },
+      {
+        term: "False pretenses",
+        es: "falsas representaciones",
+        definition:
+          "Lying about a material fact to induce someone to voluntarily give up property.",
+      },
+      {
+        term: "Material fact",
+        es: "hecho material",
+        definition:
+          "A fact with real probative weight in the victim's decision, as opposed to merely relevant.",
+      },
+    ],
+  },
+  {
+    title: "Robbery",
+    terms: [
+      {
+        term: "Robbery",
+        es: "robo con violencia",
+        definition:
+          "Taking personal property from a victim's immediate presence by force or by putting the victim in fear.",
+      },
+      {
+        term: "First degree robbery",
+        es: "robo en primer grado",
+        definition:
+          "Robbery committed with a dangerous or deadly weapon, or resulting in serious injury to the victim.",
+      },
+      {
+        term: "Second degree robbery",
+        es: "robo en segundo grado",
+        definition:
+          "Robbery committed without a weapon and without serious injury to the victim.",
+      },
+    ],
+  },
+  {
+    title: "Burglary",
+    terms: [
+      {
+        term: "Burglary",
+        es: "allanamiento con intento delictivo",
+        definition:
+          "Entering or remaining in a structure with the intent to commit a felony inside; the felony need not be completed.",
+      },
+      {
+        term: "Trespassing",
+        es: "allanamiento simple",
+        definition:
+          "Entering or remaining on property without permission, without intent to commit another crime.",
+      },
+    ],
+  },
+  {
+    title: "Forgery",
+    terms: [
+      {
+        term: "Forgery",
+        es: "falsificación",
+        definition:
+          "A material, unauthorized alteration of a document having legal significance.",
+      },
+      {
+        term: "Uttering",
+        es: "dar curso a un documento falso",
+        definition:
+          "Passing, or attempting to pass, a forged document as genuine.",
+      },
+    ],
+  },
+  {
+    title: "Arson",
+    terms: [
+      {
+        term: "Arson",
+        es: "incendio provocado",
+        definition:
+          "The unlawful burning of a structure; the only property crime a person can commit against their own property.",
+      },
+      {
+        term: "First degree arson",
+        es: "incendio en primer grado",
+        definition:
+          "Arson of an inhabited structure.",
+      },
+      {
+        term: "Second degree arson",
+        es: "incendio en segundo grado",
+        definition:
+          "Arson of an uninhabited structure.",
+      },
+    ],
+  },
+  {
+    title: "Public Order Crimes",
+    terms: [
+      {
+        term: "Disorderly conduct",
+        es: "alteración del orden público",
+        definition:
+          "Behavior causing public inconvenience, annoyance, or alarm.",
+      },
+      {
+        term: "Fighting words",
+        es: "palabras de provocación",
+        definition:
+          "Words that, by their very utterance, inflict injury or tend to incite an immediate breach of the peace.",
+      },
+      {
+        term: "Affray",
+        es: "riña mutua",
+        definition:
+          "A mutual fight in which it is unclear who started the altercation.",
+      },
+    ],
+  },
+  {
+    title: "Driving Under the Influence (DUI)",
+    terms: [
+      {
+        term: "Driving under the influence (DUI)",
+        es: "conducir bajo la influencia",
+        definition:
+          "Operating a vehicle with a blood alcohol concentration over the legal limit, or while impaired.",
+      },
+      {
+        term: "Blood alcohol concentration (BAC)",
+        es: "concentración de alcohol en la sangre",
+        definition:
+          "The measured percentage of alcohol in a person's blood.",
+      },
+      {
+        term: "Field sobriety test",
+        es: "prueba de sobriedad en campo",
+        definition:
+          "Roadside physical tests used by officers to assess impairment.",
+      },
+      {
+        term: "Horizontal Gaze Nystagmus (HGN)",
+        es: "nistagmo horizontal del globo ocular",
+        definition:
+          "A field sobriety test observing involuntary eye movement as a sign of intoxication.",
+      },
+    ],
+  },
+  {
+    title: "Drugs and Paraphernalia",
+    terms: [
+      {
+        term: "Controlled substance",
+        es: "sustancia controlada",
+        definition:
+          "A drug with a physical or psychotropic effect, regulated under criminal law.",
+      },
+      {
+        term: "Drug paraphernalia",
+        es: "parafernalia de drogas",
+        definition:
+          "Any item used to ingest, prepare, or otherwise use a controlled substance.",
+      },
+    ],
+  },
+  {
+    title: "Prostitution and Pandering",
+    terms: [
+      {
+        term: "Prostitution",
+        es: "prostitución",
+        definition:
+          "Offering or performing a sexual act in exchange for something of value.",
+      },
+      {
+        term: "Pandering",
+        es: "proxenetismo",
+        definition:
+          "Arranging for another person to engage in a sexual act in exchange for something of value.",
+      },
+      {
+        term: "Human trafficking",
+        es: "trata de personas",
+        definition:
+          "The exploitation of a person for a sexual or other purpose against their will; considered a form of pandering.",
+      },
+    ],
+  },
+  {
+    title: "Conceptos transversales",
+    terms: [
+      {
+        term: "Double jeopardy",
+        es: "doble incriminación",
+        definition:
+          "The constitutional protection against being tried twice for the same offense.",
+      },
+      {
+        term: "Mistrial",
+        es: "juicio nulo",
+        definition:
+          "A trial terminated without a valid verdict, requiring the case to start over.",
+      },
+      {
+        term: "Tort",
+        es: "agravio civil",
+        definition:
+          "A civil wrong causing harm that gives rise to a civil cause of action for damages.",
+      },
+    ],
+  },
+];
+
+const WEEK3_SECTIONS = [
+  {
+    title: "Investigation, subpoenas, and search warrants",
+    terms: [
+      {
+        term: "Investigation report",
+        es: "reporte / informe de investigación",
+        definition:
+          "A document recording the findings of an investigation (police, forensic, etc.); it may originate in civil matters (e.g., custody changes) or criminal matters, and can include autopsies, lab reports, and similar records.",
+      },
+      {
+        term: "Probable cause",
+        es: "causa probable",
+        definition:
+          "The legal standard of sufficient cause to act, such as to arrest or to search.",
+      },
+      {
+        term: "Affidavit",
+        es: "declaración jurada / afidávit",
+        definition:
+          "A written statement of facts made under oath and signed by the affiant before someone authorized to administer oaths; it is unilateral, with no real-time cross-examination.",
+      },
+      {
+        term: "Subpoena ad testificandum",
+        es: "citación a testificar",
+        definition:
+          "A court order commanding a person to appear and testify orally.",
+      },
+      {
+        term: "Subpoena duces tecum",
+        es: "citación a presentar documentos",
+        definition:
+          "A court order commanding a person to produce documents or other tangible evidence; in-person appearance may not be required if only documents are sought.",
+      },
+      {
+        term: "Authenticate",
+        es: "autenticar",
+        definition:
+          "To demonstrate that a document is what it claims to be.",
+      },
+      {
+        term: "Certify",
+        es: "certificar",
+        definition:
+          "To formally attest to the authenticity of a document, typically done by the custodian of records.",
+      },
+      {
+        term: "Custodian of records",
+        es: "custodio de registros",
+        definition:
+          "The person who certifies an institution's records so they can be admitted in court without every person involved in creating them having to testify.",
+      },
+      {
+        term: "Lay the foundation",
+        es: "sentar las bases / fundamentar",
+        definition:
+          "To establish the necessary basis for a document or piece of evidence to be admitted.",
+      },
+      {
+        term: "Motion in limine",
+        es: "moción previa al juicio",
+        definition:
+          "A pretrial request asking the judge to decide, before the jury hears it, whether certain evidence is admissible.",
+      },
+      {
+        term: "Search warrant",
+        es: "orden de cateo / de registro",
+        definition:
+          "A judicial order, based on probable cause, authorizing law enforcement to search a specific place or seize specific items; in Utah it is governed by Rule of Criminal Procedure 40 and requires a supporting affidavit.",
+      },
+      {
+        term: "Indicia of occupancy",
+        es: "indicios de ocupación",
+        definition:
+          "Evidence linking a person to occupancy of a place, such as mail or documents bearing their name.",
+      },
+      {
+        term: "Expectation of privacy",
+        es: "expectativa de privacidad",
+        definition:
+          "A reasonable expectation that a place or item is private; if it exists, a warrant (or a recognized exception) is generally required to search it.",
+      },
+      {
+        term: "Plain view",
+        es: "a simple vista",
+        definition:
+          "Evidence of a crime observed in plain sight by an officer who is lawfully present, even if not listed in the original warrant; it may be seized without a new warrant.",
+      },
+      {
+        term: "Exigent circumstances",
+        es: "circunstancias exigentes",
+        definition:
+          "Emergency circumstances, such as risk of imminent destruction of evidence or danger to persons, that excuse the warrant requirement.",
+      },
+      {
+        term: "On the lam",
+        es: "prófugo / huyendo de la ley",
+        definition:
+          "Fleeing from justice.",
+      },
+      {
+        term: "Exclusionary rule",
+        es: "regla de exclusión",
+        definition:
+          "A judicially created rule holding that evidence obtained in violation of constitutional rights (and evidence derived from it) may be inadmissible at trial.",
+      },
+      {
+        term: "Standing (to challenge)",
+        es: "legitimación procesal",
+        definition:
+          "The requirement that a person show their own rights were directly affected by a search or seizure before they can challenge its validity.",
+      },
+    ],
+  },
+  {
+    title: "Transcripts, depositions, and trial",
+    terms: [
+      {
+        term: "Transcript",
+        es: "transcripción",
+        definition:
+          "A word-for-word written record of a court proceeding; in Utah, transcripts are produced exclusively in English and generally must be requested at a cost.",
+      },
+      {
+        term: "Deposition",
+        es: "deposición",
+        definition:
+          "Sworn testimony taken outside of court as part of discovery, common in civil cases; both sides' attorneys may question and cross-examine the deponent.",
+      },
+      {
+        term: "Deponent",
+        es: "deponente",
+        definition:
+          "The person who testifies during a deposition.",
+      },
+      {
+        term: "Perjury",
+        es: "perjurio",
+        definition:
+          "Intentionally making a false statement under oath about a material matter; simply changing a later statement is not automatically perjury.",
+      },
+      {
+        term: "Preservation of testimony",
+        es: "preservación de testimonio",
+        definition:
+          "Using a deposition to preserve testimony when a witness may be unable to appear at trial, due to advanced age, serious illness, or likely unavailability.",
+      },
+      {
+        term: "Impeachment (of a witness)",
+        es: "impugnación de credibilidad",
+        definition:
+          "Challenging a witness's credibility (through prior inconsistent statements, bias, contradictions, or implausibility) without automatically invalidating their testimony.",
+      },
+      {
+        term: "Cross-examination",
+        es: "contrainterrogatorio",
+        definition:
+          "Questioning of a witness by the opposing party.",
+      },
+      {
+        term: "Sidebar",
+        es: "conferencia en el estrado",
+        definition:
+          "A brief conference between the judge and attorneys, usually out of the jury's hearing, to address matters the jury should not hear; it is often still recorded in the court record.",
+      },
+      {
+        term: "Cooperating witness",
+        es: "testigo cooperante",
+        definition:
+          "A person who provides information or testimony to assist authorities in an investigation or prosecution, sometimes in exchange for negotiated benefits that must be disclosed to the defense.",
+      },
+      {
+        term: "Turn state's evidence",
+        es: "convertirse en testigo de la fiscalía",
+        definition:
+          "When a person involved in a crime agrees to cooperate with the prosecution and testify against other participants, typically formalized through a cooperation, plea, or proffer agreement.",
+      },
+      {
+        term: "Proffer agreement",
+        es: "acuerdo de propuesta / proffer",
+        definition:
+          "An agreement setting the conditions under which a person offers information to the prosecution.",
+      },
+    ],
+  },
+  {
+    title: "Charges, plea, and sentencing",
+    terms: [
+      {
+        term: "Criminal complaint",
+        es: "denuncia penal",
+        definition:
+          "A formal document accusing a person of committing one or more crimes, including the alleged conduct, charges, and the facts supporting probable cause.",
+      },
+      {
+        term: "Information / Indictment",
+        es: "acusación formal / auto de acusación",
+        definition:
+          "Alternative formal ways of bringing criminal charges, depending on the jurisdiction and severity of the offense.",
+      },
+      {
+        term: "Initial appearance",
+        es: "comparecencia inicial",
+        definition:
+          "An early hearing (Utah Rule of Criminal Procedure 7) where the court informs the defendant of the charges, the right to remain silent, the right to counsel, and considers pretrial release.",
+      },
+      {
+        term: "Arraignment",
+        es: "lectura de cargos",
+        definition:
+          "A hearing (Utah Rule of Criminal Procedure 7A/10) at which the defendant formally enters a plea of guilty, not guilty, or no contest; distinct from the initial appearance.",
+      },
+      {
+        term: "Nolo contendere / no contest",
+        es: "no contesto",
+        definition:
+          "A plea in which the defendant does not dispute the charges.",
+      },
+      {
+        term: "Statute",
+        es: "estatuto / ley",
+        definition:
+          "A law enacted by a state or federal legislature, typically cited by section symbol (§) and organized into title, chapter, part, and section.",
+      },
+      {
+        term: "Plea bargaining",
+        es: "negociación de culpabilidad",
+        definition:
+          "The negotiation process between prosecution and defense to resolve a case without trial, covering the charge, sentencing recommendation, and other conditions.",
+      },
+      {
+        term: "Plea agreement",
+        es: "acuerdo de culpabilidad",
+        definition:
+          "The resulting agreement from plea bargaining, under which the defendant typically agrees to plead guilty or no contest under specific conditions.",
+      },
+      {
+        term: "Change of plea hearing",
+        es: "audiencia de cambio de declaración",
+        definition:
+          "The hearing at which the defendant changes their plea and presents the plea agreement to the court.",
+      },
+      {
+        term: "Settlement",
+        es: "acuerdo / transacción civil",
+        definition:
+          "An agreement resolving a civil dispute without going to trial; not every settlement must be submitted to the court.",
+      },
+      {
+        term: "Stipulation",
+        es: "estipulación",
+        definition:
+          "A formal statement that both parties agree on a particular condition, fact, or resolution.",
+      },
+      {
+        term: "Waiver (of a right)",
+        es: "renuncia (a un derecho)",
+        definition:
+          "The voluntary relinquishment of a known right; a guilty plea generally waives the right to trial, to confront witnesses, and to remain silent at trial, among others.",
+      },
+      {
+        term: "Victim impact statement",
+        es: "declaración de impacto de la víctima",
+        definition:
+          "A statement, oral or written, in which the victim describes how the crime affected them physically, emotionally, financially, and socially, typically presented at sentencing.",
+      },
+      {
+        term: "Procedural justice",
+        es: "justicia procesal",
+        definition:
+          "The perception of having been treated fairly during the process itself — informed, heard, and treated with dignity — regardless of the final outcome.",
+      },
+      {
+        term: "Right of allocution",
+        es: "derecho de alocución",
+        definition:
+          "The defendant's right to address the judge personally before sentencing to express remorse, accept responsibility, or request leniency.",
+      },
+      {
+        term: "Aggravating factors",
+        es: "factores agravantes",
+        definition:
+          "Circumstances that may justify a more severe sentence within legal limits, such as premeditation, victim vulnerability, or use of a weapon.",
+      },
+      {
+        term: "Mitigating factors",
+        es: "factores atenuantes",
+        definition:
+          "Circumstances that may support a less severe sentence, such as limited participation, no prior record, or genuine acceptance of responsibility.",
+      },
+      {
+        term: "Sentencing",
+        es: "audiencia de sentencia",
+        definition:
+          "The stage of the criminal process at which punishment is imposed.",
+      },
+    ],
+  },
+  {
+    title: "State and federal jurisdiction",
+    terms: [
+      {
+        term: "Dual sovereignty doctrine",
+        es: "doctrina de la doble soberanía",
+        definition:
+          "The doctrine, confirmed in cases like Heath v. Alabama and Gamble v. United States, holding that state and federal governments are separate sovereigns that may each prosecute the same conduct without violating double jeopardy.",
+      },
+      {
+        term: "Supremacy Clause",
+        es: "cláusula de supremacía",
+        definition:
+          "The constitutional clause (Article VI) providing that federal law prevails when it directly conflicts with state law.",
+      },
+      {
+        term: "Double jeopardy",
+        es: "doble incriminación / doble riesgo",
+        definition:
+          "The constitutional protection against being tried twice for the same offense by the same sovereign.",
+      },
+      {
+        term: "Concurrent jurisdiction",
+        es: "jurisdicción concurrente",
+        definition:
+          "Shared authority between two legal systems (e.g., state and federal) to prosecute the same underlying conduct as distinct offenses.",
+      },
+      {
+        term: "Felon in possession",
+        es: "posesión por delincuente convicto",
+        definition:
+          "Under federal law (18 U.S.C. § 922(g)), the offense of possessing a firearm or ammunition by a person with a prior felony conviction.",
+      },
+      {
+        term: "Probation",
+        es: "libertad supervisada / probación",
+        definition:
+          "Court-ordered supervision in the community in lieu of imprisonment.",
+      },
+    ],
+  },
+  {
+    title: "Street slang for drug quantities (reference appendix)",
+    terms: [
+      {
+        term: "A point",
+        es: "un punto / una décima de gramo",
+        definition:
+          "Street slang for approximately 0.1 gram of a controlled substance.",
+      },
+      {
+        term: "A hit",
+        es: "una dosis",
+        definition:
+          "Street slang for a single dose or use of a substance; the amount varies.",
+      },
+      {
+        term: "A dime bag",
+        es: "bolsa de diez dólares",
+        definition:
+          "Street slang for an amount of a controlled substance sold for $10; the weight varies.",
+      },
+      {
+        term: "A dub / dub sack",
+        es: "bolsa de veinte dólares",
+        definition:
+          "Street slang for an amount of a controlled substance sold for $20; the weight varies.",
+      },
+      {
+        term: "A teener / a sixteenth",
+        es: "aproximadamente 1.75 gramos",
+        definition:
+          "Street slang for 1/16 of an ounce of a controlled substance.",
+      },
+      {
+        term: "An eight ball",
+        es: "aproximadamente 3.5 gramos",
+        definition:
+          "Street slang for 1/8 of an ounce of a controlled substance.",
+      },
+      {
+        term: "A quarter",
+        es: "aproximadamente 7 gramos",
+        definition:
+          "Street slang for 1/4 of an ounce of a controlled substance.",
+      },
+      {
+        term: "A half",
+        es: "aproximadamente 14 gramos",
+        definition:
+          "Street slang for 1/2 ounce of a controlled substance.",
+      },
+      {
+        term: "An ounce / an O / a zip",
+        es: "aproximadamente 28.35 gramos",
+        definition:
+          "Street slang for one ounce of a controlled substance.",
+      },
+      {
+        term: "A key / a kilo",
+        es: "1,000 gramos",
+        definition:
+          "Street slang for one kilogram of a controlled substance.",
+      },
+    ],
+  },
+];
+
+const WEEK_CONTENT = {
+  1: { sections: WEEK1_SECTIONS, selftest: WEEK1_SELFTEST },
+  2: { sections: WEEK2_SECTIONS },
+  3: { sections: WEEK3_SECTIONS },
+  4: { activities: true },
+};
+
+// Calendario de las clases que aún faltan — José actualiza esto conforme avanza el curso.
+const WEEK_SCHEDULE = {
+  lastCompleted: { week: 4, date: "18 de septiembre de 2026" },
+  upcoming: [
+    { week: 5, date: "25 de septiembre de 2026" },
+    { week: 6, date: "2 de octubre de 2026" },
+    { week: 7, date: "9 de octubre de 2026" },
+    { week: 8, date: "16 de octubre de 2026" },
+  ],
+};
+
+// Caso de la semana — José reemplaza este objeto cada semana con un caso nuevo
+const CASE_OF_THE_WEEK = {
+  title: "Homicidio de Gaby Ramos (Taylorsville, Utah)",
+  dateLabel: "Actualizado noviembre 2025 — sentencia programada para el 10 de diciembre",
+  summary:
+    "Gabriela Sifuentes Castilla, conocida como Gaby Ramos, era locutora de radio en español en Utah (La Más Picosita, KMRI 1550 AM). El 17 de octubre de 2021, su expareja Manuel Omar Burciaga Perea la mató a tiros en Taylorsville, tras un altercado que ella reportó dos veces al 911. Burciaga huyó a Chihuahua, México, y fue extraditado a Utah en 2023. Tras ser ordenado a juicio en 2024, esta semana se declaró culpable mediante un acuerdo de culpabilidad que redujo los cargos originales.",
+  chargeChanges: [
+    { original: "Aggravated murder", result: "Murder" },
+    { original: "Aggravated burglary", result: "Desestimado (dismissed)" },
+    { original: "Aggravated assault", result: "Reckless endangerment" },
+    {
+      original: "Domestic violence in the presence of a child",
+      result: "Se mantiene",
+    },
+  ],
+  connections: [
+    "La distinción entre Murder y Aggravated murder (Semana 2) determinó directamente el resultado de la condena en este caso.",
+    "Plea agreement / plea bargaining (Semana 1): ejemplo real de negociación de cargos entre fiscalía y defensa.",
+    "Reckless endangerment refleja el estado mental \"recklessly\" (Semana 2) — el cargo pasó de uno intencional a uno de imprudencia temeraria.",
+    "Preliminary hearing (Semana 1): el caso tuvo una en 2024, con testimonio de un testigo presencial.",
+    "La audiencia de sentencia del 10 de diciembre contará con familiares hispanohablantes presentes — un contexto habitual en las cortes de Utah.",
+  ],
+  sources: [
+    {
+      title: "Man admits to killing estranged girlfriend... | KSL.com",
+      url: "https://www.ksl.com/article/51622551/man-admits-to-killing-estranged-girlfriend-a-local-spanish-radio-host-almost-five-years-ago",
+    },
+    {
+      title: "Ex-boyfriend ordered to stand trial... | KSL.com",
+      url: "https://www.ksl.com/article/51133786/ex-boyfriend-ordered-to-stand-trial-in-killing-of-utah-spanish-radio-host",
+    },
+    {
+      title: "Suspect ... extradited to U.S. from Mexico | CBS News",
+      url: "https://www.cbsnews.com/news/suspect-manuel-omar-burciaga-perea-murder-gabriela-sifuentes-castilla-gaby-ramos-extradited-utah-mexico/",
+    },
+  ],
+};
+
+const CANONS = [
+  {
+    number: 1,
+    title: "Accuracy and Completeness",
+    titleEs: "Exactitud e integridad",
+    definition:
+      "Interpretar todo lo dicho fielmente, sin agregar, omitir, resumir, explicar ni cambiar el significado, conservando el registro y tono en la medida posible.",
+    question: "¿Estoy interpretando fielmente?",
+  },
+  {
+    number: 2,
+    title: "Representation of Qualifications",
+    titleEs: "Representación de cualificaciones",
+    definition:
+      "El intérprete debe representar honestamente su capacitación, certificaciones, experiencia y habilidades. No debe afirmar que posee credenciales que no tiene.",
+    question: "¿Soy realmente competente/certificado para esto?",
+  },
+  {
+    number: 3,
+    title: "Impartiality and Avoidance of Conflict of Interest",
+    titleEs: "Imparcialidad y conflicto de interés",
+    definition:
+      "Mantenerse neutral e imparcial y evitar conductas que aparenten favoritismo. Debe revelar cualquier relación o interés que pueda crear un conflicto.",
+    question: "¿Estoy siendo neutral?",
+  },
+  {
+    number: 4,
+    title: "Professional Demeanor",
+    titleEs: "Conducta profesional",
+    definition:
+      "Comportarse de manera profesional, respetuosa y apropiada, siguiendo los protocolos y manteniendo la dignidad del tribunal.",
+    question: "¿Me estoy comportando profesionalmente?",
+  },
+  {
+    number: 5,
+    title: "Confidentiality",
+    titleEs: "Confidencialidad",
+    definition:
+      "Proteger la información confidencial o privilegiada obtenida durante el desempeño de sus funciones y no divulgarla indebidamente.",
+    question: "¿Estoy revelando información confidencial?",
+  },
+  {
+    number: 6,
+    title: "Restriction of Public Comment",
+    titleEs: "Restricción de comentarios públicos",
+    definition:
+      "No realizar comentarios públicos inapropiados sobre casos, procesos o asuntos en los que el intérprete haya participado.",
+    question: "¿Estoy hablando públicamente del caso?",
+  },
+  {
+    number: 7,
+    title: "Scope of Practice",
+    titleEs: "Alcance de la función",
+    definition:
+      "Limitarse al papel de intérprete. No dar asesoramiento legal, explicar qué decisión debe tomar una persona ni desempeñar funciones propias del abogado, juez u otro profesional.",
+    question: "¿Estoy haciendo algo que no corresponde al intérprete?",
+  },
+  {
+    number: 8,
+    title: "Assessing and Reporting Impediments to Performance",
+    titleEs: "Evaluación y comunicación de impedimentos",
+    definition:
+      "Informar cuando existe algo que impide interpretar adecuadamente: no escuchar, no comprender un término, velocidad excesiva, fatiga, problemas técnicos, falta de competencia lingüística, etc.",
+    question: "¿Hay algo que me impide interpretar correctamente?",
+  },
+  {
+    number: 9,
+    title: "Duty to Report Ethical Violations",
+    titleEs: "Deber de reportar infracciones éticas",
+    definition:
+      "Cuando el intérprete tiene conocimiento de una violación ética profesional, debe seguir el procedimiento correspondiente para reportarla a la autoridad apropiada.",
+    question: "¿Conozco una violación ética que debo reportar?",
+  },
+  {
+    number: 10,
+    title: "Professional Development",
+    titleEs: "Desarrollo profesional",
+    definition:
+      "Mantener y mejorar continuamente sus habilidades lingüísticas, técnicas de interpretación, terminología y conocimientos jurídicos mediante estudio, capacitación y práctica.",
+    question: "¿Estoy manteniendo y mejorando mi competencia profesional?",
+  },
+];
+
+// Escenarios de la actividad "Reflexión" del curso (material propio de la clase).
+const REFLEXION_SCENARIOS = [
+  {
+    label: "a",
+    situation:
+      "Juan, un intérprete certificado, llega al tribunal y descubre que el acusado a quien va a interpretar es su concuñado. Ya invirtió media hora de viaje y rechazó otra oportunidad de trabajo ese día.",
+    canon: 3,
+    reasoning:
+      "Debe revelar el parentesco al tribunal de inmediato. Aunque le cueste el día de trabajo, interpretar para un familiar directo compromete su imparcialidad — real o percibida.",
+  },
+  {
+    label: "b",
+    situation:
+      "Meghan estudió español en la universidad pero no es intérprete certificada. Ya trabajó una vez sin que le pidieran credenciales; ahora, bajo juramento, el juez le pide que declare sus cualificaciones para el acta. Sabe que podría perder el trabajo del día si dice la verdad.",
+    canon: 2,
+    reasoning:
+      "Debe declarar honestamente que no está certificada, sin importar la consecuencia económica. Afirmar una credencial que no tiene sería una violación directa de este canon.",
+  },
+  {
+    label: "c",
+    situation:
+      "Antes de una audiencia, el fiscal le pide a Maritza que, por prisa, le dé al acusado nada más un resumen de lo que se dice, en vez de interpretar todo.",
+    canon: 1,
+    reasoning:
+      "Debe interpretar todo el contenido de forma completa y fiel, sin resumir — incluso si un abogado se lo pide directamente. Resumir viola la exactitud e integridad exigida.",
+  },
+  {
+    label: "d",
+    situation:
+      "Robert es intérprete certificado con un año de experiencia en casos de tránsito. Lo llaman a interpretar el testimonio pericial de un arqueólogo marino, un área totalmente fuera de su experiencia.",
+    canon: 8,
+    reasoning:
+      "Debe informar al tribunal sobre esta limitación antes de proceder — la falta de familiaridad con la terminología especializada es un impedimento real para una interpretación exacta.",
+  },
+  {
+    label: "e",
+    situation:
+      "Victoria acaba de interpretar un caso muy gracioso y se muere de ganas de contárselo a sus amigos.",
+    canon: 5,
+    reasoning:
+      "No debe divulgar ningún detalle del caso, sin importar qué tan inofensivo o gracioso parezca. La confidencialidad aplica incluso a anécdotas que no parecen sensibles.",
+  },
+];
+
+// Escenarios de role-play originales — inspirados en los dilemas éticos clásicos del
+// campo (no reproducen ningún texto de terceros), para practicar el mismo tipo de
+// análisis con situaciones distintas.
+const ROLEPLAY_SCENARIOS = [
+  {
+    label: "1",
+    situation:
+      "Interpretas una consulta entre un abogado defensor y su cliente, un señor mayor. El abogado lo trata con mucha familiaridad, usando apodos que el cliente considera irrespetuosos. El cliente te pregunta en voz baja: '¿Usted cree que debería buscar otro abogado?'",
+    canon: 7,
+    reasoning:
+      "No puedes dar tu opinión ni asesorar sobre si debe cambiar de abogado — eso excede tu función. Puedes interpretar lo que el cliente diga directamente al abogado, si decide expresarlo, pero no aconsejarlo tú.",
+  },
+  {
+    label: "2",
+    situation:
+      "Después de un resultado favorable, un familiar del acusado, agradecido, intenta darte una propina en efectivo en el pasillo del tribunal.",
+    canon: 3,
+    reasoning:
+      "Debes rechazarla. Aceptar cualquier tipo de compensación adicional de una de las partes crea una apariencia de favoritismo, incluso si tu trabajo fue completamente imparcial.",
+  },
+  {
+    label: "3",
+    situation:
+      "Durante un receso, escuchas por accidente a familiares del acusado planeando intimidar a un testigo para que cambie su declaración.",
+    canon: 9,
+    reasoning:
+      "Esto va más allá de la confidencialidad ordinaria: es un plan para intimidar a un testigo, no información privilegiada de tu propio cliente. Debe reportarse a la autoridad correspondiente.",
+  },
+  {
+    label: "4",
+    situation:
+      "Un abogado que conoces te encuentra en un café después de una audiencia y te pregunta, informalmente, 'a grandes rasgos, ¿qué dijo el testigo en español?'",
+    canon: 6,
+    reasoning:
+      "No debes comentar, ni siquiera de forma casual o resumida, sobre un caso en el que participaste fuera del entorno formal del tribunal.",
+  },
+  {
+    label: "5",
+    situation:
+      "Te asignan interpretar una deposición de negligencia médica llena de terminología técnica especializada que no conoces bien.",
+    canon: 8,
+    reasoning:
+      "Debes informar con anticipación sobre esta limitación de terminología, para que se tomen medidas (tiempo de preparación, glosario, o un intérprete con esa especialidad).",
+  },
+  {
+    label: "6",
+    situation:
+      "Después de una audiencia, te das cuenta de que interpretaste mal una cifra durante un testimonio financiero — dijiste $50,000 en vez de $15,000.",
+    canon: 1,
+    reasoning:
+      "Debes corregir el error ante el tribunal tan pronto como te percates de él. La exactitud incluye reconocer y remediar tus propios errores de inmediato.",
+  },
+];
+
+// Textos de práctica originales para sight translation, en el mismo formato que
+// usan los guiones oficiales de examen (párrafo corto + términos clave), pero
+// escritos desde cero — ninguna oración proviene de material con copyright.
+const SIGHT_PRACTICE = [
+  {
+    title: "Reporte policial",
+    passage: `On March 3, 2026, at approximately 11:40 p.m., Officer Delgado was on routine patrol on Route 9 when she observed a vehicle drifting between lanes without signaling. She initiated a traffic stop near the intersection of Elm Street and 4th Avenue. Upon approaching the vehicle, the officer detected a strong odor of alcohol coming from the driver's side window. The driver, later identified as Mr. Alan Torres, appeared disoriented and had difficulty producing his driver's license. When asked whether he had been drinking, Mr. Torres admitted to consuming several beers at a nearby restaurant. Officer Delgado requested that he step out of the vehicle to perform a field sobriety test. Mr. Torres struggled to maintain his balance and was unable to complete the walk-and-turn exercise. Based on these observations, the officer placed him under arrest on suspicion of driving under the influence and transported him to the county detention center for further processing.`,
+    keywords: [
+      { term: "routine patrol", es: "patrullaje rutinario" },
+      { term: "drifting between lanes", es: "cambiando de carril sin control" },
+      { term: "without signaling", es: "sin usar la direccional" },
+      { term: "traffic stop", es: "parada de tránsito" },
+      { term: "intersection", es: "intersección / cruce" },
+      { term: "odor of alcohol", es: "olor a alcohol" },
+      { term: "driver's side window", es: "ventana del lado del conductor" },
+      { term: "disoriented", es: "desorientado" },
+      { term: "driver's license", es: "licencia de conducir" },
+      { term: "admitted", es: "admitió / reconoció" },
+      { term: "field sobriety test", es: "prueba de sobriedad en campo" },
+      { term: "maintain his balance", es: "mantener el equilibrio" },
+      { term: "walk-and-turn exercise", es: "ejercicio de caminar y girar" },
+      { term: "under arrest", es: "bajo arresto" },
+      { term: "detention center", es: "centro de detención" },
+    ],
+  },
+  {
+    title: "Carta de referencia personal",
+    passage: `To Whom It May Concern:
+
+I am writing this letter on behalf of my neighbor, Rosa Delgado, who has asked me to provide a personal reference in support of her petition for primary custody of her son, Mateo.
+
+I have known Rosa for nearly four years, ever since she and her family moved into the house next to mine. During this time, I have regularly seen her interact with Mateo, and I can attest that she is an attentive, patient, and loving mother. She has always prioritized his schooling and wellbeing, often walking him to school herself and helping him with his homework in the evenings.
+
+I have also observed Rosa handle difficult situations with calm and responsibility, including during a recent medical emergency when Mateo broke his arm. She remained composed and made sure he received prompt medical attention.
+
+Based on my long-standing relationship with the family, I fully support her request and believe it is in Mateo's best interest.
+
+Sincerely,
+Diane Walker`,
+    keywords: [
+      { term: "on behalf of", es: "en representación de / de parte de" },
+      { term: "personal reference", es: "referencia personal" },
+      { term: "petition", es: "petición / solicitud" },
+      { term: "primary custody", es: "custodia primaria" },
+      { term: "attentive", es: "atenta" },
+      { term: "prioritized", es: "dio prioridad a" },
+      { term: "wellbeing", es: "bienestar" },
+      { term: "handle", es: "manejar / afrontar" },
+      { term: "composed", es: "serena / con calma" },
+      { term: "prompt medical attention", es: "atención médica inmediata" },
+      { term: "long-standing relationship", es: "relación de muchos años" },
+      { term: "best interest", es: "el mejor interés (del menor)" },
+    ],
+  },
+  {
+    title: "Autorización notariada",
+    passage: `AUTHORIZATION TO TRAVEL. I, the undersigned, Patricia Elena Morales, a citizen of Guatemala, holder of identification card number 4471-2298, residing at Avenida Reforma 145, in the exercise of parental authority over my minor son, Diego Andres Morales, born on March 12, 2013, hereby authorize him, until he reaches the age of majority, to travel alone to any foreign country and subsequently return to the Republic of Guatemala, as many times as necessary. The undersigned agrees to notify the appropriate authority of any change in this authorization. Signed before a notary public on this 8th day of January, 2026.`,
+    keywords: [
+      { term: "the undersigned", es: "la que suscribe / el abajo firmante" },
+      { term: "citizen", es: "ciudadana" },
+      { term: "identification card", es: "cédula de identidad" },
+      { term: "residing at", es: "domiciliada en" },
+      { term: "parental authority", es: "patria potestad" },
+      { term: "minor son", es: "hijo menor de edad" },
+      { term: "hereby authorize", es: "por la presente autoriza" },
+      { term: "age of majority", es: "mayoría de edad" },
+      { term: "foreign country", es: "país extranjero" },
+      { term: "subsequently", es: "posteriormente" },
+      { term: "notify", es: "notificar" },
+      { term: "notary public", es: "notario público / escribano" },
+    ],
+  },
+];
+
+const RESOURCES = {
+  books: [
+    {
+      title: "The Bilingual Courtroom: Court Interpreters in the Judicial Process",
+      author: "Susan Berk-Seligson (2nd ed., University of Chicago Press)",
+      note:
+        "Obra de referencia en el campo — un estudio basado en más de cien horas de grabaciones de procedimientos judiciales en español e inglés, que muestra cómo las decisiones del intérprete pueden influir en el resultado de un caso. Ganadora del premio al Mejor Libro de la Asociación Británica de Lingüística Aplicada.",
+      url: "https://books.google.com/books/about/The_Bilingual_Courtroom.html?id=R2z2D8h4clcC",
+    },
+  ],
+  videos: [],
+  officialSources: [
+    {
+      title: "Utah Courts — Glossary of Legal Terms",
+      url: "https://www.utcourts.gov/en/self-help/case-categories/resources/glossary.html",
+    },
+    {
+      title: "Utah Courts — Criminal Processes",
+      url: "https://www.utcourts.gov/en/self-help/legal-help/procedures/court-process/criminal.html",
+    },
+    {
+      title: "Utah Code of Judicial Administration, Appendix H — Code of Professional Responsibility for Court Interpreters",
+      url: "https://legacy.utcourts.gov/rules/view.php?rule=10H&type=ucja",
+    },
+    {
+      title: "Utah Rules of Criminal Procedure",
+      url: "https://legacy.utcourts.gov/rules/urcrp.php",
+    },
+    {
+      title: "Utah Legislature — Utah Code, Title 76 (Utah Criminal Code)",
+      url: "https://le.utah.gov/xcode/Title76/76.html",
+    },
+    {
+      title: "U.S. Courts — Glossary of Legal Terms",
+      url: "https://www.uscourts.gov/glossary",
+    },
+    {
+      title: "Utah Rules of Evidence",
+      url: "https://legacy.utcourts.gov/rules/viewall.php?type=URE",
+    },
+    {
+      title: "Utah Rules of Juvenile Procedure",
+      url: "https://legacy.utcourts.gov/rules/urjp.php",
+    },
+  ],
+};
+
+const REFERENCE_GLOSSARY = [
+  {
+    term: "Acquittal",
+    definition:
+      "A jury verdict that a criminal defendant is not guilty, or the finding of a judge that the evidence is insufficient to support a conviction.",
+    domain: "General",
+  },
+  {
+    term: "Administrative law judge",
+    definition:
+      "An officer in a regulatory or social service agency, such as the Department of Labor or the Social Security Administration, who decides disputes under the laws and regulations administered by the agency, subject to appeals to the Article III courts.",
+    domain: "General",
+  },
+  {
+    term: "Administrative Office of the United States Courts (AO)",
+    definition:
+      "The federal agency responsible for collecting court statistics, administering the federal courts' budget, and performing many other administrative and programmatic functions, under the direction and supervision of the Judicial Conference of the United States.",
+    domain: "General",
+  },
+  {
+    term: "Admissible",
+    definition:
+      "A term used to describe evidence that may be considered by a jury or judge in civil and criminal cases.",
+    domain: "General",
+  },
+  {
+    term: "Adversary proceeding",
+    definition:
+      "A lawsuit arising in or related to a bankruptcy case (listed in Federal Rule of Bankruptcy Procedure 7001) that begins by filing a complaint with the court.",
+    domain: "General",
+  },
+  {
+    term: "Affidavit",
+    definition:
+      "A written or printed statement made under oath.",
+    domain: "General",
+  },
+  {
+    term: "Affirmed",
+    definition:
+      "A finding by an appellate court that the lower court decision is correct and will stand.",
+    domain: "General",
+  },
+  {
+    term: "Alternate juror",
+    definition:
+      "A juror selected in the same manner as a regular juror who hears all the evidence but does not help decide the case unless called on to replace a regular juror.",
+    domain: "General",
+  },
+  {
+    term: "Alternative dispute resolution (ADR)",
+    definition:
+      "Methods of resolving a legal dispute without conducting a trial, including mediation and arbitration.",
+    domain: "General",
+  },
+  {
+    term: "Amicus curiae",
+    definition:
+      "Latin for \"friend of the court.\" It is advice formally offered to the court in a brief filed by an entity interested in, but not a party to, the case.",
+    domain: "General",
+  },
+  {
+    term: "Answer",
+    definition:
+      "The formal written statement by a defendant in a civil case that responds to a complaint, articulating the grounds for defense.",
+    domain: "General",
+  },
+  {
+    term: "Appeal",
+    definition:
+      "A request challenging the decision of a court by a party that has lost on one or more issues and seeks a higher court review of the decision to determine if it was correct.",
+    domain: "General",
+  },
+  {
+    term: "Appellant",
+    definition:
+      "The party who appeals a lower court's decision, usually seeking reversal of that decision.",
+    domain: "General",
+  },
+  {
+    term: "Appellate",
+    definition:
+      "About appeals; an appellate court has the power to review the judgment of a lower court or tribunal.",
+    domain: "General",
+  },
+  {
+    term: "Appellee",
+    definition:
+      "The party who opposes an appellant's appeal, and who seeks to persuade the appeals court to affirm the lower court's decision.",
+    domain: "General",
+  },
+  {
+    term: "Arbitration",
+    definition:
+      "A form of alternative dispute resolution in which an arbitrator issues a judgment on the legal issues involved in a case after listening to presentations by each party.",
+    domain: "General",
+  },
+  {
+    term: "Arraignment",
+    definition:
+      "A proceeding in which a criminal defendant is brought into court, told of the charges in an indictment or information, and asked to plead guilty or not guilty.",
+    domain: "General",
+  },
+  {
+    term: "Article III judge",
+    definition:
+      "A federal judge who is appointed for life, during \"good behavior,\" under Article III of the U.S. Constitution.",
+    domain: "General",
+  },
+  {
+    term: "Assets",
+    definition:
+      "Property of all kinds, including real and personal, tangible and intangible.",
+    domain: "General",
+  },
+  {
+    term: "Assume",
+    definition:
+      "To take on liability or responsibility under a contract; in bankruptcy, an agreement by a debtor to continue performing obligations under certain contracts.",
+    domain: "General",
+  },
+  {
+    term: "Automatic stay",
+    definition:
+      "An injunction that usually comes into force automatically when a bankruptcy case is filed, stopping lawsuits, foreclosures, garnishments, and most collection activities against the debtor.",
+    domain: "General",
+  },
+  {
+    term: "Bail",
+    definition:
+      "Security given for the release of a criminal defendant or witness from legal custody to secure their appearance in court.",
+    domain: "General",
+  },
+  {
+    term: "Bankruptcy",
+    definition:
+      "A legal case governed by the Bankruptcy Code by which persons or businesses unable to pay their debts can liquidate or reorganize their assets and liabilities.",
+    domain: "General",
+  },
+  {
+    term: "Bankruptcy administrator",
+    definition:
+      "An officer of the federal judiciary who, like the U.S. Trustee, supervises the administration of bankruptcy cases, estates, and trustees.",
+    domain: "General",
+  },
+  {
+    term: "Bankruptcy code",
+    definition:
+      "The informal name for title 11 of the United States Code, the federal bankruptcy law.",
+    domain: "General",
+  },
+  {
+    term: "Bankruptcy court",
+    definition:
+      "The bankruptcy judge(s) in regular active service in each district; a unit of the district court.",
+    domain: "General",
+  },
+  {
+    term: "Bankruptcy estate",
+    definition:
+      "All legal or equitable interests of the debtor at the time of the bankruptcy filing.",
+    domain: "General",
+  },
+  {
+    term: "Bankruptcy judge",
+    definition:
+      "A judicial officer of the U.S. district court who presides over bankruptcy cases and proceedings.",
+    domain: "General",
+  },
+  {
+    term: "Bankruptcy petition",
+    definition:
+      "The document filed by the debtor or by creditors that commences a bankruptcy case.",
+    domain: "General",
+  },
+  {
+    term: "Bench trial",
+    definition:
+      "Trial by a judge without a jury.",
+    domain: "General",
+  },
+  {
+    term: "Brief",
+    definition:
+      "A written statement submitted in a trial or appellate proceeding that explains one side's legal and factual arguments.",
+    domain: "General",
+  },
+  {
+    term: "Burden of proof",
+    definition:
+      "The duty to prove disputed facts; the plaintiff generally bears it in civil cases, the government in criminal cases.",
+    domain: "General",
+  },
+  {
+    term: "Business bankruptcy",
+    definition:
+      "A bankruptcy case in which the debtor is a business and the debts are primarily for business purposes.",
+    domain: "General",
+  },
+  {
+    term: "Capital offense",
+    definition:
+      "A crime punishable by death.",
+    domain: "General",
+  },
+  {
+    term: "Case ancillary to a foreign proceeding",
+    definition:
+      "A case commenced under Chapter 15 of the Bankruptcy Code to protect the U.S. property of a debtor subject to an insolvency proceeding in another country.",
+    domain: "General",
+  },
+  {
+    term: "Case file",
+    definition:
+      "A complete collection of every document filed in court in a case.",
+    domain: "General",
+  },
+  {
+    term: "Case law",
+    definition:
+      "The law as established in previous court decisions; a synonym for legal precedent.",
+    domain: "General",
+  },
+  {
+    term: "Caseload",
+    definition:
+      "The number of cases handled by a judge or a court.",
+    domain: "General",
+  },
+  {
+    term: "Cause of action",
+    definition:
+      "The legal basis that allows for a party to seek judicial relief.",
+    domain: "General",
+  },
+  {
+    term: "Chambers",
+    definition:
+      "A judge's office, typically including a conference room and workspace for the judge's staff.",
+    domain: "General",
+  },
+  {
+    term: "Chapter 7",
+    definition:
+      "The chapter of the Bankruptcy Code providing for liquidation of a debtor's nonexempt property and distribution to creditors.",
+    domain: "General",
+  },
+  {
+    term: "Chapter 9",
+    definition:
+      "The chapter of the Bankruptcy Code providing for the adjustment of debts of eligible municipalities.",
+    domain: "General",
+  },
+  {
+    term: "Chapter 11",
+    definition:
+      "The chapter of the Bankruptcy Code under which a debtor may reorganize, or less often liquidate, under a plan that governs repayment of its debts.",
+    domain: "General",
+  },
+  {
+    term: "Chapter 12",
+    definition:
+      "The chapter of the Bankruptcy Code providing for adjustment of debts of a family farmer or family fisherman.",
+    domain: "General",
+  },
+  {
+    term: "Chapter 13",
+    definition:
+      "The chapter of the Bankruptcy Code providing for the adjustment of debts of an individual with regular income based on a court-approved plan.",
+    domain: "General",
+  },
+  {
+    term: "Chapter 13 trustee",
+    definition:
+      "A person appointed to administer a Chapter 13 case, overseeing the debtor's plan and disbursing payments to creditors.",
+    domain: "General",
+  },
+  {
+    term: "Chapter 15",
+    definition:
+      "The chapter of the Bankruptcy Code dealing with international insolvency cases.",
+    domain: "General",
+  },
+  {
+    term: "Chapter 7 trustee",
+    definition:
+      "A person appointed in a Chapter 7 case to represent the interests of the bankruptcy estate, liquidate property, and make distributions to creditors.",
+    domain: "General",
+  },
+  {
+    term: "Chief judge",
+    definition:
+      "The judge who has primary responsibility for the administration of a court.",
+    domain: "General",
+  },
+  {
+    term: "Circuit Executive",
+    definition:
+      "A federal court employee who assists the chief judge of a circuit and provides administrative support to the courts of the circuit.",
+    domain: "General",
+  },
+  {
+    term: "Claim",
+    definition:
+      "A creditor's right to payment from a debtor or the debtor's property.",
+    domain: "General",
+  },
+  {
+    term: "Class action",
+    definition:
+      "A lawsuit in which members of a large group sue on behalf of the entire class.",
+    domain: "General",
+  },
+  {
+    term: "Clerk of court",
+    definition:
+      "An administrative officer who manages the flow of cases, maintains court records, and provides other administrative support.",
+    domain: "General",
+  },
+  {
+    term: "Collateral",
+    definition:
+      "Property that serves as security for the satisfaction of a debt.",
+    domain: "General",
+  },
+  {
+    term: "Common law",
+    definition:
+      "The legal system originating in England and used in the U.S., relying on the articulation of legal principles in a historical succession of judicial decisions.",
+    domain: "General",
+  },
+  {
+    term: "Community service",
+    definition:
+      "A special condition the court imposes that requires an individual to work, without pay, for a civic or nonprofit organization.",
+    domain: "General",
+  },
+  {
+    term: "Complaint",
+    definition:
+      "A civil complaint is a written statement filed by a plaintiff initiating a case; a criminal complaint is a sworn document filed by the government alleging a crime and probable cause to arrest.",
+    domain: "General",
+  },
+  {
+    term: "Concurrent sentence",
+    definition:
+      "Prison terms for two or more offenses served at the same time.",
+    domain: "General",
+  },
+  {
+    term: "Confirmation",
+    definition:
+      "In bankruptcy, approval of a plan of reorganization, liquidation, or adjustment of debts by a bankruptcy judge; in judicial nominations, Senate approval of a candidate to serve as a federal judge.",
+    domain: "General",
+  },
+  {
+    term: "Consecutive sentence",
+    definition:
+      "Prison terms for two or more offenses served one after the other.",
+    domain: "General",
+  },
+  {
+    term: "Consumer bankruptcy",
+    definition:
+      "A bankruptcy case filed to reduce or eliminate debts that are primarily consumer debts.",
+    domain: "General",
+  },
+  {
+    term: "Consumer debtor",
+    definition:
+      "A debtor whose debts are primarily consumer debts.",
+    domain: "General",
+  },
+  {
+    term: "Consumer debts",
+    definition:
+      "Debts incurred for a personal, family, or household purpose, as opposed to business needs.",
+    domain: "General",
+  },
+  {
+    term: "Contested matter",
+    definition:
+      "Litigation to resolve any actual dispute, other than an adversary proceeding, before the bankruptcy court.",
+    domain: "General",
+  },
+  {
+    term: "Contingent claim",
+    definition:
+      "A claim for which the right to payment depends on the occurrence of a future event.",
+    domain: "General",
+  },
+  {
+    term: "Contract",
+    definition:
+      "An agreement between parties that imposes legally binding obligations.",
+    domain: "General",
+  },
+  {
+    term: "Conviction",
+    definition:
+      "A judgment of guilt against a criminal defendant.",
+    domain: "General",
+  },
+  {
+    term: "Counsel",
+    definition:
+      "Legal advice; a term also used to refer to the lawyers in a case.",
+    domain: "General",
+  },
+  {
+    term: "Count",
+    definition:
+      "An allegation in an indictment or information, charging a defendant with a crime.",
+    domain: "General",
+  },
+  {
+    term: "Court",
+    definition:
+      "Government entity presided over by judges and authorized by statute to resolve legal disputes.",
+    domain: "General",
+  },
+  {
+    term: "Court of International Trade",
+    definition:
+      "A court hearing cases involving U.S. international trade law, including tariffs and countervailing duties.",
+    domain: "General",
+  },
+  {
+    term: "Court reporter",
+    definition:
+      "A person who makes a word-for-word record of what is said in court and produces a transcript upon request.",
+    domain: "General",
+  },
+  {
+    term: "Credit counseling",
+    definition:
+      "Required budget and credit counseling that individual debtors must attend prior to filing bankruptcy.",
+    domain: "General",
+  },
+  {
+    term: "Creditor",
+    definition:
+      "A person or business to whom or which the debtor owes money.",
+    domain: "General",
+  },
+  {
+    term: "Damages",
+    definition:
+      "Money that a defendant pays a plaintiff in a civil case if the plaintiff has won.",
+    domain: "General",
+  },
+  {
+    term: "De facto",
+    definition:
+      "Latin for \"in fact\" or \"actually\"; something that exists in fact but not as a matter of law.",
+    domain: "General",
+  },
+  {
+    term: "De jure",
+    definition:
+      "Latin for \"in law\"; something that exists by operation of law.",
+    domain: "General",
+  },
+  {
+    term: "De novo",
+    definition:
+      "Latin for \"anew\"; a trial de novo is a completely new trial.",
+    domain: "General",
+  },
+  {
+    term: "Debtor",
+    definition:
+      "A person, business, or government entity concerning which a bankruptcy case has been filed.",
+    domain: "General",
+  },
+  {
+    term: "Declaratory judgment",
+    definition:
+      "A legal determination of a court defining the rights and obligations of litigants to resolve legal uncertainty.",
+    domain: "General",
+  },
+  {
+    term: "Default judgment",
+    definition:
+      "A judgment for the plaintiff because the defendant failed to answer or appear to contest the claim.",
+    domain: "General",
+  },
+  {
+    term: "Defendant",
+    definition:
+      "In a civil case, the person or entity being sued; in a criminal case, the person accused of the crime.",
+    domain: "General",
+  },
+  {
+    term: "Deposition",
+    definition:
+      "An oral statement made under oath before an officer authorized by law, often taken for discovery or later trial use.",
+    domain: "General",
+  },
+  {
+    term: "Discharge",
+    definition:
+      "A release of a debtor from personal liability for certain dischargeable debts.",
+    domain: "General",
+  },
+  {
+    term: "Dischargeable debt",
+    definition:
+      "A debt for which the Bankruptcy Code allows the debtor's personal liability to be eliminated.",
+    domain: "General",
+  },
+  {
+    term: "Disclosure statement",
+    definition:
+      "A written document that provides adequate information to creditors to enable them to evaluate a Chapter 11 plan.",
+    domain: "General",
+  },
+  {
+    term: "Discovery",
+    definition:
+      "The process by which lawyers learn about their opponent's case in preparation for trial.",
+    domain: "General",
+  },
+  {
+    term: "Dismissal with prejudice",
+    definition:
+      "Court action that prevents an identical lawsuit or criminal charges from being filed later.",
+    domain: "General",
+  },
+  {
+    term: "Dismissal without prejudice",
+    definition:
+      "Court action that allows a later filing.",
+    domain: "General",
+  },
+  {
+    term: "Disposable income",
+    definition:
+      "Income not reasonably necessary for the maintenance or support of the debtor or dependents.",
+    domain: "General",
+  },
+  {
+    term: "Docket",
+    definition:
+      "A log containing the complete history of each case in brief chronological entries.",
+    domain: "General",
+  },
+  {
+    term: "Due process",
+    definition:
+      "The constitutional guarantee of a fair and impartial trial, and of legal rights against adverse actions threatening liberty or property.",
+    domain: "General",
+  },
+  {
+    term: "En banc",
+    definition:
+      "Court sessions with the entire membership of a court participating, rather than a smaller panel.",
+    domain: "General",
+  },
+  {
+    term: "Equitable",
+    definition:
+      "Pertaining to civil suits in \"equity\" rather than in \"law,\" where a court can order someone to do or cease doing something.",
+    domain: "General",
+  },
+  {
+    term: "Equity",
+    definition:
+      "The value of a debtor's interest in property that remains after liens and other creditors' interests are considered.",
+    domain: "General",
+  },
+  {
+    term: "Evidence",
+    definition:
+      "Any material, object, or information used to persuade the fact finder to decide the case in favor of one side.",
+    domain: "General",
+  },
+  {
+    term: "Ex parte",
+    definition:
+      "A proceeding brought before a court by one party only, without notice to the other side.",
+    domain: "General",
+  },
+  {
+    term: "Exclusionary rule",
+    definition:
+      "Doctrine that evidence obtained in violation of a defendant's constitutional or statutory rights is not admissible at trial.",
+    domain: "General",
+  },
+  {
+    term: "Exculpatory evidence",
+    definition:
+      "Evidence indicating that a defendant did not commit the crime.",
+    domain: "General",
+  },
+  {
+    term: "Executory contracts",
+    definition:
+      "A contract under which both parties have material duties remaining to be performed; a debtor may assume or reject it, subject to court approval.",
+    domain: "General",
+  },
+  {
+    term: "Exempt assets",
+    definition:
+      "Property that a debtor is allowed to retain, free from the claims of creditors who do not have liens on the property.",
+    domain: "General",
+  },
+  {
+    term: "Exemptions, exempt property",
+    definition:
+      "Property that the Bankruptcy Code or state law permits a debtor to keep from unsecured creditors.",
+    domain: "General",
+  },
+  {
+    term: "Family farmer",
+    definition:
+      "An individual, corporation, or partnership engaged in a farming operation that meets certain debt limits for filing under Chapter 12.",
+    domain: "General",
+  },
+  {
+    term: "Federal public defender",
+    definition:
+      "An attorney employed by the federal courts to provide legal defense to defendants unable to afford counsel.",
+    domain: "General",
+  },
+  {
+    term: "Federal public defender organization",
+    definition:
+      "An organization established within a federal judicial circuit to represent criminal defendants who cannot afford an adequate defense.",
+    domain: "General",
+  },
+  {
+    term: "Federal question jurisdiction",
+    definition:
+      "Jurisdiction given to federal courts in cases involving interpretation of the Constitution, federal statutes, and treaties.",
+    domain: "General",
+  },
+  {
+    term: "Felony",
+    definition:
+      "A serious crime carrying a penalty of more than one year in prison.",
+    domain: "General",
+  },
+  {
+    term: "File",
+    definition:
+      "To transmit or place a document in the official custody of the clerk of court; also, the official record of a case.",
+    domain: "General",
+  },
+  {
+    term: "Financial management",
+    definition:
+      "Required budget and credit counseling that individual debtors must attend after filing, before obtaining a discharge.",
+    domain: "General",
+  },
+  {
+    term: "Fraudulent transfer",
+    definition:
+      "A transfer of a debtor's property made with intent to defraud or for less than reasonably equivalent value.",
+    domain: "General",
+  },
+  {
+    term: "Grand jury",
+    definition:
+      "A body of citizens who listen to evidence of criminal allegations and determine whether there is probable cause to believe an individual committed an offense.",
+    domain: "General",
+  },
+  {
+    term: "Habeas corpus",
+    definition:
+      "Latin for \"you have the body\"; a judicial order forcing law enforcement to produce a prisoner and justify continued confinement.",
+    domain: "General",
+  },
+  {
+    term: "Hearsay",
+    definition:
+      "Statements by a witness who heard about an incident second-hand rather than seeing or hearing it directly.",
+    domain: "General",
+  },
+  {
+    term: "Home confinement",
+    definition:
+      "A condition requiring an individual to remain at home except for approved activities, sometimes with electronic monitoring.",
+    domain: "General",
+  },
+  {
+    term: "Impeachment",
+    definition:
+      "The process of calling a witness's testimony into doubt; also, the constitutional process for removing federal officials from office.",
+    domain: "General",
+  },
+  {
+    term: "In camera",
+    definition:
+      "Latin for \"in chambers\"; in private, outside the presence of a jury and the public.",
+    domain: "General",
+  },
+  {
+    term: "In forma pauperis",
+    definition:
+      "Latin for \"in the manner of a pauper\"; permission to file a case without paying court fees because the person cannot afford them.",
+    domain: "General",
+  },
+  {
+    term: "Inculpatory evidence",
+    definition:
+      "Evidence indicating that a defendant did commit the crime.",
+    domain: "General",
+  },
+  {
+    term: "Indictment",
+    definition:
+      "The formal charge issued by a grand jury that there is enough evidence to justify a defendant standing trial; used primarily for felonies.",
+    domain: "General",
+  },
+  {
+    term: "Information",
+    definition:
+      "A formal accusation by a government attorney that the defendant committed a misdemeanor, or in a felony case if the defendant waives a grand jury indictment.",
+    domain: "General",
+  },
+  {
+    term: "Injunction",
+    definition:
+      "A court order preventing one or more named parties from taking some action.",
+    domain: "General",
+  },
+  {
+    term: "Insider (bankruptcy)",
+    definition:
+      "Certain parties with a close relationship to the debtor, such as relatives, officers, directors, and affiliates.",
+    domain: "General",
+  },
+  {
+    term: "Interrogatories",
+    definition:
+      "Written questions sent by one party in a lawsuit to an opposing party as part of pretrial discovery.",
+    domain: "General",
+  },
+  {
+    term: "Issue",
+    definition:
+      "The disputed point between parties in a lawsuit; also, to send out officially, as in a court issuing an order.",
+    domain: "General",
+  },
+  {
+    term: "Joint administration",
+    definition:
+      "A court-approved mechanism under which two or more related cases can be administered together for procedural purposes.",
+    domain: "General",
+  },
+  {
+    term: "Joint petition",
+    definition:
+      "One bankruptcy petition filed together by spouses.",
+    domain: "General",
+  },
+  {
+    term: "Judge",
+    definition:
+      "An official with statutory authority to decide legal disputes according to the law.",
+    domain: "General",
+  },
+  {
+    term: "Judgeship",
+    definition:
+      "The position of judge; Congress authorizes the number of judgeships for each court.",
+    domain: "General",
+  },
+  {
+    term: "Judgment",
+    definition:
+      "The official decision of a court finally resolving the dispute between the parties.",
+    domain: "General",
+  },
+  {
+    term: "Judicial Conference of the United States",
+    definition:
+      "The policymaking body for the federal courts, convening twice a year to consider administrative and policy issues.",
+    domain: "General",
+  },
+  {
+    term: "Jurisdiction",
+    definition:
+      "The legal authority of a court to hear and decide a certain type of case.",
+    domain: "General",
+  },
+  {
+    term: "Jurisprudence",
+    definition:
+      "The study of law and the structure of the legal system.",
+    domain: "General",
+  },
+  {
+    term: "Jury",
+    definition:
+      "The group of citizens selected to hear the evidence in a trial and render a verdict on matters of fact.",
+    domain: "General",
+  },
+  {
+    term: "Jury instructions",
+    definition:
+      "A judge's directions to the jury regarding the factual questions and legal rules it must apply.",
+    domain: "General",
+  },
+  {
+    term: "Lawsuit",
+    definition:
+      "A legal action filed in a court alleging that a defendant's unlawful actions have harmed the plaintiff.",
+    domain: "General",
+  },
+  {
+    term: "Lien",
+    definition:
+      "A claim or charge on property to secure payment of a debt or performance of an obligation.",
+    domain: "General",
+  },
+  {
+    term: "Liquidated claim",
+    definition:
+      "A creditor's claim for a fixed amount of money.",
+    domain: "General",
+  },
+  {
+    term: "Liquidation",
+    definition:
+      "The sale of a debtor's property with the proceeds generally used for the benefit of creditors.",
+    domain: "General",
+  },
+  {
+    term: "Litigation",
+    definition:
+      "A case, controversy, or lawsuit; participants are called litigants.",
+    domain: "General",
+  },
+  {
+    term: "Magistrate judge",
+    definition:
+      "A judicial officer of a district court who conducts initial proceedings, decides misdemeanor cases, and handles pretrial matters.",
+    domain: "General",
+  },
+  {
+    term: "Means test",
+    definition:
+      "A calculation used to determine whether an individual debtor's Chapter 7 filing is presumed to be an abuse of the Bankruptcy Code.",
+    domain: "General",
+  },
+  {
+    term: "Mediation",
+    definition:
+      "An informal alternative dispute resolution process in which a mediator facilitates negotiations between the parties.",
+    domain: "General",
+  },
+  {
+    term: "Misdemeanor",
+    definition:
+      "An offense punishable by one year of imprisonment or less.",
+    domain: "General",
+  },
+  {
+    term: "Mistrial",
+    definition:
+      "An invalid trial caused by fundamental error, requiring the trial to start again.",
+    domain: "General",
+  },
+  {
+    term: "Moot",
+    definition:
+      "Not subject to a court ruling because the controversy has not actually arisen or has ended.",
+    domain: "General",
+  },
+  {
+    term: "Motion",
+    definition:
+      "A request by a litigant to a judge for a decision on an issue relating to the case.",
+    domain: "General",
+  },
+  {
+    term: "Motion in Limine",
+    definition:
+      "A pretrial motion requesting the court to prohibit the other side from presenting highly prejudicial evidence.",
+    domain: "General",
+  },
+  {
+    term: "Motion to lift the automatic stay",
+    definition:
+      "A request by a creditor to take action against the debtor or the debtor's property that would otherwise be prohibited by the automatic stay.",
+    domain: "General",
+  },
+  {
+    term: "No-asset case",
+    definition:
+      "A Chapter 7 case in which there are no non-exempt assets available to satisfy unsecured claims.",
+    domain: "General",
+  },
+  {
+    term: "Nolo contendere",
+    definition:
+      "Also called no contest; a plea with the same effect as guilty for sentencing but not necessarily an admission of guilt.",
+    domain: "General",
+  },
+  {
+    term: "Nondischargeable debt",
+    definition:
+      "A debt for which the debtor's personal liability is not allowed to be discharged in bankruptcy.",
+    domain: "General",
+  },
+  {
+    term: "Nonexempt assets",
+    definition:
+      "Property of a debtor that can be liquidated to satisfy claims of creditors.",
+    domain: "General",
+  },
+  {
+    term: "Objection to discharge",
+    definition:
+      "An objection to the debtor receiving a discharge, for reasons such as concealing property or making a false oath.",
+    domain: "General",
+  },
+  {
+    term: "Objection to dischargeability",
+    definition:
+      "An objection to the debtor being released from personal liability for certain debts.",
+    domain: "General",
+  },
+  {
+    term: "Objection to exemptions",
+    definition:
+      "An objection to the debtor's attempt to claim certain property as exempt.",
+    domain: "General",
+  },
+  {
+    term: "Opinion",
+    definition:
+      "A judge's written explanation of the decision of the court.",
+    domain: "General",
+  },
+  {
+    term: "Oral argument",
+    definition:
+      "An opportunity for lawyers and pro se parties to summarize their position before the court and answer judges' questions.",
+    domain: "General",
+  },
+  {
+    term: "Panel",
+    definition:
+      "A group of judges assigned to decide a case; also, the group of potential jurors or available court-appointed counsel.",
+    domain: "General",
+  },
+  {
+    term: "Parole",
+    definition:
+      "The release of a prison inmate after completing part of their sentence, placed under supervision of a probation officer.",
+    domain: "General",
+  },
+  {
+    term: "Party",
+    definition:
+      "An individual or entity involved in a legal action.",
+    domain: "General",
+  },
+  {
+    term: "Party in interest",
+    definition:
+      "A party who has standing to be heard by the court in a bankruptcy matter.",
+    domain: "General",
+  },
+  {
+    term: "Per curiam",
+    definition:
+      "Latin for \"for the court\"; often refers to an unsigned appellate opinion.",
+    domain: "General",
+  },
+  {
+    term: "Peremptory challenge",
+    definition:
+      "The right to exclude a certain number of prospective jurors without cause.",
+    domain: "General",
+  },
+  {
+    term: "Petit jury (or trial jury)",
+    definition:
+      "A group of citizens who hear the evidence at trial and determine the facts in dispute.",
+    domain: "General",
+  },
+  {
+    term: "Petition",
+    definition:
+      "A formal application in writing requesting judicial action.",
+    domain: "General",
+  },
+  {
+    term: "Petition preparer",
+    definition:
+      "A person or business not authorized to practice law that prepares bankruptcy petitions.",
+    domain: "General",
+  },
+  {
+    term: "Petty offense",
+    definition:
+      "A federal misdemeanor punishable by six months or less in prison.",
+    domain: "General",
+  },
+  {
+    term: "Plaintiff",
+    definition:
+      "A person or entity that files a civil lawsuit.",
+    domain: "General",
+  },
+  {
+    term: "Plan",
+    definition:
+      "A detailed proposal for how claims or interests of the debtor will be paid or treated if confirmed.",
+    domain: "General",
+  },
+  {
+    term: "Plea",
+    definition:
+      "The defendant's statement pleading \"guilty\" or \"not guilty\" in answer to the charges.",
+    domain: "General",
+  },
+  {
+    term: "Pleadings",
+    definition:
+      "Written statements filed with the court describing a party's legal or factual assertions.",
+    domain: "General",
+  },
+  {
+    term: "Postpetition transfer",
+    definition:
+      "A transfer of property of the bankruptcy estate made after the commencement of the case.",
+    domain: "General",
+  },
+  {
+    term: "Prebankruptcy planning",
+    definition:
+      "Arranging a debtor's property before bankruptcy to take maximum advantage of Bankruptcy Code provisions.",
+    domain: "General",
+  },
+  {
+    term: "Precedent",
+    definition:
+      "A court decision in an earlier case with similar facts and legal issues that judges will generally follow.",
+    domain: "General",
+  },
+  {
+    term: "Preference (bankruptcy)",
+    definition:
+      "A debt payment made to a creditor shortly before bankruptcy that may be avoided and recovered by the trustee.",
+    domain: "General",
+  },
+  {
+    term: "Presentence report",
+    definition:
+      "A report summarizing background information needed to determine an appropriate sentence.",
+    domain: "General",
+  },
+  {
+    term: "Pretrial conference",
+    definition:
+      "A meeting of the judge and lawyers prior to trial to discuss matters and set a schedule.",
+    domain: "General",
+  },
+  {
+    term: "Priority",
+    definition:
+      "The statutory ranking of unsecured claims determining the order in which they will be paid.",
+    domain: "General",
+  },
+  {
+    term: "Priority claim",
+    definition:
+      "An unsecured claim entitled to be paid ahead of other unsecured claims.",
+    domain: "General",
+  },
+  {
+    term: "Pro se",
+    definition:
+      "Representing oneself in court, without a lawyer.",
+    domain: "General",
+  },
+  {
+    term: "Pro tem",
+    definition:
+      "A temporary assignment of a judge to manage court proceedings when the regular judge is unavailable.",
+    domain: "General",
+  },
+  {
+    term: "Probation",
+    definition:
+      "A sentencing alternative to imprisonment under supervision of a probation officer.",
+    domain: "General",
+  },
+  {
+    term: "Probation officer",
+    definition:
+      "An officer who conducts presentence investigations and supervises released or probationary defendants.",
+    domain: "General",
+  },
+  {
+    term: "Procedure",
+    definition:
+      "The rules for conducting a case before the court.",
+    domain: "General",
+  },
+  {
+    term: "Proof of claim",
+    definition:
+      "A written statement describing the reason a debtor owes a creditor money and the amount owed.",
+    domain: "General",
+  },
+  {
+    term: "Property of the estate",
+    definition:
+      "All legal or equitable interests of the debtor in property as of the commencement of the case.",
+    domain: "General",
+  },
+  {
+    term: "Prosecute",
+    definition:
+      "To charge someone with a crime; a prosecutor tries a criminal case on behalf of the government.",
+    domain: "General",
+  },
+  {
+    term: "Reaffirmation agreement",
+    definition:
+      "An agreement under which a debtor continues paying a dischargeable debt after bankruptcy in exchange for keeping collateral.",
+    domain: "General",
+  },
+  {
+    term: "Recalled judge",
+    definition:
+      "A retired judge who returns to duty for a limited term.",
+    domain: "General",
+  },
+  {
+    term: "Record",
+    definition:
+      "The official documented account of the proceedings in a case.",
+    domain: "General",
+  },
+  {
+    term: "Redemption",
+    definition:
+      "A procedure whereby a debtor removes a secured creditor's lien on collateral by paying its value.",
+    domain: "General",
+  },
+  {
+    term: "Remand",
+    definition:
+      "The act of an appellate court sending a case to a lower court for further proceedings.",
+    domain: "General",
+  },
+  {
+    term: "Reverse",
+    definition:
+      "The act of a court setting aside the decision of a lower court.",
+    domain: "General",
+  },
+  {
+    term: "Sanction",
+    definition:
+      "A penalty or enforcement used to bring about compliance with the law or rules.",
+    domain: "General",
+  },
+  {
+    term: "Schedules",
+    definition:
+      "Detailed lists filed by the debtor showing assets, liabilities, and other financial information.",
+    domain: "General",
+  },
+  {
+    term: "Section 341 meeting",
+    definition:
+      "The meeting of creditors at which the debtor is questioned under oath about financial affairs.",
+    domain: "General",
+  },
+  {
+    term: "Secured creditor",
+    definition:
+      "A creditor with a lien securing some or all of its claim against the debtor.",
+    domain: "General",
+  },
+  {
+    term: "Secured debt",
+    definition:
+      "Debt backed by a mortgage, pledge of collateral, or other lien.",
+    domain: "General",
+  },
+  {
+    term: "Senior judge",
+    definition:
+      "A federal judge who, after meeting age and service requirements, takes senior status while continuing to perform judicial duties.",
+    domain: "General",
+  },
+  {
+    term: "Sentence",
+    definition:
+      "The punishment ordered by a court for a defendant convicted of a crime.",
+    domain: "General",
+  },
+  {
+    term: "Sentencing guidelines",
+    definition:
+      "Rules and principles trial judges use as a factor in determining a sentence.",
+    domain: "General",
+  },
+  {
+    term: "Sequester",
+    definition:
+      "To separate; juries are sometimes sequestered from outside influences during a trial.",
+    domain: "General",
+  },
+  {
+    term: "Service of process",
+    definition:
+      "The delivery of writs or summonses to the appropriate party.",
+    domain: "General",
+  },
+  {
+    term: "Settlement",
+    definition:
+      "Parties resolving their dispute without a trial, often involving payment but usually no admission of fault.",
+    domain: "General",
+  },
+  {
+    term: "Small business or Subchapter V case",
+    definition:
+      "Special categories of Chapter 11 for small business debtors, with accelerated deadlines.",
+    domain: "General",
+  },
+  {
+    term: "Standard of proof",
+    definition:
+      "The degree of proof required; \"beyond a reasonable doubt\" in criminal cases, \"preponderance of the evidence\" in most civil cases.",
+    domain: "General",
+  },
+  {
+    term: "Statement of financial affairs",
+    definition:
+      "A form the debtor completes concerning sources of income, transfers of property, and lawsuits by creditors.",
+    domain: "General",
+  },
+  {
+    term: "Statement of intention",
+    definition:
+      "A declaration by an individual Chapter 7 debtor of plans for dealing with property subject to security interests.",
+    domain: "General",
+  },
+  {
+    term: "Statute",
+    definition:
+      "A law passed by a legislature.",
+    domain: "General",
+  },
+  {
+    term: "Statute of limitations",
+    definition:
+      "The time within which a lawsuit must be filed or a criminal prosecution must begin.",
+    domain: "General",
+  },
+  {
+    term: "Sua sponte",
+    definition:
+      "Latin for \"of its own will\"; a court taking action without being asked to by any party.",
+    domain: "General",
+  },
+  {
+    term: "Subordination",
+    definition:
+      "The process by which a person's rights or claims are ranked below those of others.",
+    domain: "General",
+  },
+  {
+    term: "Subpoena",
+    definition:
+      "A command to a witness to appear and give testimony.",
+    domain: "General",
+  },
+  {
+    term: "Subpoena duces tecum",
+    definition:
+      "A command to a witness to appear and produce documents.",
+    domain: "General",
+  },
+  {
+    term: "Substantive consolidation",
+    definition:
+      "Pooling the assets and liabilities of two or more related debtors to pay creditors under a plan.",
+    domain: "General",
+  },
+  {
+    term: "Summary judgment",
+    definition:
+      "A decision made on statements and evidence without a trial, granted when one party is entitled to judgment as a matter of law.",
+    domain: "General",
+  },
+  {
+    term: "Temporary restraining order",
+    definition:
+      "A judge's short-term order forbidding certain actions until a full hearing can be conducted; often called a TRO.",
+    domain: "General",
+  },
+  {
+    term: "Testimony",
+    definition:
+      "Evidence presented by witnesses during trials or other legal proceedings.",
+    domain: "General",
+  },
+  {
+    term: "Toll",
+    definition:
+      "To stop the running of a time period, such as one set by a statute of limitations.",
+    domain: "General",
+  },
+  {
+    term: "Tort",
+    definition:
+      "A civil wrong or breach of a duty to another person, for which the victim may be entitled to sue.",
+    domain: "General",
+  },
+  {
+    term: "Transcript",
+    definition:
+      "A written, word-for-word record of what was said in a proceeding.",
+    domain: "General",
+  },
+  {
+    term: "Transfer",
+    definition:
+      "Any mode or means by which a debtor disposes of or parts with property.",
+    domain: "General",
+  },
+  {
+    term: "Trustee",
+    definition:
+      "A person appointed to represent the interests of the bankruptcy estate.",
+    domain: "General",
+  },
+  {
+    term: "U.S. attorney",
+    definition:
+      "A lawyer appointed by the President to prosecute and defend cases for the federal government in a judicial district.",
+    domain: "General",
+  },
+  {
+    term: "U.S. trustee",
+    definition:
+      "An officer of the Department of Justice responsible for supervising the administration of bankruptcy cases and trustees.",
+    domain: "General",
+  },
+  {
+    term: "Undersecured claim",
+    definition:
+      "A right to payment based on a debt secured by property worth less than the amount of the debt.",
+    domain: "General",
+  },
+  {
+    term: "Undue hardship (bankruptcy)",
+    definition:
+      "The legal standard for discharging most student debts in bankruptcy.",
+    domain: "General",
+  },
+  {
+    term: "Unlawful detainer action",
+    definition:
+      "A lawsuit by a landlord against a tenant to evict them, usually for nonpayment of rent.",
+    domain: "General",
+  },
+  {
+    term: "Unliquidated claim",
+    definition:
+      "A claim for which a specific value has not yet been determined.",
+    domain: "General",
+  },
+  {
+    term: "Unscheduled debt",
+    definition:
+      "A debt that should have been listed by the debtor but was not.",
+    domain: "General",
+  },
+  {
+    term: "Unsecured claim",
+    definition:
+      "A claim for which a creditor holds no security.",
+    domain: "General",
+  },
+  {
+    term: "Uphold",
+    definition:
+      "The appellate court agrees with the lower court decision and allows it to stand.",
+    domain: "General",
+  },
+  {
+    term: "Venue",
+    definition:
+      "The geographic area in which a case is filed and heard.",
+    domain: "General",
+  },
+  {
+    term: "Verdict",
+    definition:
+      "The decision of a trial jury or judge that determines guilt, innocence, or the final outcome of a civil case.",
+    domain: "General",
+  },
+  {
+    term: "Voir dire",
+    definition:
+      "A French phrase meaning \"to speak the truth\"; the process of selecting a trial jury by questioning prospective jurors.",
+    domain: "General",
+  },
+  {
+    term: "Wage garnishment",
+    definition:
+      "A non-bankruptcy proceeding whereby a creditor seeks to subject a debtor's future wages to their claim.",
+    domain: "General",
+  },
+  {
+    term: "Warrant",
+    definition:
+      "Court authorization, most often for law enforcement, to conduct a search or make an arrest.",
+    domain: "General",
+  },
+  {
+    term: "Witness",
+    definition:
+      "A person called upon in a case to give testimony before the court or jury.",
+    domain: "General",
+  },
+  {
+    term: "Writ",
+    definition:
+      "A written command or order, issued by the court, requiring the performance of a specific act.",
+    domain: "General",
+  },
+  {
+    term: "Writ of certiorari",
+    definition:
+      "An order issued by the U.S. Supreme Court directing the lower court to transmit records for a case it will hear on appeal.",
+    domain: "General",
+  },
+];
+
+const JUVENILE_GLOSSARY = [
+  {
+    term: "Action Step",
+    definition:
+      "A short term, small step the youth will take to achieve their overall case plan goal.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Adjudication",
+    definition:
+      "The finding in juvenile court that a youth committed a delinquent act (similar to a guilty finding in adult court), or that allegations of abuse, neglect, or dependency are true.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Affidavit",
+    definition:
+      "A written declaration or statement of facts, sworn to by oath or affirmation.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Apology Letter",
+    definition:
+      "A letter an individual writes to the victim of their offense expressing regret and a plan for positive change.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Appeal",
+    definition:
+      "A review by a higher court of a lower juvenile court's final judgment or decree.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Arraignment",
+    definition:
+      "The initial hearing after a petition is filed where the alleged offenses are read and the youth is asked to admit or deny them.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Assessment",
+    definition:
+      "When the probation officer gathers information from the youth and family to complete required risk assessments.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Behavior Change",
+    definition:
+      "The work a youth does to incorporate newly learned skills into daily life to avoid problematic situations in the future.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Case Plan",
+    definition:
+      "A plan created with the youth's input to address dynamic risk factors while under court jurisdiction, in order to change targeted behavior.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Chief Probation Officer",
+    definition:
+      "The probation executive who oversees the juvenile probation department of a district.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Child Welfare (CW)",
+    definition:
+      "Juvenile court cases not related to a delinquency offense, but to allegations of abuse, neglect, abandonment, or dependency.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Clerk of Court (COC)",
+    definition:
+      "The clerical executive who oversees the clerical department of a district.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Community-Based",
+    definition:
+      "A non-secure local placement option allowing a youth to receive treatment or intervention while still living at home.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Community Service",
+    definition:
+      "A consequence requiring a youth to work in the community to repay society for the harm caused by their actions.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Contempt of Court",
+    definition:
+      "Disrespect to the court or failure to obey its rules or orders.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Court Appointed Special Advocate (CASA)",
+    definition:
+      "A sworn volunteer appointed by a judge to advocate for a child's best interests in foster care cases.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Custodian",
+    definition:
+      "The person with physical and/or legal control of a youth, temporarily or permanently.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Custody",
+    definition:
+      "The physical and legal responsibility for a youth, usually from parenthood, adoption, or court assignment.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Defense Attorney",
+    definition:
+      "An attorney who represents a youth in the formal court process, protecting their rights and interests.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Delinquency",
+    definition:
+      "Conduct out of accord with accepted behavior or the law; the general category of matters before the court involving youth offenses.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Delinquent Youth",
+    definition:
+      "Youth under age 18 who have committed an act that is a crime.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Detention",
+    definition:
+      "Short-term locked confinement for delinquent youth awaiting adjudication, placement, or disposition.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Detention Hearing",
+    definition:
+      "A hearing held within 48 hours of a youth's admission to detention to decide whether the youth continues in detention, is returned home, or is placed elsewhere.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Disposition",
+    definition:
+      "A court order after adjudication, similar to the sentencing of an adult.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Expungement",
+    definition:
+      "A court order allowing the destruction or sealing of juvenile records after a specified period without another offense.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Felony",
+    definition:
+      "In juvenile court, an offense that would be a felony if committed by an adult, classified into capital, 1st, 2nd, and 3rd degree in Utah.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Formal Probation",
+    definition:
+      "A probation status for higher-risk youth needing additional court jurisdiction, interventions, and more intense supervision.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Guardian ad Litem (GAL)",
+    definition:
+      "An attorney appointed to represent the best interests of a youth, which may differ from the youth's own wishes.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Guardianship",
+    definition:
+      "A legal relationship giving a guardian rights and obligations to care for a child, without severing the parent-child relationship.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Hearing",
+    definition:
+      "A session held before a judge to decide issues of fact, of law, or both.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Home Detention",
+    definition:
+      "An alternative to locked detention allowing a youth to be confined at home if not a danger to themselves or the community.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Incentives",
+    definition:
+      "Items or areas of value that encourage a youth's motivation for change and compliance with court-ordered conditions.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Intake Probation",
+    definition:
+      "A probation status for lower-risk youth needing less court jurisdiction and limited supervision.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Juvenile Court Judge",
+    definition:
+      "The judicial official overseeing a youth's case under a \"one family, one judge\" philosophy.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Mediation",
+    definition:
+      "Resolution of a dispute between two people with the help of an independent third party.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Misdemeanor",
+    definition:
+      "A minor offense, lower than a felony, classified into Class A, B, and C in Utah.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Non-Compliance",
+    definition:
+      "When a youth fails to follow through with a probation request, court order, or engages in problematic behavior.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Nonjudicial Agreement (NJA)",
+    definition:
+      "A written agreement (also known as diversion) between a delinquent youth and a probation officer that avoids filing a petition with the court.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Offense",
+    definition:
+      "A matter referred to juvenile court alleging that a youth violated a law or ordinance.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Petition",
+    definition:
+      "A legal document describing the alleged offense committed by a youth, or alleging abuse, neglect, or dependency of a child.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Plea",
+    definition:
+      "The youth's formal response to an offense, entered as \"admit\" or \"deny.\"",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Plea in Abeyance",
+    definition:
+      "When an offense admission is put on hold while the youth completes court-ordered requirements, after which the admission is withdrawn and offenses dismissed.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Probation Officer (PO)",
+    definition:
+      "An officer who supervises youth under juvenile court jurisdiction, completes assessments and case plans, and monitors compliance.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Prosecutor",
+    definition:
+      "A public official who represents the state or local jurisdiction during court proceedings.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Public Defender",
+    definition:
+      "A government lawyer appointed to provide free legal defense to a youth charged with an offense.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Recidivism",
+    definition:
+      "The commission of another offense after having previously been adjudicated of a prior offense.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Referral",
+    definition:
+      "A written report alleging that a juvenile committed an offense placing them within the jurisdiction of the juvenile court.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Restitution",
+    definition:
+      "Money, goods, or services assessed against a youth for an offense, to compensate a victim for their loss.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Review",
+    definition:
+      "A hearing before a juvenile court judge on the progress of a youth's case under continuing jurisdiction.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Secure Care",
+    definition:
+      "A secure facility for long-term placement of youth, similar to adult prisons.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Shelter Hearing",
+    definition:
+      "A court hearing held 72 hours after a child's removal from home in abuse, dependency, or neglect cases.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Status Offense",
+    definition:
+      "Misbehavior that would not be criminal for an adult but is an offense because of the youth's age, such as truancy.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Summons",
+    definition:
+      "A notice ordering a parent or guardian to appear in juvenile court with their youth at a set time and place.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Termination of Jurisdiction",
+    definition:
+      "The juvenile court concluding any control, authority, or interest in a case by court order.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Termination of Parental Rights (TPR)",
+    definition:
+      "The permanent elimination of all parental rights and duties by court order.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Trial",
+    definition:
+      "A formal, adversarial proceeding to determine facts and reach a decision on a contested matter.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Truant",
+    definition:
+      "A school-age youth who is absent from school without a legitimate or valid excuse.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Utah Juvenile Court",
+    definition:
+      "The Utah court with exclusive original jurisdiction over youth under 18 who violate the law, and children who are abused, neglected, or dependent.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Warrant",
+    definition:
+      "An order commanding a law enforcement officer to perform an arrest, search, or seizure.",
+    domain: "Corte Juvenil",
+  },
+  {
+    term: "Youth Court",
+    definition:
+      "A diversion program addressing minor offenses to prevent youth from entering the juvenile justice system.",
+    domain: "Corte Juvenil",
+  },
+];
+
+function normalizeTermKey(term) {
+  return term.trim().toLowerCase();
+}
+
+// Memoria local de términos que se fallan seguido (Quiz + Autoevaluación).
+// Vive únicamente en este navegador — no hay login ni sincronización.
+const WEAK_TERMS_KEY = "palabraJusta_weakTerms_v1";
+
+function loadWeakTerms() {
+  try {
+    return JSON.parse(window.localStorage.getItem(WEAK_TERMS_KEY) || "{}");
+  } catch (e) {
+    return {};
   }
+}
 
-  const renderView = () => {
-    if (semanasPorId[view]) {
-      return <SemanaView semana={semanasPorId[view]} />;
+function recordMiss(term) {
+  try {
+    const data = loadWeakTerms();
+    const key = normalizeTermKey(term);
+    data[key] = (data[key] || 0) + 1;
+    window.localStorage.setItem(WEAK_TERMS_KEY, JSON.stringify(data));
+  } catch (e) {
+    // Si localStorage no está disponible, seguimos sin trackear en silencio.
+  }
+}
+
+function clearWeakTerms() {
+  try {
+    window.localStorage.removeItem(WEAK_TERMS_KEY);
+  } catch (e) {}
+}
+
+function dedupeGlossary(sourcesInPriorityOrder) {
+  const seen = new Map();
+  for (const list of sourcesInPriorityOrder) {
+    for (const t of list) {
+      const key = normalizeTermKey(t.term);
+      if (!seen.has(key)) seen.set(key, t);
     }
-    switch (view) {
-      case "resumen":
-        return <ResumenView quizScores={quizScores} onNavigate={setView} />;
-      case "glosario":
-        return <GlosarioView />;
-      case "tarjetas":
-        return (
-          <TarjetasView
-            learnedTerms={learnedTerms}
-            toggleLearned={toggleLearned}
-          />
-        );
-      case "relacionar":
-        return <RelacionarView />;
-      case "quiz":
-        return <QuizView recordQuizScore={recordQuizScore} />;
-      case "caso":
-        return <CasoView />;
-      case "recursos":
-        return <RecursosView />;
-      default:
-        return <ResumenView quizScores={quizScores} onNavigate={setView} />;
-    }
-  };
+  }
+  return Array.from(seen.values());
+}
+
+const WEEK_TERMS = Object.entries(WEEK_CONTENT).flatMap(([week, data]) =>
+  (data.sections || []).flatMap((s) =>
+    s.terms.map((t) => ({ ...t, week: Number(week), section: s.title }))
+  )
+);
+
+// Precedencia: el glosario general (REFERENCE_GLOSSARY) que Jose proporcionó gana
+// sobre cualquier término repetido que también aparezca en el contenido semanal o
+// en el glosario de corte juvenil, para que cada término exista una sola vez.
+// Si la versión semanal de un término repetido traía equivalente en español, se
+// conserva ese dato sobre la entrada ganadora (no se pierde información útil).
+const SPANISH_BY_TERM = new Map(
+  WEEK_TERMS.filter((t) => t.es).map((t) => [normalizeTermKey(t.term), t.es])
+);
+
+const SEED_GLOSSARY = dedupeGlossary([
+  REFERENCE_GLOSSARY,
+  WEEK_TERMS,
+  JUVENILE_GLOSSARY,
+]).map((t) =>
+  t.es ? t : { ...t, es: SPANISH_BY_TERM.get(normalizeTermKey(t.term)) }
+);
+
+function NavButton({ active, onClick, children, icon: Icon }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-left px-4 py-2 flex items-center gap-2 transition-colors"
+      style={{
+        fontFamily: sans,
+        fontSize: 16,
+        color: active ? C.accent : C.text,
+        backgroundColor: active ? "rgba(0,80,211,0.08)" : "transparent",
+        borderLeft: `3px solid ${active ? C.highlight : "transparent"}`,
+        borderTop: "none",
+        borderRight: "none",
+        borderBottom: "none",
+        borderRadius: "0 8px 8px 0",
+        cursor: "pointer",
+      }}
+    >
+      {Icon && <Icon size={17} strokeWidth={2} style={{ flexShrink: 0 }} />}
+      <span>{children}</span>
+    </button>
+  );
+}
+
+function Eyebrow({ children }) {
+  return (
+    <p
+      style={{
+        fontFamily: mono,
+        fontSize: 11,
+        letterSpacing: "0.08em",
+        textTransform: "uppercase",
+        color: C.accent,
+        margin: "0 0 8px 0",
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+function WeekView({ week }) {
+  const content = WEEK_CONTENT[week];
+  const [openSection, setOpenSection] = useState(null);
 
   return (
-    <div className="flex min-h-screen font-sans bg-content">
-      <Sidebar view={view} onNavigate={setView} />
-      <main className="flex-1 p-6 md:p-10 overflow-y-auto">{renderView()}</main>
+    <div>
+      <Eyebrow>Programa semanal · Semana {week}</Eyebrow>
+      <h1
+        className="flex items-center gap-2"
+        style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}
+      >
+        <img
+          src={LOGO_URI}
+          alt=""
+          style={{ width: 46, height: 46, opacity: 0.95 }}
+        />
+        Semana {week}
+      </h1>
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, marginTop: 4 }}>
+        {content && content.sections
+          ? "Toca un tema para ver sus definiciones"
+          : content && content.activities
+          ? "Ética profesional y práctica de sight translation"
+          : "Aún no hay contenido cargado para esta semana."}
+      </p>
+
+      {content && content.sections ? (
+        <section className="mt-6">
+          <h2
+            style={{
+              fontFamily: serif,
+              color: C.accent,
+              fontSize: 19,
+              margin: "0 0 8px 0",
+            }}
+          >
+            Temario de la clase
+          </h2>
+          <div className="flex flex-col gap-1">
+            {content.sections.map((s, i) => {
+              const isOpen = openSection === s.title;
+              return (
+                <div
+                  key={s.title}
+                  className="rounded"
+                  style={{
+                    backgroundColor: C.card,
+                    border: `1px solid ${C.border}`,
+                  }}
+                >
+                  <button
+                    onClick={() => setOpenSection(isOpen ? null : s.title)}
+                    className="w-full px-3 py-2 flex items-baseline gap-3 text-left"
+                    style={{ background: "none", border: "none", cursor: "pointer" }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: serif,
+                        fontSize: 15,
+                        color: C.accent,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {i + 1}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: sans,
+                        fontSize: 15,
+                        color: C.text,
+                        flex: 1,
+                      }}
+                    >
+                      {s.title}
+                    </span>
+                    <span style={{ fontFamily: sans, fontSize: 13, color: C.label }}>
+                      {s.terms.length} términos
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div
+                      className="px-3 pb-3 flex flex-col gap-2"
+                      style={{ borderTop: `1px solid ${C.border}` }}
+                    >
+                      {s.terms.map((t) => (
+                        <div key={t.term} className="pt-2">
+                          <p
+                            style={{
+                              fontFamily: sans,
+                              fontSize: 15,
+                              color: C.text,
+                              margin: 0,
+                            }}
+                          >
+                            {t.term}
+                            {t.es && (
+                              <span
+                                style={{
+                                  fontStyle: "italic",
+                                  color: C.text,
+                                  marginLeft: 6,
+                                }}
+                              >
+                                — {t.es}
+                              </span>
+                            )}
+                          </p>
+                          <p
+                            style={{
+                              fontFamily: sans,
+                              fontSize: 14,
+                              color: C.muted,
+                              margin: "3px 0 0 0",
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {t.definition}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : content && content.activities ? (
+        <>
+          <section className="mt-6">
+            <p
+              style={{
+                fontFamily: sans,
+                fontSize: 15,
+                color: C.text,
+                lineHeight: 1.6,
+                margin: 0,
+              }}
+            >
+              Esta semana no se centró en vocabulario nuevo, sino en el código de
+              ética del intérprete judicial (NAJIT) y en la práctica de sight
+              translation. Los escenarios de abajo son los mismos que en la
+              pestaña Cánones; la práctica de lectura a la vista vive en su
+              propia sección.
+            </p>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                window.dispatchEvent(
+                  new CustomEvent("navigate", { detail: "sight" })
+                );
+              }}
+              className="inline-block mt-3 rounded px-4 py-2"
+              style={{
+                fontFamily: sans,
+                fontSize: 15,
+                color: C.bg,
+                backgroundColor: C.accent,
+                textDecoration: "none",
+              }}
+            >
+              Ir a Sight Translation →
+            </a>
+          </section>
+
+          <ScenarioSection
+            title="Escenarios de reflexión"
+            subtitle="Actividad de clase — toca un escenario para ver qué canón aplica"
+            scenarios={REFLEXION_SCENARIOS}
+          />
+          <ScenarioSection
+            title="Escenarios de práctica adicionales"
+            subtitle="Dilemas originales para seguir practicando el mismo tipo de análisis"
+            scenarios={ROLEPLAY_SCENARIOS}
+          />
+        </>
+      ) : (
+        <section className="mt-6">
+          <div
+            className="rounded p-4"
+            style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+          >
+            <p style={{ fontFamily: sans, color: C.text, fontSize: 15, margin: 0, lineHeight: 1.6 }}>
+              Vamos en la Semana {WEEK_SCHEDULE.lastCompleted.week} — la última clase
+              fue el {WEEK_SCHEDULE.lastCompleted.date}. Las próximas clases son los
+              viernes:
+            </p>
+            <ul className="mt-2 pl-4" style={{ margin: 0 }}>
+              {WEEK_SCHEDULE.upcoming.map((w) => (
+                <li
+                  key={w.week}
+                  style={{
+                    fontFamily: sans,
+                    fontSize: 15,
+                    color: w.week === week ? C.accent : C.muted,
+                    lineHeight: 1.8,
+                  }}
+                >
+                  Semana {w.week} — {w.date}
+                </li>
+              ))}
+            </ul>
+            <p style={{ fontFamily: sans, color: C.muted, fontSize: 13, margin: "10px 0 0 0" }}>
+              Esta sección se carga después de cada clase, con el mismo formato que
+              las anteriores.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {content && content.sections && (
+        <section className="mt-5">
+          <h2
+            style={{
+              fontFamily: serif,
+              color: C.accent,
+              fontSize: 19,
+              margin: "0 0 8px 0",
+            }}
+          >
+            Autoevaluación rápida
+          </h2>
+          <FillBlank
+            terms={content.sections.flatMap((s) => s.terms)}
+          />
+        </section>
+      )}
     </div>
+  );
+}
+
+function normalizeAnswer(s) {
+  return s
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function FillBlank({ terms }) {
+  const [order, setOrder] = useState(() => shuffle(terms));
+  const [idx, setIdx] = useState(0);
+  const [answer, setAnswer] = useState("");
+  const [checked, setChecked] = useState(null); // null | "correct" | "wrong"
+  const [score, setScore] = useState({ correct: 0, total: 0 });
+
+  const current = order[idx];
+  const done = idx >= order.length;
+
+  function check() {
+    if (!answer.trim() || checked) return;
+    const isCorrect = normalizeAnswer(answer) === normalizeAnswer(current.term);
+    setChecked(isCorrect ? "correct" : "wrong");
+    if (!isCorrect) recordMiss(current.term);
+    setScore((s) => ({
+      correct: s.correct + (isCorrect ? 1 : 0),
+      total: s.total + 1,
+    }));
+  }
+
+  function next() {
+    setAnswer("");
+    setChecked(null);
+    setIdx((i) => i + 1);
+  }
+
+  if (order.length === 0) return null;
+
+  if (done) {
+    return (
+      <div
+        className="rounded p-4 text-center"
+        style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+      >
+        <img
+          src={LOGO_URI}
+          alt=""
+          style={{ width: 38, height: 38, margin: "0 auto 10px auto", display: "block", opacity: 0.18 }}
+        />
+        <p style={{ fontFamily: serif, fontSize: 20, color: C.text, margin: 0 }}>
+          {score.correct} de {score.total} correctas
+        </p>
+        <button
+          onClick={() => {
+            setOrder(shuffle(terms));
+            setIdx(0);
+            setAnswer("");
+            setChecked(null);
+            setScore({ correct: 0, total: 0 });
+          }}
+          className="mt-3"
+          style={{
+            fontFamily: sans,
+            fontSize: 15,
+            padding: "6px 14px",
+            borderRadius: 4,
+            border: `1px solid ${C.border}`,
+            backgroundColor: "transparent",
+            color: C.text,
+            cursor: "pointer",
+          }}
+        >
+          Repetir
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="rounded p-4"
+      style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+    >
+      <p
+        style={{
+          fontFamily: sans,
+          fontSize: 16,
+          color: C.text,
+          lineHeight: 1.5,
+          margin: "8px 0 0 0",
+        }}
+      >
+        {current.definition}
+      </p>
+
+      <input
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && (checked ? next() : check())}
+        placeholder="Escribe el término en inglés..."
+        disabled={!!checked}
+        className="w-full rounded px-3 py-2 mt-3"
+        style={{
+          fontFamily: sans,
+          fontSize: 16,
+          color: C.text,
+          backgroundColor: C.bg,
+          border: `1px solid ${
+            checked === "correct"
+              ? C.success
+              : checked === "wrong"
+              ? "#C0392B"
+              : C.border
+          }`,
+          outline: "none",
+        }}
+      />
+
+      {checked && (
+        <p
+          style={{
+            fontFamily: sans,
+            fontSize: 15,
+            color: checked === "correct" ? C.success : "#C0392B",
+            margin: "8px 0 0 0",
+          }}
+        >
+          {checked === "correct"
+            ? "Correcto."
+            : `La respuesta era: ${current.term}`}
+          {current.es && (
+            <span style={{ color: C.muted }}> — {current.es}</span>
+          )}
+        </p>
+      )}
+
+      <button
+        onClick={checked ? next : check}
+        className="mt-3"
+        style={{
+          fontFamily: sans,
+          fontSize: 15,
+          padding: "8px 16px",
+          borderRadius: 4,
+          border: "none",
+          backgroundColor: C.accent,
+          color: C.bg,
+          cursor: "pointer",
+        }}
+      >
+        {checked ? "Siguiente" : "Comprobar"}
+      </button>
+    </div>
+  );
+}
+
+function GlossaryView({ terms }) {
+  const [query, setQuery] = useState("");
+  const [letter, setLetter] = useState(null);
+  const [openTerm, setOpenTerm] = useState(null);
+
+  const letters = useMemo(() => {
+    const set = new Set(terms.map((t) => t.term[0].toUpperCase()));
+    return Array.from(set).sort();
+  }, [terms]);
+
+  function matchScore(t, q) {
+    const term = t.term.toLowerCase();
+    const es = t.es ? t.es.toLowerCase() : "";
+    const def = t.definition.toLowerCase();
+    if (term === q) return 0;
+    if (term.startsWith(q)) return 1;
+    if (es.startsWith(q)) return 2;
+    if (term.includes(q)) return 3;
+    if (es.includes(q)) return 4;
+    if (def.includes(q)) return 5;
+    return null;
+  }
+
+  const filtered = useMemo(() => {
+    let list = terms;
+    if (letter) list = list.filter((t) => t.term[0].toUpperCase() === letter);
+
+    const q = query.trim().toLowerCase();
+    if (!q) return list;
+
+    const scored = list
+      .map((t) => ({ t, score: matchScore(t, q) }))
+      .filter((x) => x.score !== null)
+      .sort((a, b) => a.score - b.score || a.t.term.localeCompare(b.t.term));
+
+    // Mientras se escribe (sin navegar por letra), muestra solo las 3
+    // coincidencias más cercanas, tipo autocompletado.
+    const ranked = scored.map((x) => x.t);
+    return letter ? ranked : ranked.slice(0, 3);
+  }, [terms, letter, query]);
+
+  return (
+    <div>
+      <Eyebrow>Herramientas de estudio · Consulta</Eyebrow>
+      <h1
+        style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}
+      >
+        Glosario jurídico
+      </h1>
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, marginTop: 4 }}>
+        Busca por palabra o navega por letra
+      </p>
+
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Buscar término o definición..."
+        className="w-full rounded px-3 py-2 mt-5"
+        style={{
+          fontFamily: sans,
+          fontSize: 16,
+          color: C.text,
+          backgroundColor: C.card,
+          border: `1px solid ${C.border}`,
+          outline: "none",
+        }}
+      />
+
+      <div className="flex flex-wrap gap-1 mt-3">
+        <button
+          onClick={() => setLetter(null)}
+          style={{
+            fontFamily: sans,
+            fontSize: 14,
+            padding: "4px 9px",
+            borderRadius: 4,
+            border: `1px solid ${C.border}`,
+            backgroundColor: letter === null ? C.accent : "transparent",
+            color: letter === null ? C.bg : C.muted,
+            cursor: "pointer",
+          }}
+        >
+          Todas
+        </button>
+        {letters.map((l) => (
+          <button
+            key={l}
+            onClick={() => setLetter(l)}
+            style={{
+              fontFamily: sans,
+              fontSize: 14,
+              padding: "4px 9px",
+              borderRadius: 4,
+              border: `1px solid ${C.border}`,
+              backgroundColor: letter === l ? C.accent : "transparent",
+              color: letter === l ? C.bg : C.muted,
+              cursor: "pointer",
+            }}
+          >
+            {l}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-5 flex flex-col gap-2">
+        {filtered.length === 0 && (
+          <p style={{ fontFamily: sans, color: C.muted, fontSize: 15 }}>
+            Sin resultados para esa búsqueda.
+          </p>
+        )}
+        {filtered.map((t) => {
+          const isOpen = openTerm === t.term;
+          return (
+            <div
+              key={t.term}
+              className="rounded"
+              style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+            >
+              <button
+                onClick={() => setOpenTerm(isOpen ? null : t.term)}
+                className="w-full text-left px-4 py-3 flex items-center justify-between gap-3"
+                style={{
+                  fontFamily: sans,
+                  fontSize: 16,
+                  color: C.text,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <span>
+                  {t.term}
+                  {t.es && (
+                    <span
+                      style={{
+                        display: "block",
+                        fontStyle: "italic",
+                        color: C.text,
+                        fontSize: 14,
+                        marginTop: 2,
+                      }}
+                    >
+                      {t.es}
+                    </span>
+                  )}
+                </span>
+                {(t.week || t.domain) && (
+                  <span
+                    style={{
+                      fontSize: 13,
+                      color: C.label,
+                      whiteSpace: "nowrap",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {t.week ? `Semana ${t.week}` : t.domain}
+                  </span>
+                )}
+              </button>
+              {isOpen && (
+                <div className="px-4 pb-4">
+                  <p
+                    style={{
+                      fontFamily: sans,
+                      fontSize: 15,
+                      color: C.muted,
+                      margin: 0,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {t.definition}
+                  </p>
+                  {t.context && (
+                    <p
+                      className="mt-3 pl-3"
+                      style={{
+                        fontFamily: sans,
+                        fontSize: 15,
+                        fontStyle: "italic",
+                        color: C.text,
+                        margin: "12px 0 0 0",
+                        borderLeft: `2px solid ${C.accent}`,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {t.context}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function FlashcardsView({ terms }) {
+  const [idx, setIdx] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const term = terms[idx];
+
+  function next() {
+    setFlipped(false);
+    setIdx((idx + 1) % terms.length);
+  }
+  function prev() {
+    setFlipped(false);
+    setIdx((idx - 1 + terms.length) % terms.length);
+  }
+
+  return (
+    <div>
+      <Eyebrow>Herramientas de estudio · Memorización</Eyebrow>
+      <h1
+        style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}
+      >
+        Flashcards
+      </h1>
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, marginTop: 4 }}>
+        Tarjeta {idx + 1} de {terms.length}
+      </p>
+
+      <div
+        onClick={() => setFlipped(!flipped)}
+        className="mt-6 rounded flex flex-col items-center justify-center text-center p-8"
+        style={{
+          backgroundColor: C.card,
+          border: `1px solid ${C.border}`,
+          minHeight: 220,
+          cursor: "pointer",
+        }}
+      >
+        {flipped ? (
+          <>
+            {term.es && (
+              <p
+                style={{
+                  fontFamily: serif,
+                  fontSize: 21,
+                  fontStyle: "italic",
+                  color: C.text,
+                  margin: "0 0 12px 0",
+                }}
+              >
+                {term.es}
+              </p>
+            )}
+            <p
+              style={{
+                fontFamily: sans,
+                fontSize: 16,
+                color: C.text,
+                lineHeight: 1.5,
+                margin: 0,
+              }}
+            >
+              {term.definition}
+            </p>
+            {term.context && (
+              <p
+                style={{
+                  fontFamily: sans,
+                  fontSize: 15,
+                  fontStyle: "italic",
+                  color: C.muted,
+                  lineHeight: 1.5,
+                  margin: "14px 0 0 0",
+                }}
+              >
+                {term.context}
+              </p>
+            )}
+          </>
+        ) : (
+          <p
+            style={{
+              fontFamily: serif,
+              fontSize: 24,
+              color: C.text,
+              lineHeight: 1.5,
+              margin: 0,
+            }}
+          >
+            {term.term}
+          </p>
+        )}
+      </div>
+      <p
+        className="text-center mt-2"
+        style={{ fontFamily: sans, fontSize: 14, color: C.muted }}
+      >
+        toca la tarjeta para {flipped ? "ver el término" : "ver la definición"}
+      </p>
+
+      <div className="flex justify-center gap-3 mt-5">
+        <button
+          onClick={prev}
+          style={{
+            fontFamily: sans,
+            fontSize: 15,
+            padding: "8px 16px",
+            borderRadius: 4,
+            border: `1px solid ${C.border}`,
+            backgroundColor: "transparent",
+            color: C.text,
+            cursor: "pointer",
+          }}
+        >
+          Anterior
+        </button>
+        <button
+          onClick={next}
+          style={{
+            fontFamily: sans,
+            fontSize: 15,
+            padding: "8px 16px",
+            borderRadius: 4,
+            border: "none",
+            backgroundColor: C.accent,
+            color: C.bg,
+            cursor: "pointer",
+          }}
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ResourceCard({ title, subtitle, note, url }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      className="block rounded px-3 py-3"
+      style={{
+        backgroundColor: C.card,
+        border: `1px solid ${C.border}`,
+        textDecoration: "none",
+      }}
+    >
+      <p
+        style={{
+          fontFamily: serif,
+          fontSize: 16,
+          color: C.text,
+          margin: 0,
+        }}
+      >
+        {title}
+      </p>
+      {subtitle && (
+        <p
+          style={{
+            fontFamily: sans,
+            fontSize: 14,
+            fontStyle: "italic",
+            color: C.text,
+            margin: "3px 0 0 0",
+          }}
+        >
+          {subtitle}
+        </p>
+      )}
+      {note && (
+        <p
+          style={{
+            fontFamily: sans,
+            fontSize: 14,
+            color: C.muted,
+            lineHeight: 1.5,
+            margin: "6px 0 0 0",
+          }}
+        >
+          {note}
+        </p>
+      )}
+    </a>
+  );
+}
+
+function CanonsView() {
+  return (
+    <div>
+      <Eyebrow>Contenido complementario · Ética</Eyebrow>
+      <h1 style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}>
+        Cánones del intérprete judicial
+      </h1>
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, marginTop: 4 }}>
+        Código de ética profesional — 10 cánones
+      </p>
+
+      <div className="flex flex-col gap-3 mt-6">
+        {CANONS.map((c) => (
+          <div
+            key={c.number}
+            className="rounded p-4"
+            style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+          >
+            <div className="flex items-baseline gap-3">
+              <span
+                style={{
+                  fontFamily: serif,
+                  fontSize: 20,
+                  color: C.accent,
+                  flexShrink: 0,
+                }}
+              >
+                {c.number}
+              </span>
+              <div>
+                <p style={{ fontFamily: sans, fontSize: 16, color: C.text, margin: 0 }}>
+                  {c.title}
+                </p>
+                <p
+                  style={{
+                    fontFamily: sans,
+                    fontSize: 14,
+                    fontStyle: "italic",
+                    color: C.text,
+                    margin: "2px 0 0 0",
+                  }}
+                >
+                  {c.titleEs}
+                </p>
+              </div>
+            </div>
+            <p
+              style={{
+                fontFamily: sans,
+                fontSize: 14,
+                color: C.muted,
+                lineHeight: 1.5,
+                margin: "10px 0 0 0",
+              }}
+            >
+              {c.definition}
+            </p>
+            <p
+              style={{
+                fontFamily: sans,
+                fontSize: 13,
+                color: C.accent,
+                margin: "8px 0 0 0",
+              }}
+            >
+              {c.question}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <ScenarioSection
+        title="Escenarios de reflexión"
+        subtitle="Actividad de clase — toca un escenario para ver qué canón aplica"
+        scenarios={REFLEXION_SCENARIOS}
+      />
+
+      <ScenarioSection
+        title="Escenarios de práctica adicionales"
+        subtitle="Dilemas originales para seguir practicando el mismo tipo de análisis"
+        scenarios={ROLEPLAY_SCENARIOS}
+      />
+    </div>
+  );
+}
+
+function ScenarioSection({ title, subtitle, scenarios }) {
+  const [openLabel, setOpenLabel] = useState(null);
+
+  return (
+    <section className="mt-8">
+      <h2
+        style={{
+          fontFamily: serif,
+          color: C.accent,
+          fontSize: 19,
+          margin: "0 0 4px 0",
+        }}
+      >
+        {title}
+      </h2>
+      <p style={{ fontFamily: sans, fontSize: 13, color: C.muted, margin: "0 0 10px 0" }}>
+        {subtitle}
+      </p>
+      <div className="flex flex-col gap-2">
+        {scenarios.map((s) => {
+          const isOpen = openLabel === s.label;
+          const canon = CANONS.find((c) => c.number === s.canon);
+          return (
+            <div
+              key={s.label}
+              className="rounded"
+              style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+            >
+              <button
+                onClick={() => setOpenLabel(isOpen ? null : s.label)}
+                className="w-full px-3 py-3 flex items-start gap-3 text-left"
+                style={{ background: "none", border: "none", cursor: "pointer" }}
+              >
+                <span
+                  style={{
+                    fontFamily: serif,
+                    fontSize: 15,
+                    color: C.accent,
+                    flexShrink: 0,
+                  }}
+                >
+                  {s.label}
+                </span>
+                <span style={{ fontFamily: sans, fontSize: 14, color: C.text, lineHeight: 1.5 }}>
+                  {s.situation}
+                </span>
+              </button>
+              {isOpen && (
+                <div
+                  className="px-3 pb-3"
+                  style={{ borderTop: `1px solid ${C.border}` }}
+                >
+                  <p
+                    style={{
+                      fontFamily: sans,
+                      fontSize: 14,
+                      color: C.accent,
+                      margin: "10px 0 0 0",
+                    }}
+                  >
+                    Canón {canon.number}: {canon.title} — {canon.titleEs}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: sans,
+                      fontSize: 14,
+                      color: C.muted,
+                      lineHeight: 1.5,
+                      margin: "6px 0 0 0",
+                    }}
+                  >
+                    {s.reasoning}
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function SightPracticeView() {
+  const [idx, setIdx] = useState(0);
+  const current = SIGHT_PRACTICE[idx];
+
+  return (
+    <div>
+      <Eyebrow>Herramientas de estudio · Práctica</Eyebrow>
+      <h1 style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}>
+        Sight Translation
+      </h1>
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, marginTop: 4 }}>
+        Textos originales de práctica — no son material de examen oficial
+      </p>
+
+      <div className="flex flex-wrap gap-1 mt-4">
+        {SIGHT_PRACTICE.map((p, i) => (
+          <button
+            key={p.title}
+            onClick={() => setIdx(i)}
+            style={{
+              fontFamily: sans,
+              fontSize: 14,
+              padding: "5px 12px",
+              borderRadius: 4,
+              border: `1px solid ${C.border}`,
+              backgroundColor: idx === i ? C.accent : "transparent",
+              color: idx === i ? C.bg : C.muted,
+              cursor: "pointer",
+            }}
+          >
+            {p.title}
+          </button>
+        ))}
+      </div>
+
+      <div
+        key={current.title + "-passage"}
+        className="rounded p-4 mt-4"
+        style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+      >
+        <p
+          style={{
+            fontFamily: sans,
+            fontSize: 15,
+            color: C.text,
+            lineHeight: 1.7,
+            margin: 0,
+            whiteSpace: "pre-line",
+          }}
+        >
+          {current.passage}
+        </p>
+      </div>
+
+      <section className="mt-5">
+        <h2
+          style={{
+            fontFamily: serif,
+            color: C.accent,
+            fontSize: 19,
+            margin: "0 0 8px 0",
+          }}
+        >
+          Términos clave
+        </h2>
+        <KeywordDrill key={current.title} terms={current.keywords} />
+      </section>
+    </div>
+  );
+}
+
+function KeywordDrill({ terms }) {
+  const [order, setOrder] = useState(() => shuffle(terms));
+  const [idx, setIdx] = useState(0);
+  const [answer, setAnswer] = useState("");
+  const [checked, setChecked] = useState(null);
+
+  const current = order[idx];
+  const done = idx >= order.length;
+
+  function check() {
+    if (!answer.trim() || checked) return;
+    const isCorrect = normalizeAnswer(answer) === normalizeAnswer(current.es);
+    setChecked(isCorrect ? "correct" : "wrong");
+  }
+
+  function next() {
+    setAnswer("");
+    setChecked(null);
+    setIdx((i) => i + 1);
+  }
+
+  function restart() {
+    setOrder(shuffle(terms));
+    setIdx(0);
+    setAnswer("");
+    setChecked(null);
+  }
+
+  if (done) {
+    return (
+      <div
+        className="rounded p-4 text-center"
+        style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+      >
+        <p style={{ fontFamily: serif, fontSize: 18, color: C.text, margin: 0 }}>
+          Terminaste los términos de este texto
+        </p>
+        <button
+          onClick={restart}
+          className="mt-3"
+          style={{
+            fontFamily: sans,
+            fontSize: 15,
+            padding: "6px 14px",
+            borderRadius: 4,
+            border: `1px solid ${C.border}`,
+            backgroundColor: "transparent",
+            color: C.text,
+            cursor: "pointer",
+          }}
+        >
+          Repetir
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="rounded p-4"
+      style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+    >
+      <p
+        style={{
+          fontFamily: serif,
+          fontSize: 19,
+          color: C.text,
+          margin: 0,
+        }}
+      >
+        {current.term}
+      </p>
+
+      <input
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && (checked ? next() : check())}
+        placeholder="Escribe el equivalente en español..."
+        disabled={!!checked}
+        className="w-full rounded px-3 py-2 mt-3"
+        style={{
+          fontFamily: sans,
+          fontSize: 16,
+          color: C.text,
+          backgroundColor: C.bg,
+          border: `1px solid ${
+            checked === "correct" ? C.success : checked === "wrong" ? "#C0392B" : C.border
+          }`,
+          outline: "none",
+        }}
+      />
+
+      {checked && (
+        <p
+          style={{
+            fontFamily: sans,
+            fontSize: 15,
+            color: checked === "correct" ? C.success : "#C0392B",
+            margin: "8px 0 0 0",
+          }}
+        >
+          {checked === "correct" ? "Correcto." : `Sugerido: ${current.es}`}
+        </p>
+      )}
+
+      <button
+        onClick={checked ? next : check}
+        className="mt-3"
+        style={{
+          fontFamily: sans,
+          fontSize: 15,
+          padding: "8px 16px",
+          borderRadius: 4,
+          border: "none",
+          backgroundColor: C.accent,
+          color: C.bg,
+          cursor: "pointer",
+        }}
+      >
+        {checked ? "Siguiente" : "Comprobar"}
+      </button>
+    </div>
+  );
+}
+
+function WeakTermsView({ terms }) {
+  const [weakData, setWeakData] = useState(() => loadWeakTerms());
+  const [practicing, setPracticing] = useState(false);
+
+  const weakList = useMemo(() => {
+    return Object.entries(weakData)
+      .map(([key, misses]) => {
+        const t = terms.find((x) => normalizeTermKey(x.term) === key);
+        return t ? { ...t, misses } : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.misses - a.misses);
+  }, [weakData, terms]);
+
+  function refresh() {
+    setWeakData(loadWeakTerms());
+  }
+
+  function reset() {
+    clearWeakTerms();
+    setWeakData({});
+    setPracticing(false);
+  }
+
+  if (practicing && weakList.length > 0) {
+    return (
+      <div>
+        <Eyebrow>Herramientas de estudio · Repaso dirigido</Eyebrow>
+        <h1 style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}>
+          Practicando tus términos difíciles
+        </h1>
+        <button
+          onClick={() => setPracticing(false)}
+          className="mt-3"
+          style={{
+            fontFamily: sans,
+            fontSize: 14,
+            color: C.accent,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 0,
+          }}
+        >
+          ← Volver a la lista
+        </button>
+        <div className="mt-4">
+          <FillBlank terms={weakList} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Eyebrow>Herramientas de estudio · Repaso dirigido</Eyebrow>
+      <h1 style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}>
+        Términos difíciles
+      </h1>
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, marginTop: 4 }}>
+        Se guarda solo en este navegador — cada vez que fallas un término en Quiz o
+        Autoevaluación, aparece aquí.
+      </p>
+
+      {weakList.length === 0 ? (
+        <div
+          className="rounded p-4 mt-6"
+          style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+        >
+          <p style={{ fontFamily: sans, color: C.muted, fontSize: 15, margin: 0 }}>
+            Todavía no has fallado ningún término en Quiz o Autoevaluación en este
+            navegador. Esta lista se va a ir llenando sola conforme practiques.
+          </p>
+          <button
+            onClick={refresh}
+            className="mt-3"
+            style={{
+              fontFamily: sans,
+              fontSize: 14,
+              padding: "6px 14px",
+              borderRadius: 4,
+              border: `1px solid ${C.border}`,
+              backgroundColor: "transparent",
+              color: C.text,
+              cursor: "pointer",
+            }}
+          >
+            Actualizar
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="flex gap-2 mt-6">
+            <button
+              onClick={() => setPracticing(true)}
+              style={{
+                fontFamily: sans,
+                fontSize: 15,
+                padding: "8px 16px",
+                borderRadius: 4,
+                border: "none",
+                backgroundColor: C.accent,
+                color: C.bg,
+                cursor: "pointer",
+              }}
+            >
+              Practicar estos {weakList.length} términos
+            </button>
+            <button
+              onClick={reset}
+              style={{
+                fontFamily: sans,
+                fontSize: 15,
+                padding: "8px 16px",
+                borderRadius: 4,
+                border: `1px solid ${C.border}`,
+                backgroundColor: "transparent",
+                color: C.muted,
+                cursor: "pointer",
+              }}
+            >
+              Reiniciar lista
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-2 mt-4">
+            {weakList.map((t) => (
+              <div
+                key={t.term}
+                className="rounded px-3 py-2 flex items-start justify-between gap-3"
+                style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+              >
+                <div>
+                  <p style={{ fontFamily: sans, fontSize: 15, color: C.text, margin: 0 }}>
+                    {t.term}
+                    {t.es && (
+                      <span style={{ fontStyle: "italic", marginLeft: 6 }}>
+                        — {t.es}
+                      </span>
+                    )}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: sans,
+                      fontSize: 13,
+                      color: C.muted,
+                      margin: "3px 0 0 0",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {t.definition}
+                  </p>
+                </div>
+                <span
+                  style={{
+                    fontFamily: mono,
+                    fontSize: 12,
+                    color: C.highlight,
+                    flexShrink: 0,
+                  }}
+                >
+                  {t.misses}×
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function ResourcesView({ data }) {
+  return (
+    <div>
+      <Eyebrow>Contenido complementario · Biblioteca</Eyebrow>
+      <h1 style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}>
+        Recursos del intérprete
+      </h1>
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, marginTop: 4 }}>
+        Libros, video y fuentes oficiales
+      </p>
+
+      <section className="mt-6">
+        <h2
+          style={{
+            fontFamily: serif,
+            color: C.accent,
+            fontSize: 19,
+            margin: "0 0 8px 0",
+          }}
+        >
+          Libros
+        </h2>
+        <div className="flex flex-col gap-2">
+          {data.books.map((b) => (
+            <ResourceCard
+              key={b.title}
+              title={b.title}
+              subtitle={b.author}
+              note={b.note}
+              url={b.url}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-5">
+        <h2
+          style={{
+            fontFamily: serif,
+            color: C.accent,
+            fontSize: 19,
+            margin: "0 0 8px 0",
+          }}
+        >
+          Video
+        </h2>
+        {data.videos.length === 0 ? (
+          <div
+            className="rounded p-4"
+            style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+          >
+            <p style={{ fontFamily: sans, color: C.muted, fontSize: 15, margin: 0 }}>
+              Aún no hay video agregado.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {data.videos.map((v) => (
+              <ResourceCard
+                key={v.title}
+                title={v.title}
+                subtitle={v.author}
+                note={v.note}
+                url={v.url}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-5 mb-2">
+        <h2
+          style={{
+            fontFamily: serif,
+            color: C.accent,
+            fontSize: 19,
+            margin: "0 0 8px 0",
+          }}
+        >
+          Fuentes oficiales
+        </h2>
+        <div className="flex flex-col gap-1">
+          {data.officialSources.map((s) => (
+            <a
+              key={s.url}
+              href={s.url}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                fontFamily: sans,
+                fontSize: 14,
+                color: C.accent,
+                textDecoration: "none",
+              }}
+            >
+              {s.title}
+            </a>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function CaseView({ data }) {
+  return (
+    <div>
+      <Eyebrow>Contenido complementario · Actualidad</Eyebrow>
+      <h1 style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}>
+        Caso de la semana
+      </h1>
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, marginTop: 4 }}>
+        {data.dateLabel}
+      </p>
+
+      <h2
+        style={{
+          fontFamily: serif,
+          color: C.accent,
+          fontSize: 21,
+          margin: "20px 0 8px 0",
+        }}
+      >
+        {data.title}
+      </h2>
+      <p
+        style={{
+          fontFamily: sans,
+          fontSize: 16,
+          color: C.text,
+          lineHeight: 1.6,
+          margin: 0,
+        }}
+      >
+        {data.summary}
+      </p>
+
+      <section className="mt-5">
+        <h3
+          style={{
+            fontFamily: serif,
+            color: C.accent,
+            fontSize: 18,
+            margin: "0 0 8px 0",
+          }}
+        >
+          Cómo cambiaron los cargos
+        </h3>
+        <div
+          className="rounded overflow-hidden"
+          style={{ border: `1px solid ${C.border}` }}
+        >
+          {data.chargeChanges.map((c, i) => (
+            <div
+              key={i}
+              className="px-3 py-2 flex items-center justify-between gap-3"
+              style={{
+                backgroundColor: i % 2 === 0 ? C.card : C.bg,
+                borderTop: i === 0 ? "none" : `1px solid ${C.border}`,
+              }}
+            >
+              <span style={{ fontFamily: sans, fontSize: 15, color: C.muted }}>
+                {c.original}
+              </span>
+              <span style={{ fontFamily: sans, fontSize: 13, color: C.label }}>
+                →
+              </span>
+              <span
+                style={{
+                  fontFamily: sans,
+                  fontSize: 15,
+                  color: C.text,
+                  textAlign: "right",
+                }}
+              >
+                {c.result}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-5">
+        <h3
+          style={{
+            fontFamily: serif,
+            color: C.accent,
+            fontSize: 18,
+            margin: "0 0 8px 0",
+          }}
+        >
+          Terminología en contexto
+        </h3>
+        <div className="flex flex-col gap-2">
+          {data.connections.map((c, i) => (
+            <p
+              key={i}
+              className="rounded px-3 py-2"
+              style={{
+                backgroundColor: C.card,
+                border: `1px solid ${C.border}`,
+                fontFamily: sans,
+                fontSize: 15,
+                color: C.text,
+                lineHeight: 1.5,
+                margin: 0,
+              }}
+            >
+              {c}
+            </p>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-5 mb-2">
+        <h3
+          style={{
+            fontFamily: serif,
+            color: C.accent,
+            fontSize: 18,
+            margin: "0 0 8px 0",
+          }}
+        >
+          Fuentes
+        </h3>
+        <div className="flex flex-col gap-1">
+          {data.sources.map((s, i) => (
+            <a
+              key={i}
+              href={s.url}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                fontFamily: sans,
+                fontSize: 14,
+                color: C.accent,
+                textDecoration: "none",
+              }}
+            >
+              {s.title}
+            </a>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function buildMCQuestions(terms, count) {
+  const pool = shuffle(terms).slice(0, count);
+  return pool.map((t) => {
+    const stop = new Set([
+      "of", "a", "an", "the", "and", "or", "in", "to", "for", "by", "on",
+      "at", "with", "is", "are", "as", "from", "that", "this", "be",
+    ]);
+    const queryWords = t.term
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length > 2 && !stop.has(w));
+
+    // Evita distractores que compartan cualquier palabra significativa con el
+    // término preguntado (ej. "Attempted battery" vs. cualquier otro término o
+    // definición que contenga "battery"), no solo la frase completa.
+    const isSafe = (x) => {
+      if (x.term === t.term) return false;
+      const haystack = (x.term + " " + x.definition).toLowerCase();
+      return !queryWords.some((w) =>
+        new RegExp(`\\b${w}\\b`).test(haystack)
+      );
+    };
+
+    const tag = t.section || t.domain;
+    const sameTag = terms.filter((x) => isSafe(x) && (x.section || x.domain) === tag);
+    const rest = terms.filter((x) => isSafe(x) && (x.section || x.domain) !== tag);
+    // Prioriza 3 distractores del mismo tema/dominio; si no alcanzan, rellena con el resto.
+    const distractorSource = shuffle(sameTag).slice(0, 3);
+    if (distractorSource.length < 3) {
+      const needed = 3 - distractorSource.length;
+      distractorSource.push(...shuffle(rest).slice(0, needed));
+    }
+    const options = shuffle([
+      { text: t.definition, correct: true },
+      ...distractorSource.map((d) => ({ text: d.definition, correct: false })),
+    ]);
+    return { term: t.term, es: t.es, options };
+  });
+}
+
+function shareRoot(a, b) {
+  const x = a.toLowerCase();
+  const y = b.toLowerCase();
+  return x !== y && (x.includes(y) || y.includes(x));
+}
+
+function pickDistinctTerms(terms, count) {
+  const shuffled = shuffle(terms);
+  const chosen = [];
+  for (const t of shuffled) {
+    if (chosen.length >= count) break;
+    if (chosen.some((c) => shareRoot(c.term, t.term))) continue;
+    chosen.push(t);
+  }
+  return chosen;
+}
+
+function MatchView() {
+  const weekNumbers = Object.keys(WEEK_CONTENT).map(Number);
+  const [scope, setScope] = useState(weekNumbers[0] || "all");
+  const isMobile = useIsMobile();
+
+  const scopePool = useMemo(() => {
+    if (scope === "all") return SEED_GLOSSARY;
+    return SEED_GLOSSARY.filter((t) => t.week === scope);
+  }, [scope]);
+
+  const [pairs, setPairs] = useState(() => pickDistinctTerms(scopePool, 5));
+  const [rightOrder, setRightOrder] = useState(() => shuffle(pairs));
+  const [leftSel, setLeftSel] = useState(null);
+  const [matched, setMatched] = useState(new Set());
+  const [wrong, setWrong] = useState(null); // { leftTerm, rightTerm } briefly
+
+  function newRound(pool) {
+    const fresh = pickDistinctTerms(pool, 5);
+    setPairs(fresh);
+    setRightOrder(shuffle(fresh));
+    setLeftSel(null);
+    setMatched(new Set());
+    setWrong(null);
+  }
+
+  function changeScope(s) {
+    setScope(s);
+    const pool = s === "all" ? SEED_GLOSSARY : SEED_GLOSSARY.filter((t) => t.week === s);
+    newRound(pool);
+  }
+
+  function pickLeft(term) {
+    if (matched.has(term)) return;
+    setLeftSel(term);
+  }
+
+  function pickRight(term) {
+    if (matched.has(term) || leftSel === null) return;
+    if (leftSel === term) {
+      setMatched((m) => new Set([...m, term]));
+      setLeftSel(null);
+    } else {
+      setWrong({ left: leftSel, right: term });
+      setTimeout(() => setWrong(null), 500);
+      setLeftSel(null);
+    }
+  }
+
+  const done = pairs.length > 0 && matched.size === pairs.length;
+
+  return (
+    <div>
+      <Eyebrow>Herramientas de estudio · Asociación</Eyebrow>
+      <h1 style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}>
+        Relacionar
+      </h1>
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, marginTop: 4 }}>
+        Toca un término y luego su definición
+      </p>
+
+      <div className="flex flex-wrap gap-1 mt-4">
+        {weekNumbers.map((w) => (
+          <button
+            key={w}
+            onClick={() => changeScope(w)}
+            style={{
+              fontFamily: sans,
+              fontSize: 14,
+              padding: "4px 10px",
+              borderRadius: 4,
+              border: `1px solid ${C.border}`,
+              backgroundColor: scope === w ? C.accent : "transparent",
+              color: scope === w ? C.bg : C.muted,
+              cursor: "pointer",
+            }}
+          >
+            Semana {w}
+          </button>
+        ))}
+        <button
+          onClick={() => changeScope("all")}
+          style={{
+            fontFamily: sans,
+            fontSize: 14,
+            padding: "4px 10px",
+            borderRadius: 4,
+            border: `1px solid ${C.border}`,
+            backgroundColor: scope === "all" ? C.accent : "transparent",
+            color: scope === "all" ? C.bg : C.muted,
+            cursor: "pointer",
+          }}
+        >
+          Todo
+        </button>
+      </div>
+
+      {done ? (
+        <div
+          className="mt-6 rounded p-4 text-center"
+          style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+        >
+          <img
+            src={LOGO_URI}
+            alt=""
+            style={{ width: 38, height: 38, margin: "0 auto 10px auto", display: "block", opacity: 0.18 }}
+          />
+          <p style={{ fontFamily: serif, fontSize: 20, color: C.text, margin: 0 }}>
+            Tanda completa
+          </p>
+          <button
+            onClick={() => newRound(scopePool)}
+            className="mt-3"
+            style={{
+              fontFamily: sans,
+              fontSize: 15,
+              padding: "6px 14px",
+              borderRadius: 4,
+              border: `1px solid ${C.border}`,
+              backgroundColor: "transparent",
+              color: C.text,
+              cursor: "pointer",
+            }}
+          >
+            Nueva tanda
+          </button>
+        </div>
+      ) : (
+        (() => {
+          const visLeft = pairs.filter((p) => !matched.has(p.term));
+          const visRight = rightOrder.filter((p) => !matched.has(p.term));
+
+          if (isMobile) {
+            return (
+              <>
+                <div className="flex flex-wrap gap-2 mt-6">
+                  {visLeft.map((p) => (
+                    <button
+                      key={p.term}
+                      onClick={() => pickLeft(p.term)}
+                      className="rounded px-3 py-2"
+                      style={{
+                        fontFamily: sans,
+                        fontSize: 15,
+                        color: leftSel === p.term ? C.bg : C.text,
+                        backgroundColor:
+                          wrong && wrong.left === p.term
+                            ? "rgba(192,57,43,0.10)"
+                            : leftSel === p.term
+                            ? C.accent
+                            : C.card,
+                        border: `1px solid ${C.border}`,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {p.term}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex flex-col gap-2 mt-4">
+                  {visRight.map((p) => (
+                    <button
+                      key={p.term}
+                      onClick={() => pickRight(p.term)}
+                      className="text-left rounded px-3 py-2 w-full"
+                      style={{
+                        fontFamily: sans,
+                        fontSize: 15,
+                        color: C.muted,
+                        backgroundColor:
+                          wrong && wrong.right === p.term
+                            ? "rgba(192,57,43,0.10)"
+                            : C.card,
+                        border: `1px solid ${C.border}`,
+                        cursor: leftSel === null ? "default" : "pointer",
+                        lineHeight: 1.5,
+                        opacity: leftSel === null ? 0.6 : 1,
+                      }}
+                    >
+                      {p.definition}
+                    </button>
+                  ))}
+                </div>
+              </>
+            );
+          }
+
+          return (
+            <div
+              className="mt-6"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 2fr",
+                gap: "8px",
+                alignItems: "stretch",
+              }}
+            >
+              {visLeft.map((p, i) => (
+                <button
+                  key={p.term}
+                  onClick={() => pickLeft(p.term)}
+                  className="rounded px-3 py-2 flex items-center justify-center text-center"
+                  style={{
+                    gridColumn: 1,
+                    gridRow: i + 1,
+                    fontFamily: sans,
+                    fontSize: 15,
+                    color: leftSel === p.term ? C.bg : C.text,
+                    backgroundColor:
+                      wrong && wrong.left === p.term
+                        ? "rgba(192,57,43,0.10)"
+                        : leftSel === p.term
+                        ? C.accent
+                        : C.card,
+                    border: `1px solid ${C.border}`,
+                    cursor: "pointer",
+                  }}
+                >
+                  {p.term}
+                </button>
+              ))}
+              {visRight.map((p, i) => (
+                <button
+                  key={p.term}
+                  onClick={() => pickRight(p.term)}
+                  className="text-left rounded px-3 py-2 flex items-center"
+                  style={{
+                    gridColumn: 2,
+                    gridRow: i + 1,
+                    fontFamily: sans,
+                    fontSize: 15,
+                    color: C.muted,
+                    backgroundColor:
+                      wrong && wrong.right === p.term
+                        ? "rgba(192,57,43,0.10)"
+                        : C.card,
+                    border: `1px solid ${C.border}`,
+                    cursor: leftSel === null ? "default" : "pointer",
+                    lineHeight: 1.5,
+                    opacity: leftSel === null ? 0.6 : 1,
+                  }}
+                >
+                  {p.definition}
+                </button>
+              ))}
+            </div>
+          );
+        })()
+      )}
+    </div>
+  );
+}
+
+function QuizView({ terms }) {
+  const [freshOrder, setFreshOrder] = useState(() => buildMCQuestions(terms, 15));
+  const [idx, setIdx] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
+
+  const current = freshOrder[idx];
+  const done = idx >= freshOrder.length;
+
+  function choose(i) {
+    if (selected !== null) return;
+    setSelected(i);
+    if (!current.options[i].correct) recordMiss(current.term);
+    setScore((s) => ({
+      correct: s.correct + (current.options[i].correct ? 1 : 0),
+      total: s.total + 1,
+    }));
+  }
+
+  function next() {
+    setSelected(null);
+    setIdx((i) => i + 1);
+  }
+
+  function restart() {
+    setFreshOrder(buildMCQuestions(terms, 15));
+    setIdx(0);
+    setSelected(null);
+    setScore({ correct: 0, total: 0 });
+  }
+
+  if (terms.length === 0) return null;
+
+  return (
+    <div>
+      <Eyebrow>Herramientas de estudio · Evaluación</Eyebrow>
+      <h1 style={{ fontFamily: serif, color: C.text, fontSize: 33, margin: 0 }}>
+        Quiz
+      </h1>
+
+      {done ? (
+        <div
+          className="mt-6 rounded p-4 text-center"
+          style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+        >
+          <img
+            src={LOGO_URI}
+            alt=""
+            style={{ width: 38, height: 38, margin: "0 auto 10px auto", display: "block", opacity: 0.18 }}
+          />
+          <p style={{ fontFamily: serif, fontSize: 20, color: C.text, margin: 0 }}>
+            {score.correct} de {score.total} correctas
+          </p>
+          <button
+            onClick={restart}
+            className="mt-3"
+            style={{
+              fontFamily: sans,
+              fontSize: 15,
+              padding: "6px 14px",
+              borderRadius: 4,
+              border: `1px solid ${C.border}`,
+              backgroundColor: "transparent",
+              color: C.text,
+              cursor: "pointer",
+            }}
+          >
+            Repetir con preguntas nuevas
+          </button>
+        </div>
+      ) : (
+        <div
+          className="mt-6 rounded p-4"
+          style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
+        >
+          <p
+            style={{
+              fontFamily: serif,
+              fontSize: 21,
+              color: C.text,
+              margin: "8px 0 4px 0",
+            }}
+          >
+            {current.term}
+          </p>
+          {current.es && (
+            <p
+              style={{
+                fontFamily: sans,
+                fontSize: 15,
+                fontStyle: "italic",
+                color: C.text,
+                margin: "0 0 12px 0",
+              }}
+            >
+              {current.es}
+            </p>
+          )}
+
+          <div className="flex flex-col gap-2 mt-2">
+            {current.options.map((opt, i) => {
+              const isChosen = selected === i;
+              const showResult = selected !== null;
+              let bg = C.bg;
+              if (showResult && opt.correct) bg = "rgba(20,107,68,0.10)";
+              else if (showResult && isChosen && !opt.correct)
+                bg = "rgba(192,57,43,0.10)";
+              return (
+                <button
+                  key={i}
+                  onClick={() => choose(i)}
+                  disabled={selected !== null}
+                  className="text-left rounded px-3 py-2 flex items-start gap-2"
+                  style={{
+                    fontFamily: sans,
+                    fontSize: 15,
+                    color: C.text,
+                    backgroundColor: bg,
+                    border: `1px solid ${C.border}`,
+                    cursor: selected === null ? "pointer" : "default",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  <span style={{ flex: 1 }}>{opt.text}</span>
+                  {showResult && opt.correct && (
+                    <span
+                      style={{
+                        color: C.success,
+                        fontSize: 15,
+                        flexShrink: 0,
+                      }}
+                    >
+                      ✓
+                    </span>
+                  )}
+                  {showResult && isChosen && !opt.correct && (
+                    <span
+                      style={{
+                        color: "#C0392B",
+                        fontSize: 15,
+                        flexShrink: 0,
+                      }}
+                    >
+                      ✗
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {selected !== null && (
+            <button
+              onClick={next}
+              className="mt-4"
+              style={{
+                fontFamily: sans,
+                fontSize: 15,
+                padding: "8px 16px",
+                borderRadius: 4,
+                border: "none",
+                backgroundColor: C.accent,
+                color: C.bg,
+                cursor: "pointer",
+              }}
+            >
+              Siguiente
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SplashScreen() {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        backgroundColor: C.bg,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 9999,
+        animation: "palabraJustaSplashOut 0.7s ease forwards",
+        animationDelay: "1.9s",
+      }}
+    >
+      <style>{`
+        @keyframes palabraJustaLogoIn {
+          from { opacity: 0; transform: scale(0.82); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes palabraJustaTextIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes palabraJustaSplashOut {
+          from { opacity: 1; visibility: visible; }
+          to { opacity: 0; visibility: hidden; }
+        }
+      `}</style>
+      <img
+        src={LOGO_URI}
+        alt=""
+        style={{
+          width: 108,
+          height: 108,
+          opacity: 0,
+          animation: "palabraJustaLogoIn 0.8s cubic-bezier(0.22,1,0.36,1) forwards",
+        }}
+      />
+      <p
+        style={{
+          fontFamily: brand,
+          fontWeight: 700,
+          fontSize: 30,
+          letterSpacing: "0.2px",
+          color: C.accent,
+          margin: "18px 0 0 0",
+          opacity: 0,
+          animation: "palabraJustaTextIn 0.7s ease forwards",
+          animationDelay: "0.4s",
+        }}
+      >
+        Palabra Justa
+      </p>
+      <p
+        style={{
+          fontFamily: mono,
+          fontSize: 11,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          color: C.label,
+          margin: "6px 0 0 0",
+          opacity: 0,
+          animation: "palabraJustaTextIn 0.7s ease forwards",
+          animationDelay: "0.55s",
+        }}
+      >
+        Inglés · Español
+      </p>
+    </div>
+  );
+}
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false
+  );
+  useEffect(() => {
+    function onResize() {
+      setIsMobile(window.innerWidth < 768);
+    }
+    window.addEventListener("resize", onResize);
+    onResize();
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return isMobile;
+}
+
+export default function App() {
+  const [section, setSection] = useState("semana-1");
+  const [navOpen, setNavOpen] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowSplash(false), 2600);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    function onNavigate(e) {
+      setSection(e.detail);
+    }
+    window.addEventListener("navigate", onNavigate);
+    return () => window.removeEventListener("navigate", onNavigate);
+  }, []);
+
+  return (
+    <>
+      {showSplash && <SplashScreen />}
+      <div
+      style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        width: "100%",
+        minHeight: "100vh",
+        backgroundColor: C.bg,
+      }}
+    >
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=JetBrains+Mono:wght@500&display=swap');`}</style>
+      <aside
+        style={{
+          width: isMobile ? "100%" : 224,
+          flexShrink: 0,
+          padding: isMobile ? 12 : 16,
+          display: "flex",
+          flexDirection: "column",
+          borderBottom: isMobile ? `1px solid ${C.border}` : "none",
+          borderRight: isMobile ? "none" : `1px solid ${C.border}`,
+        }}
+      >
+        <div
+          style={{
+            marginBottom: isMobile ? 4 : 16,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 8,
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <img
+              src={LOGO_URI}
+              alt=""
+              style={{ width: 56, height: 56, opacity: 0.95, flexShrink: 0 }}
+            />
+            <div>
+              <p
+                style={{
+                  fontFamily: brand,
+                  fontWeight: 700,
+                  color: C.text,
+                  fontSize: 20,
+                  letterSpacing: "-0.2px",
+                  whiteSpace: "nowrap",
+                  margin: 0,
+                }}
+              >
+                Palabra Justa
+              </p>
+              <p
+                style={{
+                  fontFamily: sans,
+                  color: C.label,
+                  fontSize: 15,
+                  margin: "1px 0 0 0",
+                }}
+              >
+                Inglés – Español
+              </p>
+            </div>
+          </div>
+
+          {isMobile && (
+            <button
+              onClick={() => setNavOpen((v) => !v)}
+              className="flex items-center justify-center rounded"
+              aria-label="Menú"
+              style={{
+                width: 46,
+                height: 46,
+                border: `1px solid ${C.border}`,
+                backgroundColor: navOpen ? C.accent : "transparent",
+                color: navOpen ? C.bg : C.text,
+                fontSize: 22,
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              {navOpen ? "✕" : "☰"}
+            </button>
+          )}
+        </div>
+
+        <div
+          onClick={() => isMobile && setNavOpen(false)}
+          style={{
+            display: isMobile ? (navOpen ? "flex" : "none") : "flex",
+            flexDirection: "column",
+            gap: 4,
+            marginTop: isMobile ? 8 : 0,
+          }}
+        >
+          {WEEKS.map((w) => (
+            <NavButton
+              key={w}
+              icon={BookOpen}
+              active={section === `semana-${w}`}
+              onClick={() => setSection(`semana-${w}`)}
+            >
+              Semana {w}
+            </NavButton>
+          ))}
+
+          {!isMobile && (
+            <div className="my-2" style={{ borderTop: `1px solid ${C.border}` }} />
+          )}
+
+          <NavButton
+            icon={Scale}
+            active={section === "caso"}
+            onClick={() => setSection("caso")}
+          >
+            Caso de la semana
+          </NavButton>
+          <NavButton
+            icon={ScrollText}
+            active={section === "canones"}
+            onClick={() => setSection("canones")}
+          >
+            Cánones
+          </NavButton>
+          <NavButton
+            icon={Eye}
+            active={section === "sight"}
+            onClick={() => setSection("sight")}
+          >
+            Sight Translation
+          </NavButton>
+          <NavButton
+            icon={Library}
+            active={section === "recursos"}
+            onClick={() => setSection("recursos")}
+          >
+            Recursos
+          </NavButton>
+
+          {!isMobile && (
+            <div className="my-2" style={{ borderTop: `1px solid ${C.border}` }} />
+          )}
+
+          <NavButton
+            icon={ListChecks}
+            active={section === "glosario"}
+            onClick={() => setSection("glosario")}
+          >
+            Glosario
+          </NavButton>
+          <NavButton
+            icon={Layers}
+            active={section === "flashcards"}
+            onClick={() => setSection("flashcards")}
+          >
+            Flashcards
+          </NavButton>
+          <NavButton
+            icon={Zap}
+            active={section === "match"}
+            onClick={() => setSection("match")}
+          >
+            Relacionar
+          </NavButton>
+          <NavButton
+            icon={ClipboardCheck}
+            active={section === "quiz"}
+            onClick={() => setSection("quiz")}
+          >
+            Quiz
+          </NavButton>
+          <NavButton
+            icon={AlertTriangle}
+            active={section === "debiles"}
+            onClick={() => setSection("debiles")}
+          >
+            Términos difíciles
+          </NavButton>
+        </div>
+      </aside>
+
+      <main
+        style={{
+          flex: 1,
+          padding: isMobile ? 16 : 32,
+          width: "100%",
+          maxWidth: isMobile ? "100%" : 672,
+        }}
+      >
+        {section.startsWith("semana-") && (
+          <WeekView
+            key={section}
+            week={Number(section.split("-")[1])}
+          />
+        )}
+        {section === "caso" && <CaseView data={CASE_OF_THE_WEEK} />}
+        {section === "recursos" && <ResourcesView data={RESOURCES} />}
+        {section === "canones" && <CanonsView />}
+        {section === "sight" && <SightPracticeView />}
+        {section === "glosario" && <GlossaryView terms={SEED_GLOSSARY} />}
+        {section === "flashcards" && <FlashcardsView terms={SEED_GLOSSARY} />}
+        {section === "match" && <MatchView />}
+        {section === "quiz" && <QuizView terms={SEED_GLOSSARY} />}
+        {section === "debiles" && <WeakTermsView terms={SEED_GLOSSARY} />}
+      </main>
+      </div>
+    </>
   );
 }
