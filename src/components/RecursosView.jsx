@@ -44,25 +44,22 @@ const RECURSOS = [
 
 export default function RecursosView() {
   return (
-    <div className="view-enter">
-      <p className="text-[10px] font-semibold tracking-[0.16em] text-blue-600 uppercase mb-3">
-        Fuentes de referencia
-      </p>
-      <h1 className="text-[30px] sm:text-[36px] leading-tight tracking-[-0.035em] font-serif font-semibold mb-4 text-gray-900">
+    <div>
+      <h1 className="text-[26px] font-serif mb-3 text-gray-900">
         Recursos del intérprete
       </h1>
-      <p className="text-[15px] leading-relaxed text-gray-500 mb-8 max-w-2xl">
+      <p className="text-gray-500 mb-8 max-w-lg">
         Fuentes oficiales citadas en las semanas {semanas.map((s) => s.id).join(", ")}.
         Úsalas para verificar uso, procedimiento y responsabilidad profesional.
       </p>
-      <div className="grid grid-cols-1 min-[540px]:grid-cols-2 gap-3 sm:gap-4">
+      <div className="grid sm:grid-cols-2 gap-5">
         {RECURSOS.map((r) => (
           <a
             key={r.titulo}
             href={r.url}
             target="_blank"
             rel="noreferrer"
-            className="resource-card bg-white rounded-[18px] border border-gray-200 p-5 hover:border-accent transition-all"
+            className="bg-white rounded-lg border border-gray-200 p-5 hover:border-accent transition-colors"
           >
             <div className="flex items-start justify-between mb-4">
               <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-badgeBg text-[#0B4C8C]">

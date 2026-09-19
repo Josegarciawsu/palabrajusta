@@ -64,7 +64,7 @@ export default function RelacionarView() {
     <div>
       <h1 className="text-[26px] font-serif mb-5 text-gray-900">Relacionar</h1>
 
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-5">
+      <div className="flex items-center gap-3 mb-6">
         <select
           value={semanaFiltro}
           onChange={(e) => {
@@ -94,7 +94,7 @@ export default function RelacionarView() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-6 max-w-lg">
+      <div className="grid grid-cols-2 gap-6 max-w-lg">
         <div className="space-y-2">
           {round.left.map((item) => {
             const isMatched = matched.includes(item.key);
@@ -104,7 +104,7 @@ export default function RelacionarView() {
                 key={item.key}
                 disabled={isMatched}
                 onClick={() => handleLeft(item.key)}
-                className={`w-full min-h-14 text-left px-3 sm:px-4 py-3 rounded-xl text-[13px] sm:text-sm border transition-colors ${
+                className={`w-full text-left px-4 py-3 rounded-lg text-sm border transition-colors ${
                   isMatched
                     ? "bg-green-50 border-progressGreen text-progressGreen"
                     : isSelected
@@ -127,7 +127,7 @@ export default function RelacionarView() {
                 key={item.key + item.label}
                 disabled={isMatched}
                 onClick={() => handleRight(item.key)}
-                className={`w-full min-h-14 text-left px-3 sm:px-4 py-3 rounded-xl text-[13px] sm:text-sm border transition-colors ${
+                className={`w-full text-left px-4 py-3 rounded-lg text-sm border transition-colors ${
                   isMatched
                     ? "bg-green-50 border-progressGreen text-progressGreen"
                     : isWrong

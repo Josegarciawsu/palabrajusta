@@ -79,7 +79,7 @@ export default function QuizView({ recordQuizScore }) {
     <div>
       <h1 className="text-[26px] font-serif mb-5 text-gray-900">Quiz</h1>
 
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-5">
+      <div className="flex items-center gap-3 mb-6">
         <select
           value={semanaFiltro}
           onChange={(e) => {
@@ -102,7 +102,7 @@ export default function QuizView({ recordQuizScore }) {
           <p className="text-xs text-gray-400 mb-2">
             Pregunta {i + 1} de {quiz.length}
           </p>
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 mb-4">
+          <div className="bg-white rounded-lg border border-gray-200 p-6 mb-4">
             <p className="text-xs text-gray-400 mb-1">¿Cuál es el equivalente en español de:</p>
             <p className="text-xl font-serif text-gray-900">{q.pregunta}</p>
           </div>
@@ -120,7 +120,7 @@ export default function QuizView({ recordQuizScore }) {
                   key={opt}
                   onClick={() => choose(opt)}
                   disabled={!!selected}
-                  className={`w-full min-h-14 text-left px-4 py-3 rounded-xl text-sm border transition-colors flex items-center gap-2 ${style}`}
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm border transition-colors flex items-center gap-2 ${style}`}
                 >
                   {selected && isCorrect && <Check size={14} />}
                   {selected && isSelected && !isCorrect && <X size={14} />}

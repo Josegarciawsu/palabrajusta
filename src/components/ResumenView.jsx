@@ -5,31 +5,29 @@ export default function ResumenView({ quizScores, onNavigate }) {
   const totalTerminos = glosarioCompleto.length;
 
   return (
-    <div className="view-enter">
-      <header className="dashboard-hero mb-8">
-        <p className="text-[10px] font-semibold tracking-[0.16em] text-blue-600 uppercase mb-3">Palabra Justa</p>
-        <h1 className="text-[32px] md:text-[42px] leading-tight font-serif font-semibold text-slate-900 tracking-[-0.04em]">
-          Tu preparación,<br /><span className="text-accent">palabra por palabra.</span>
-        </h1>
-        <p className="text-slate-500 mt-4 max-w-xl leading-relaxed">
-          Entrena vocabulario y precisión para la certificación de intérprete judicial inglés–español en Utah.
-        </p>
-      </header>
+    <div>
+      <h1 className="text-[26px] font-serif mb-3 text-gray-900">
+        Bienvenido de vuelta
+      </h1>
+      <p className="text-gray-500 mb-8 max-w-lg">
+        Certificación de intérprete judicial inglés-español · Utah. Continúa
+        donde te quedaste o repasa lo ya visto.
+      </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-        <div className="metric-card">
-          <p className="metric-label">Términos disponibles</p>
-          <p className="metric-value">{totalTerminos}</p>
+      <div className="border border-gray-200 rounded-lg bg-white grid grid-cols-3 divide-x divide-gray-200 mb-6">
+        <div className="p-4">
+          <p className="text-xs text-gray-400 mb-1">Términos disponibles</p>
+          <p className="text-xl font-semibold text-gray-900">{totalTerminos}</p>
         </div>
-        <div className="metric-card">
-          <p className="metric-label">Semanas con contenido</p>
-          <p className="metric-value">
+        <div className="p-4">
+          <p className="text-xs text-gray-400 mb-1">Semanas con contenido</p>
+          <p className="text-xl font-semibold text-gray-900">
             {semanas.length} de {totalSemanas}
           </p>
         </div>
-        <div className="metric-card">
-          <p className="metric-label">Mejor quiz</p>
-          <p className="metric-value">
+        <div className="p-4">
+          <p className="text-xs text-gray-400 mb-1">Mejor quiz</p>
+          <p className="text-xl font-semibold text-gray-900">
             {Object.keys(quizScores).length > 0
               ? `${Math.max(...Object.values(quizScores).map((s) => s.score))} aciertos`
               : "Sin intentos"}
@@ -37,8 +35,8 @@ export default function ResumenView({ quizScores, onNavigate }) {
         </div>
       </div>
 
-      <div className="progress-card">
-        <p className="text-sm font-semibold text-gray-900 mb-5">
+      <div className="border border-gray-200 rounded-lg bg-white p-5">
+        <p className="text-sm font-medium text-gray-900 mb-4">
           Progreso por semana
         </p>
         {semanas.map((s) => {
