@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import ConsecutivaSection from "./components/Consecutiva/ConsecutivaSection.jsx";
 
 // ---- Design tokens: clean, accessible learning interface ----
 const C = {
@@ -4506,12 +4507,17 @@ export default function App() {
             onClick={() => setSection("match")}
           >
             Relacionar
-          </NavButton>
           <NavButton
             active={section === "quiz"}
             onClick={() => setSection("quiz")}
           >
             Quiz
+          </NavButton>
+          <NavButton
+            active={section === "consecutiva"}
+            onClick={() => setSection("consecutiva")}
+          >
+            Consecutiva
           </NavButton>
         </div>
       </aside>
@@ -4527,6 +4533,7 @@ export default function App() {
         {section === "flashcards" && <FlashcardsView terms={SEED_GLOSSARY} />}
         {section === "match" && <MatchView />}
         {section === "quiz" && <QuizView terms={SEED_GLOSSARY} />}
+        {section === "consecutiva" && <ConsecutivaSection />}
         </div>
       </main>
     </div>
