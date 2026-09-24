@@ -10,7 +10,9 @@ import {
   Zap,
   ClipboardCheck,
   AlertTriangle,
+  Headphones,
 } from "lucide-react";
+import ConsecutivaSection from "./components/Consecutiva/ConsecutivaSection.jsx";
 
 // ---- Tokens (Wasatch palette) ----
 const C = {
@@ -6129,6 +6131,13 @@ export default function App() {
           >
             Términos difíciles
           </NavButton>
+            <NavButton
+            icon={Headphones}
+            active={section === "consecutiva"}
+            onClick={() => setSection("consecutiva")}
+          >
+            Consecutiva
+          </NavButton>
         </div>
       </aside>
 
@@ -6155,6 +6164,7 @@ export default function App() {
         {section === "match" && <MatchView />}
         {section === "quiz" && <QuizView terms={SEED_GLOSSARY} />}
         {section === "debiles" && <WeakTermsView terms={SEED_GLOSSARY} />}
+        {section === "consecutiva" && <ConsecutivaSection />}
       </main>
       </div>
     </>
