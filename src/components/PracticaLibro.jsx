@@ -1,6 +1,6 @@
 // src/components/PracticaLibro.jsx
 // Glosario y modos de práctica con el glosario del libro (inglés ↔ español).
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Check, X, Star, ChevronDown, Download } from "lucide-react";
 import LIBRO from "../data/glosarioLibro.js";
 import GLOSARIO, { letraDe } from "../data/glosarioUnificado.js";
@@ -209,7 +209,7 @@ function poolDe(grupo) {
   });
 }
 
-function Controles({ dir, setDir, grupo, setGrupo, cantidad, setCantidad }) {
+function Controles({ dir, setDir, grupo, setGrupo }) {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 16px", alignItems: "center", margin: "20px 0 18px 0", fontFamily: sans, fontSize: 14, color: C.muted }}>
       <Segmento
@@ -226,17 +226,6 @@ function Controles({ dir, setDir, grupo, setGrupo, cantidad, setCantidad }) {
           ))}
         </select>
       </label>
-      {setCantidad && (
-        <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          Términos
-          <select value={cantidad} onChange={(e) => setCantidad(e.target.value)} style={selectStyle}>
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="todos">Todos</option>
-          </select>
-        </label>
-      )}
     </div>
   );
 }
@@ -331,25 +320,54 @@ function Vacio({ grupo }) {
   );
 }
 
-// Ronda de práctica compartida por Tarjetas, Opción múltiple y Escribir.
-function useRonda(grupo, cantidad, fijo) {
-  const armar = (lista) => {
-    const base = lista || fijo || poolDe(grupo);
-    const n = cantidad === "todos" ? base.length : Number(cantidad);
-    return shuffle(base).slice(0, n);
-  };
-  const [mazo, setMazo] = useState(() => armar());
+// Sesión de práctica compartida por Tarjetas, Quiz y Escribir.
+// Los términos se revuelven cada vez que se abre la sección y se practican de 20 en 20,
+// sin repetir hasta terminar el grupo completo.
+const POR_SESION = 20;
+
+function useRonda(grupo, fijo) {
+  const [orden, setOrden] = useState(() => shuffle(fijo || poolDe(grupo)));
+  const [inicio, setInicio] = useState(0);
+  const [mazo, setMazo] = useState(() => orden.slice(0, POR_SESION));
   const [pos, setPos] = useState(0);
   const [aciertos, setAciertos] = useState(0);
   const [fallas, setFallas] = useState([]);
 
-  const reiniciar = (lista) => {
-    setMazo(armar(lista));
+  const empezar = (lista) => {
+    setMazo(lista);
     setPos(0);
     setAciertos(0);
     setFallas([]);
   };
-  useEffect(() => reiniciar(), [grupo, cantidad]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Al cambiar de grupo se revuelve todo de nuevo.
+  const primeraVez = useRef(true);
+  useEffect(() => {
+    if (primeraVez.current) {
+      primeraVez.current = false;
+      return;
+    }
+    const nuevo = shuffle(fijo || poolDe(grupo));
+    setOrden(nuevo);
+    setInicio(0);
+    empezar(nuevo.slice(0, POR_SESION));
+  }, [grupo]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const restantes = Math.max(0, orden.length - (inicio + POR_SESION));
+
+  const continuar = () => {
+    if (restantes === 0) {
+      const nuevo = shuffle(orden);
+      setOrden(nuevo);
+      setInicio(0);
+      empezar(nuevo.slice(0, POR_SESION));
+    } else {
+      const siguienteInicio = inicio + POR_SESION;
+      setInicio(siguienteInicio);
+      empezar(orden.slice(siguienteInicio, siguienteInicio + POR_SESION));
+    }
+  };
+  const repasar = (lista) => empezar(shuffle(lista));
 
   const contestar = (t, ok) => {
     registrar(t, ok);
@@ -357,12 +375,13 @@ function useRonda(grupo, cantidad, fijo) {
     else setFallas((f) => (f.includes(t) ? f : [...f, t]));
   };
   const siguiente = () => setPos((p) => p + 1);
-  return { mazo, pos, aciertos, fallas, contestar, siguiente, reiniciar, actual: mazo[pos], fin: pos >= mazo.length };
+  return { mazo, pos, aciertos, fallas, restantes, contestar, siguiente, continuar, repasar, actual: mazo[pos], fin: pos >= mazo.length };
 }
 
 function Resultado({ ronda }) {
-  const { mazo, aciertos, fallas, reiniciar } = ronda;
+  const { mazo, aciertos, fallas, restantes, continuar, repasar } = ronda;
   const pct = Math.round((aciertos / mazo.length) * 100);
+  const siguientes = Math.min(POR_SESION, restantes);
   return (
     <div style={{ backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 24 }}>
       <p style={{ fontFamily: serif, fontWeight: 600, fontSize: 40, lineHeight: 1, color: C.text, margin: 0 }}>
@@ -370,7 +389,7 @@ function Resultado({ ronda }) {
       </p>
       <p style={{ fontFamily: sans, fontSize: 15, color: C.muted, margin: "8px 0 16px 0" }}>
         {pct}% correctas.{" "}
-        {fallas.length ? "Los términos que fallaste se sumaron a Términos difíciles." : "Sin errores en esta ronda."}
+        {fallas.length ? "Los términos que fallaste se sumaron a Términos difíciles." : "Sin errores en esta sesión."}
       </p>
       {fallas.length > 0 && (
         <div style={{ borderTop: `1px solid ${C.border}`, marginBottom: 16 }}>
@@ -382,11 +401,16 @@ function Resultado({ ronda }) {
           ))}
         </div>
       )}
+      <p style={{ fontFamily: sans, fontSize: 16, fontWeight: 500, color: C.text, margin: "0 0 12px 0" }}>
+        {siguientes > 0
+          ? `¿Quieres continuar con ${siguientes === POR_SESION ? "20" : `los ${siguientes}`} más?`
+          : "Terminaste todos los términos de este grupo. ¿Quieres empezar de nuevo?"}
+      </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        {fallas.length > 0 && (
-          <Boton variante="primario" onClick={() => reiniciar(fallas)}>Repasar las falladas</Boton>
-        )}
-        <Boton variante={fallas.length ? "secundario" : "primario"} onClick={() => reiniciar()}>Nueva ronda</Boton>
+        <Boton variante="primario" onClick={continuar}>
+          {siguientes > 0 ? `Continuar con ${siguientes} más` : "Empezar de nuevo"}
+        </Boton>
+        {fallas.length > 0 && <Boton onClick={() => repasar(fallas)}>Repasar las falladas</Boton>}
       </div>
     </div>
   );
@@ -495,14 +519,26 @@ export function GlosarioView() {
   const base = vista === "traduccion" ? conTraduccion : vista === "definicion" ? conDefinicion : pendientes;
 
   const letras = useMemo(() => [...new Set(base.map(letraDe))].sort(), [base]);
+  const nq = norm(q);
+  const buscando = nq.length > 0;
+
+  // Búsqueda global: siempre en todo el glosario, ordenada por relevancia.
   const filtradas = useMemo(() => {
-    const nq = norm(q);
-    return base.filter((f) => {
-      if (letra && letraDe(f) !== letra) return false;
-      if (!nq) return true;
-      return norm(f.en + " " + (f.es || "") + " " + f.defs.map((d) => d.texto).join(" ")).includes(nq);
-    });
-  }, [base, q, letra]);
+    if (!buscando) return letra ? base.filter((f) => letraDe(f) === letra) : base;
+    const puntaje = (f) => {
+      const en = norm(f.en);
+      const es = alternativas(f.es || "");
+      if (en === nq || es.includes(nq)) return 0;
+      if (en.startsWith(nq) || es.some((x) => x.startsWith(nq))) return 1;
+      if (en.includes(nq) || norm(f.es || "").includes(nq)) return 2;
+      if (norm(f.defs.map((d) => d.texto).join(" ")).includes(nq)) return 3;
+      return null;
+    };
+    return GLOSARIO.map((f) => [f, puntaje(f)])
+      .filter(([, p]) => p !== null)
+      .sort((a, b) => a[1] - b[1])
+      .map(([f]) => f);
+  }, [base, letra, nq, buscando]);
 
   const opciones = [
     ["traduccion", `Términos con traducción · ${conTraduccion.length}`],
@@ -512,14 +548,15 @@ export function GlosarioView() {
 
   return (
     <div>
-      <Titulo sub="Busca en inglés o en español, o navega por letra.">Glosario jurídico</Titulo>
+      <Titulo sub="Busca cualquier palabra en inglés o en español, o navega por pestaña y letra.">Glosario jurídico</Titulo>
 
       <div style={{ marginTop: 20 }}>
         <Segmento
           etiqueta="Tipo de glosario"
-          valor={vista}
+          valor={buscando ? null : vista}
           onChange={(v) => {
             setVista(v);
+            setQ("");
             setLetra(null);
             setAbierta(null);
           }}
@@ -530,11 +567,12 @@ export function GlosarioView() {
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder={vista === "definicion" ? "Buscar término o definición" : "Buscar en inglés o español"}
+        placeholder="Buscar palabra"
         aria-label="Buscar"
         style={{ width: "100%", marginTop: 14, fontFamily: sans, fontSize: 16, color: C.text, backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", boxSizing: "border-box" }}
       />
 
+      {!buscando && (
       <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 10 }}>
         {[null, ...letras].map((l) => (
           <button
@@ -547,13 +585,16 @@ export function GlosarioView() {
           </button>
         ))}
       </div>
+      )}
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", margin: "14px 0 8px 0" }}>
         <p style={{ fontFamily: sans, fontSize: 13, color: C.muted, margin: 0 }}>
-          {filtradas.length} términos
-          {vista === "pendientes" && " sin traducción. Escríbelas en src/data/traduccionesPropias.js."}
+          {buscando
+            ? `${filtradas.length} ${filtradas.length === 1 ? "resultado" : "resultados"}`
+            : `${filtradas.length} términos`}
+          {!buscando && vista === "pendientes" && " sin traducción. Escríbelas en src/data/traduccionesPropias.js."}
         </p>
-        {vista === "pendientes" && (
+        {!buscando && vista === "pendientes" && (
           <Boton onClick={() => descargarPendientes(filtradas)}>
             <Download size={16} /> Descargar lista (CSV)
           </Boton>
@@ -621,8 +662,7 @@ export function GlosarioView() {
 export function TarjetasView({ fijo, titulo = "Tarjetas" }) {
   const [dir, setDir] = useState("en");
   const [grupo, setGrupo] = useState("todo");
-  const [cantidad, setCantidad] = useState("20");
-  const ronda = useRonda(grupo, cantidad, fijo);
+  const ronda = useRonda(grupo, fijo);
   const [volteada, setVolteada] = useState(false);
   useEffect(() => setVolteada(false), [ronda.pos, ronda.mazo]);
 
@@ -633,8 +673,8 @@ export function TarjetasView({ fijo, titulo = "Tarjetas" }) {
 
   return (
     <div>
-      <Titulo sub="Mira el término, voltea la tarjeta y di si lo sabías.">{titulo}</Titulo>
-      {fijo ? <div style={{ height: 20 }} /> : <Controles {...{ dir, setDir, grupo, setGrupo, cantidad, setCantidad }} />}
+      <Titulo sub="20 términos por sesión. Mira el término, voltea la tarjeta y di si lo sabías.">{titulo}</Titulo>
+      {fijo ? <div style={{ height: 20 }} /> : <Controles {...{ dir, setDir, grupo, setGrupo }} />}
       {ronda.mazo.length === 0 ? (
         <Vacio grupo={grupo} />
       ) : ronda.fin ? (
@@ -669,8 +709,7 @@ export function TarjetasView({ fijo, titulo = "Tarjetas" }) {
 export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
   const [dir, setDir] = useState("en");
   const [grupo, setGrupo] = useState("todo");
-  const [cantidad, setCantidad] = useState("20");
-  const ronda = useRonda(grupo, cantidad, fijo);
+  const ronda = useRonda(grupo, fijo);
   const [elegida, setElegida] = useState(null);
 
   const opciones = useMemo(
@@ -688,7 +727,7 @@ export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
   return (
     <div>
       <Titulo sub="Elige la equivalencia correcta. Las otras opciones son términos parecidos: fíjate bien.">{titulo}</Titulo>
-      {fijo ? <div style={{ height: 20 }} /> : <Controles {...{ dir, setDir, grupo, setGrupo, cantidad, setCantidad }} />}
+      {fijo ? <div style={{ height: 20 }} /> : <Controles {...{ dir, setDir, grupo, setGrupo }} />}
       {ronda.mazo.length === 0 ? (
         <Vacio grupo={grupo} />
       ) : ronda.fin ? (
@@ -747,8 +786,7 @@ export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
 export function EscribirView({ fijo, titulo = "Escribir" }) {
   const [dir, setDir] = useState("en");
   const [grupo, setGrupo] = useState("todo");
-  const [cantidad, setCantidad] = useState("20");
-  const ronda = useRonda(grupo, cantidad, fijo);
+  const ronda = useRonda(grupo, fijo);
   const [texto, setTexto] = useState("");
   const [estado, setEstado] = useState(null); // null | "ok" | "casi" | "no"
   useEffect(() => {
@@ -767,7 +805,7 @@ export function EscribirView({ fijo, titulo = "Escribir" }) {
   return (
     <div>
       <Titulo sub="Escribe la equivalencia. Se acepta cualquiera de las que da el libro, sin importar acentos ni artículos.">{titulo}</Titulo>
-      {fijo ? <div style={{ height: 20 }} /> : <Controles {...{ dir, setDir, grupo, setGrupo, cantidad, setCantidad }} />}
+      {fijo ? <div style={{ height: 20 }} /> : <Controles {...{ dir, setDir, grupo, setGrupo }} />}
       {ronda.mazo.length === 0 ? (
         <Vacio grupo={grupo} />
       ) : ronda.fin ? (
@@ -883,8 +921,8 @@ export function RelacionarView() {
         <Vacio grupo={grupo} />
       ) : fin ? (
         <div style={{ backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 24 }}>
-          <p style={{ fontFamily: serif, fontWeight: 600, fontSize: 24, color: C.text, margin: "0 0 14px 0" }}>Tanda completa</p>
-          <Boton variante="primario" onClick={nueva}>Nueva tanda</Boton>
+          <p style={{ fontFamily: serif, fontWeight: 600, fontSize: 24, color: C.text, margin: "0 0 14px 0" }}>Completaste estos 5 pares</p>
+          <Boton variante="primario" onClick={nueva}>Otros 5 pares</Boton>
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
