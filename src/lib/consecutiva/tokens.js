@@ -13,7 +13,7 @@ export const C = {
   verdeSuave: T.successSoft,
   coral: T.error,
   coralSuave: T.errorSoft,
-  ambar: T.clay,
+  ambar: T.clayText,
 };
 
 export const F = {
