@@ -583,7 +583,7 @@ function WeekView({ week }) {
                 className="px-3 py-2 flex items-baseline gap-3"
                 style={{ borderTop: i ? `1px solid ${C.border}` : "none" }}
               >
-                <span style={{ fontFamily: serif, fontSize: 15, color: C.clay, flexShrink: 0, minWidth: 18 }}>
+                <span style={{ fontFamily: serif, fontSize: 15, color: C.clayText, flexShrink: 0, minWidth: 18 }}>
                   {i + 1}
                 </span>
                 <span style={{ fontFamily: sans, fontSize: 15, color: C.text }}>{s.title}</span>
@@ -1370,7 +1370,7 @@ function CaseView({ data }) {
 // Presentación: el logo aparece y se disuelve con desenfoque (1.5 s en total).
 // Lleva sus propios estilos para no depender de ningún otro archivo.
 const SPLASH_CSS = `
-.pj-splash { position: fixed; inset: 0; z-index: 9999; background-color: #F5F7F8; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; animation: pjSplashFondo 1.5s ease forwards; }
+.pj-splash { position: fixed; inset: 0; z-index: 9999; background-color: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; animation: pjSplashFondo 1.5s ease forwards; }
 .pj-splash-logo { animation: pjSplashLogo 1.5s cubic-bezier(.2,.7,.3,1) forwards; will-change: transform, opacity, filter; }
 .pj-splash-texto { opacity: 0; animation: pjSplashTexto 1.5s cubic-bezier(.2,.7,.3,1) forwards; will-change: transform, opacity, filter; }
 .pj-splash-linea { transform: scaleX(0); animation: pjSplashLinea 1.5s cubic-bezier(.2,.7,.3,1) forwards; }
@@ -1411,7 +1411,7 @@ function SplashScreen() {
       <img className="pj-splash-logo" src={LOGO_URI} alt="" style={{ width: 112, height: 112 }} />
       <p
         className="pj-splash-texto"
-        style={{ fontFamily: brand, fontWeight: 600, fontSize: 32, color: C.accent, margin: "18px 0 0 0" }}
+        style={{ fontFamily: brand, fontWeight: 600, fontSize: 32, color: C.navy, margin: "18px 0 0 0" }}
       >
         Palabra Justa
       </p>
@@ -1421,7 +1421,7 @@ function SplashScreen() {
       />
       <p
         className="pj-splash-texto"
-        style={{ fontFamily: sans, fontSize: 14.5, color: "#5E7150", fontWeight: 500, margin: "10px 0 0 0", animationDelay: "40ms" }}
+        style={{ fontFamily: sans, fontSize: 14.5, color: C.muted, fontWeight: 500, margin: "10px 0 0 0", animationDelay: "40ms" }}
       >
         Inglés · Español
       </p>
@@ -1601,7 +1601,7 @@ function InicioView({ irA, isMobile }) {
   return (
     <div>
       {!isMobile && (
-        <h1 style={{ fontFamily: serif, fontWeight: 600, color: C.text, fontSize: 32, margin: 0 }}>
+        <h1 style={{ fontFamily: serif, fontWeight: 600, color: C.navy, fontSize: 32, margin: 0 }}>
           Palabra Justa
         </h1>
       )}
@@ -1620,7 +1620,22 @@ function InicioView({ irA, isMobile }) {
                 aria-expanded={semanasAbiertas}
                 style={{ ...mosaico(semanasAbiertas), ...retraso() }}
               >
-                {icono(BookOpen)}
+                <span
+                  className="pj-ic"
+                  style={{
+                    width: isMobile ? 28 : 36,
+                    height: isMobile ? 28 : 36,
+                    borderRadius: 9,
+                    backgroundColor: C.claySoft,
+                    color: C.clayText,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <BookOpen size={isMobile ? 16 : 19} />
+                </span>
                 {textos("Contenido por semana", "Temas de cada clase")}
                 <ChevronDown
                   size={isMobile ? 16 : 17}
@@ -1758,7 +1773,7 @@ export default function App() {
                 style={{
                   fontFamily: brand,
                   fontWeight: 700,
-                  color: C.text,
+                  color: C.navy,
                   fontSize: isMobile ? 19 : 20,
                   letterSpacing: "-0.2px",
                   whiteSpace: "nowrap",
