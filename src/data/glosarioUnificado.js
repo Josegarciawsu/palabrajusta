@@ -7,6 +7,7 @@ import COURTS from "./glosarioCourts.js";
 import JUVENIL from "./glosarioJuvenil.js";
 import NOTAS from "./notasJuvenil.js";
 import PROPIAS from "./traduccionesPropias.js";
+import EXCLUSIVO from "./juvenilExclusivo.js";
 
 export const clave = (s) =>
   s
@@ -61,6 +62,17 @@ PROPIAS.forEach((p) => {
     f.es = p.es.trim();
     f.esFuente = "propia";
   }
+});
+
+// Términos exclusivos de la Corte Juvenil y su equivalente en adultos
+Object.entries(EXCLUSIVO).forEach(([k, info]) => {
+  const f = porClave.get(clave(k));
+  if (!f) return;
+  const adulto = info.adulto ? porClave.get(clave(info.adulto)) : null;
+  f.juvenil = {
+    adulto: adulto ? { en: adulto.en, es: adulto.es } : null,
+    sinEquivalente: info.sinEquivalente || null,
+  };
 });
 
 const orden = (s) => s.toLowerCase().replace(/^["«]/, "").replace(/^(the|a|an|to) /, "");

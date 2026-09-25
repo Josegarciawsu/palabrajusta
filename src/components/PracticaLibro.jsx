@@ -397,22 +397,24 @@ const idiomaDe = (dir, lado) =>
 
 /* ---------- Glosario ---------- */
 
-const NOMBRE_FUENTE = { libro: "Libro", courts: "U.S. Courts", juvenil: "Corte Juvenil" };
-const COLOR_FUENTE = { libro: C.accent, courts: C.sage, juvenil: C.clay };
+const NOMBRE_FUENTE = { courts: "U.S. Courts", juvenil: "Corte Juvenil" };
 
-function Etiqueta({ fuente }) {
+// Ícono de joven para los términos propios de la Corte Juvenil.
+function IconoJoven({ size = 16, color = C.clay }) {
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontFamily: sans, fontSize: 12, color: C.muted, whiteSpace: "nowrap" }}>
-      <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_FUENTE[fuente] }} />
-      {NOMBRE_FUENTE[fuente]}
-    </span>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+      <path d="M8.5 7.5a3.5 3.5 0 0 1 7 0v1a3.5 3.5 0 0 1-7 0z" />
+      <path d="M7.5 6.2c1.2-2.1 3-2.9 4.8-2.7 1.4.1 2.6.8 3.4 2" />
+      <path d="M5 21v-2.5A5.5 5.5 0 0 1 10.5 13h3a5.5 5.5 0 0 1 5.5 5.5V21" />
+      <path d="M9.5 13.3 12 17l2.5-3.7" />
+    </svg>
   );
 }
 
 function descargarPendientes(lista) {
   const celda = (v) => `"${(v || "").replace(/"/g, '""')}"`;
   const filas = [["en", "es", "fuentes", "definicion"]].concat(
-    lista.map((f) => [f.en, "", f.fuentes.map((x) => NOMBRE_FUENTE[x]).join(" + "), f.defs.map((d) => d.texto).join(" | ")])
+    lista.map((f) => [f.en, "", f.fuentes.filter((x) => x !== "libro").map((x) => NOMBRE_FUENTE[x]).join(" + "), f.defs.map((d) => d.texto).join(" | ")])
   );
   const csv = "\uFEFF" + filas.map((r) => r.map(celda).join(",")).join("\n");
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
@@ -423,68 +425,115 @@ function descargarPendientes(lista) {
   URL.revokeObjectURL(url);
 }
 
-const FILTROS = [
-  ["todas", "Todas"],
-  ["libro", "Libro"],
-  ["courts", "U.S. Courts"],
-  ["juvenil", "Corte Juvenil"],
-  ["pendientes", "Sin traducción"],
-];
+function FichaDetalle({ f }) {
+  const [verAdulto, setVerAdulto] = useState(false);
+  return (
+    <div style={{ padding: "0 14px 14px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
+      {f.juvenil && (
+        <div style={{ padding: "10px 12px", backgroundColor: C.claySoft, borderLeft: `3px solid ${C.clay}`, borderRadius: 4, fontFamily: sans, fontSize: 14, color: C.text, lineHeight: 1.45 }}>
+          <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <IconoJoven />
+            Aplica generalmente solo en la corte juvenil.
+          </span>
+          {f.juvenil.sinEquivalente && <span style={{ display: "block", marginTop: 6, color: C.muted }}>{f.juvenil.sinEquivalente}</span>}
+          {f.juvenil.adulto &&
+            (verAdulto ? (
+              <span style={{ display: "block", marginTop: 6 }}>
+                En la corte de adultos: <b>{f.juvenil.adulto.en}</b>
+                {f.juvenil.adulto.es && <> · {f.juvenil.adulto.es}</>}
+              </span>
+            ) : (
+              <button
+                onClick={() => setVerAdulto(true)}
+                style={{ marginTop: 8, fontFamily: sans, fontSize: 13.5, fontWeight: 500, color: C.accent, backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: 999, padding: "5px 12px", cursor: "pointer" }}
+              >
+                Ver el equivalente en la corte de adultos
+              </button>
+            ))}
+        </div>
+      )}
+      {f.nota && (
+        <p style={{ fontFamily: sans, fontSize: 14, lineHeight: 1.45, color: C.text, margin: 0, padding: "8px 12px", backgroundColor: C.claySoft, borderLeft: `3px solid ${C.clay}`, borderRadius: 4, display: "flex", gap: 8, alignItems: "flex-start" }}>
+          <IconoJoven />
+          <span>{f.nota}</span>
+        </p>
+      )}
+      {f.defs.map((d, k) => (
+        <div key={k}>
+          {f.defs.length > 1 && (
+            <span style={{ fontFamily: sans, fontSize: 12, fontWeight: 600, color: C.label }}>{NOMBRE_FUENTE[d.fuente]}</span>
+          )}
+          <p style={{ fontFamily: sans, fontSize: 14, lineHeight: 1.5, color: C.muted, margin: f.defs.length > 1 ? "2px 0 0 0" : 0 }}>{d.texto}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function GlosarioView() {
-  const [filtro, setFiltro] = useState("todas");
+  // La pestaña "Sin traducción" es solo para ti: se abre con palabrajusta.com/#pendientes
+  const leerAdmin = () => typeof window !== "undefined" && window.location.hash === "#pendientes";
+  const [admin, setAdmin] = useState(leerAdmin);
+  const [vista, setVista] = useState(() => (leerAdmin() ? "pendientes" : "traduccion"));
+  useEffect(() => {
+    const alCambiar = () => {
+      const a = leerAdmin();
+      setAdmin(a);
+      setVista((v) => (a ? "pendientes" : v === "pendientes" ? "traduccion" : v));
+    };
+    window.addEventListener("hashchange", alCambiar);
+    return () => window.removeEventListener("hashchange", alCambiar);
+  }, []);
   const [q, setQ] = useState("");
   const [letra, setLetra] = useState(null);
   const [abierta, setAbierta] = useState(null);
   const [dificiles, setDificiles] = useState(() => cargarDificiles());
 
-  const porFiltro = useMemo(
-    () =>
-      GLOSARIO.filter((f) =>
-        filtro === "todas" ? true : filtro === "pendientes" ? !f.es : f.fuentes.includes(filtro)
-      ),
-    [filtro]
-  );
-  const letras = useMemo(() => [...new Set(porFiltro.map(letraDe))].sort(), [porFiltro]);
+  const conTraduccion = useMemo(() => GLOSARIO.filter((f) => f.es), []);
+  const conDefinicion = useMemo(() => GLOSARIO.filter((f) => f.defs.length), []);
+  const pendientes = useMemo(() => GLOSARIO.filter((f) => !f.es), []);
+  const base = vista === "traduccion" ? conTraduccion : vista === "definicion" ? conDefinicion : pendientes;
+
+  const letras = useMemo(() => [...new Set(base.map(letraDe))].sort(), [base]);
   const filtradas = useMemo(() => {
     const nq = norm(q);
-    return porFiltro.filter((f) => {
+    return base.filter((f) => {
       if (letra && letraDe(f) !== letra) return false;
       if (!nq) return true;
       return norm(f.en + " " + (f.es || "") + " " + f.defs.map((d) => d.texto).join(" ")).includes(nq);
     });
-  }, [porFiltro, q, letra]);
+  }, [base, q, letra]);
 
-  const pendientes = GLOSARIO.filter((f) => !f.es).length;
+  const opciones = [
+    ["traduccion", `Términos con traducción · ${conTraduccion.length}`],
+    ["definicion", `Términos con definiciones · ${conDefinicion.length}`],
+  ];
+  if (admin) opciones.push(["pendientes", `Sin traducción · ${pendientes.length}`]);
 
   return (
     <div>
-      <Titulo sub="Un solo glosario: busca en inglés o en español, o navega por letra.">Glosario jurídico</Titulo>
+      <Titulo sub="Busca en inglés o en español, o navega por letra.">Glosario jurídico</Titulo>
+
+      <div style={{ marginTop: 20 }}>
+        <Segmento
+          etiqueta="Tipo de glosario"
+          valor={vista}
+          onChange={(v) => {
+            setVista(v);
+            setLetra(null);
+            setAbierta(null);
+          }}
+          opciones={opciones}
+        />
+      </div>
 
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Buscar término, traducción o definición"
+        placeholder={vista === "definicion" ? "Buscar término o definición" : "Buscar en inglés o español"}
         aria-label="Buscar"
-        style={{ width: "100%", marginTop: 20, fontFamily: sans, fontSize: 16, color: C.text, backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", boxSizing: "border-box" }}
+        style={{ width: "100%", marginTop: 14, fontFamily: sans, fontSize: 16, color: C.text, backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", boxSizing: "border-box" }}
       />
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
-        {FILTROS.map(([v, l]) => (
-          <button
-            key={v}
-            onClick={() => {
-              setFiltro(v);
-              setLetra(null);
-            }}
-            aria-pressed={filtro === v}
-            style={{ fontFamily: sans, fontSize: 13.5, fontWeight: 500, padding: "6px 11px", borderRadius: 999, border: `1px solid ${filtro === v ? C.accent : C.border}`, backgroundColor: filtro === v ? C.accent : C.card, color: filtro === v ? "#fff" : C.muted, cursor: "pointer" }}
-          >
-            {l}
-            {v === "pendientes" ? ` · ${pendientes}` : ""}
-          </button>
-        ))}
-      </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 10 }}>
         {[null, ...letras].map((l) => (
@@ -502,9 +551,9 @@ export function GlosarioView() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", margin: "14px 0 8px 0" }}>
         <p style={{ fontFamily: sans, fontSize: 13, color: C.muted, margin: 0 }}>
           {filtradas.length} términos
-          {filtro === "pendientes" && " sin traducción. Escríbelas en src/data/traduccionesPropias.js."}
+          {vista === "pendientes" && " sin traducción. Escríbelas en src/data/traduccionesPropias.js."}
         </p>
-        {filtro === "pendientes" && (
+        {vista === "pendientes" && (
           <Boton onClick={() => descargarPendientes(filtradas)}>
             <Download size={16} /> Descargar lista (CSV)
           </Boton>
@@ -516,7 +565,7 @@ export function GlosarioView() {
       ) : (
         <div style={{ backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: 10, overflow: "hidden" }}>
           {filtradas.map((f, i) => {
-            const tieneDetalle = f.defs.length > 0 || f.nota;
+            const tieneDetalle = f.defs.length > 0 || f.nota || f.juvenil;
             const open = abierta === f;
             return (
               <div key={f.en + i} style={{ borderTop: i ? `1px solid ${C.border}` : "none" }}>
@@ -524,29 +573,27 @@ export function GlosarioView() {
                   <button
                     onClick={() => tieneDetalle && setAbierta(open ? null : f)}
                     aria-expanded={tieneDetalle ? open : undefined}
-                    style={{ flex: 1, minWidth: 0, display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 12, alignItems: "baseline", textAlign: "left", background: "none", border: "none", padding: 0, cursor: tieneDetalle ? "pointer" : "default", fontFamily: sans }}
+                    style={{ flex: 1, minWidth: 0, display: "grid", gridTemplateColumns: f.es ? "minmax(0,1fr) minmax(0,1fr)" : "minmax(0,1fr)", gap: 12, alignItems: "baseline", textAlign: "left", background: "none", border: "none", padding: 0, cursor: tieneDetalle ? "pointer" : "default", fontFamily: sans }}
                   >
-                    <span>
-                      <span style={{ display: "block", fontSize: 14.5, fontWeight: 600, color: C.accent }}>{f.en}</span>
-                      <span style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 3 }}>
-                        {f.fuentes.map((x) => (
-                          <Etiqueta key={x} fuente={x} />
-                        ))}
+                    <span style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 14.5, fontWeight: 600, color: C.accent }}>
+                      {f.en}
+                      {(f.juvenil || f.nota) && <IconoJoven size={15} />}
+                    </span>
+                    {f.es && (
+                      <span style={{ fontSize: 14.5, color: C.text }}>
+                        {f.es}
+                        {f.esFuente === "propia" && (
+                          <span style={{ display: "block", fontSize: 12, color: C.clay, marginTop: 2 }}>Traducción propia</span>
+                        )}
                       </span>
-                    </span>
-                    <span style={{ fontSize: 14.5, color: f.es ? C.text : C.label, fontStyle: f.es ? "normal" : "italic" }}>
-                      {f.es || "Sin traducción"}
-                      {f.esFuente === "propia" && (
-                        <span style={{ display: "block", fontSize: 12, fontStyle: "normal", color: C.clay, marginTop: 2 }}>Traducción propia</span>
-                      )}
-                    </span>
+                    )}
                   </button>
                   {tieneDetalle ? (
                     <ChevronDown size={17} color={C.label} style={{ flexShrink: 0, transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }} />
                   ) : (
                     <span style={{ width: 17, flexShrink: 0 }} />
                   )}
-                  {f.libro ? (
+                  {f.libro && (
                     <button
                       onClick={() => {
                         alternarDificil(f.libro);
@@ -557,25 +604,9 @@ export function GlosarioView() {
                     >
                       <Star size={17} fill={dificiles[f.libro.en] ? C.clay : "none"} />
                     </button>
-                  ) : (
-                    <span style={{ width: 25, flexShrink: 0 }} />
                   )}
                 </div>
-                {open && (
-                  <div style={{ padding: "0 14px 14px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
-                    {f.nota && (
-                      <p style={{ fontFamily: sans, fontSize: 14, lineHeight: 1.45, color: C.text, margin: 0, padding: "8px 12px", backgroundColor: C.claySoft, borderLeft: `3px solid ${C.clay}`, borderRadius: 4 }}>
-                        {f.nota}
-                      </p>
-                    )}
-                    {f.defs.map((d, k) => (
-                      <div key={k}>
-                        <Etiqueta fuente={d.fuente} />
-                        <p style={{ fontFamily: sans, fontSize: 14, lineHeight: 1.5, color: C.muted, margin: "3px 0 0 0" }}>{d.texto}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {open && <FichaDetalle f={f} />}
               </div>
             );
           })}
@@ -635,7 +666,7 @@ export function TarjetasView({ fijo, titulo = "Tarjetas" }) {
 
 /* ---------- Opción múltiple ---------- */
 
-export function OpcionMultipleView({ fijo, titulo = "Opción múltiple" }) {
+export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
   const [dir, setDir] = useState("en");
   const [grupo, setGrupo] = useState("todo");
   const [cantidad, setCantidad] = useState("20");
@@ -920,7 +951,7 @@ export function DificilesView() {
         <>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, margin: "20px 0 16px 0" }}>
             <Boton variante="primario" onClick={() => setModo("escribir")}>Practicar escribiendo</Boton>
-            <Boton onClick={() => setModo("multiple")}>Opción múltiple</Boton>
+            <Boton onClick={() => setModo("multiple")}>Quiz</Boton>
             <Boton onClick={() => setModo("tarjetas")}>Tarjetas</Boton>
             <Boton
               onClick={() => {

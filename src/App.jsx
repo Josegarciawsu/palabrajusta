@@ -1483,10 +1483,10 @@ function TamanoLetra({ nivel, setNivel }) {
 
 function InicioView({ irA }) {
   const accesos = [
-    { id: "glosario", icon: ListChecks, titulo: "Glosario", texto: "815 términos en una sola búsqueda" },
-    { id: "quiz", icon: ClipboardCheck, titulo: "Opción múltiple", texto: "Con opciones trampa" },
-    { id: "escribir", icon: PenLine, titulo: "Escribir", texto: "Escribe la equivalencia exacta" },
-    { id: "consecutiva", icon: Headphones, titulo: "Consecutiva", texto: "Práctica y autoevaluación" },
+    { id: "glosario", icon: ListChecks, titulo: "Glosario", texto: "Términos jurídicos" },
+    { id: "quiz", icon: ClipboardCheck, titulo: "Quiz", texto: "Opción múltiple" },
+    { id: "escribir", icon: PenLine, titulo: "Escribir", texto: "Escribe la equivalencia" },
+    { id: "consecutiva", icon: Headphones, titulo: "Consecutiva", texto: "Grábate traduciendo ejemplos" },
   ];
   return (
     <div>
@@ -1763,7 +1763,7 @@ export default function App() {
             active={section === "quiz"}
             onClick={() => setSection("quiz")}
           >
-            Opción múltiple
+            Quiz
           </NavButton>
           <NavButton
             icon={PenLine}

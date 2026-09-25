@@ -5,6 +5,4 @@ export default {
   plea: "En la corte juvenil: el menor responde «admit» o «deny», no «guilty» o «not guilty».",
   petition: "En la corte juvenil: es el documento que inicia el caso contra el menor (o por abuso, negligencia o dependencia). En general: solicitud escrita al tribunal.",
   felony: "En la corte juvenil: es el acto que sería delito grave si lo cometiera un adulto.",
-  adjudication: "Equivale en adultos a la declaración de culpabilidad (conviction).",
-  disposition: "Equivale en adultos a la sentencia (sentence).",
 };
