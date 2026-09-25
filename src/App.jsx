@@ -1481,57 +1481,93 @@ function TamanoLetra({ nivel, setNivel }) {
   );
 }
 
-function InicioView({ irA }) {
-  const accesos = [
-    { id: "glosario", icon: ListChecks, titulo: "Glosario", texto: "Términos jurídicos" },
-    { id: "quiz", icon: ClipboardCheck, titulo: "Quiz", texto: "Opción múltiple" },
-    { id: "flashcards", icon: Layers, titulo: "Tarjetas", texto: "Repasa 20 términos por sesión" },
-    { id: "escribir", icon: PenLine, titulo: "Escribir", texto: "Escribe la equivalencia" },
-    { id: "consecutiva", icon: Headphones, titulo: "Consecutiva", texto: "Grábate traduciendo ejemplos" },
-    { id: "sight", icon: Eye, titulo: "Sight Translation", texto: "Traduce un texto a la vista" },
-  ];
+// Todas las secciones, de mayor a menor relevancia.
+const SECCIONES = [
+  { id: "glosario", icon: ListChecks, titulo: "Glosario", texto: "Términos jurídicos" },
+  { id: "quiz", icon: ClipboardCheck, titulo: "Quiz", texto: "Opción múltiple" },
+  { id: "flashcards", icon: Layers, titulo: "Tarjetas", texto: "Repaso rápido de términos", corto: "Repaso rápido" },
+  { id: "escribir", icon: PenLine, titulo: "Escribir", texto: "Escribe la equivalencia" },
+  { id: "consecutiva", icon: Headphones, titulo: "Consecutiva", texto: "Grábate traduciendo ejemplos", corto: "Grábate traduciendo" },
+  { id: "sight", icon: Eye, titulo: "Sight Translation", texto: "Traduce un texto a la vista", corto: "Traducción a la vista" },
+  { id: "debiles", icon: AlertTriangle, titulo: "Términos difíciles", texto: "Los que más fallas" },
+  { id: "match", icon: Zap, titulo: "Relacionar", texto: "Une término y traducción", corto: "Une las parejas" },
+  { id: "caso", icon: Scale, titulo: "Caso de la semana", texto: "Un caso para analizar" },
+  { id: "canones", icon: ScrollText, titulo: "Cánones", texto: "Ética del intérprete" },
+  { id: "recursos", icon: Library, titulo: "Recursos", texto: "Enlaces y materiales" },
+];
+
+function InicioView({ irA, isMobile }) {
+  const fila = (i) => ({
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    width: "100%",
+    textAlign: "left",
+    padding: isMobile ? "5px 12px" : "11px 14px",
+    background: "none",
+    border: "none",
+    borderTop: i ? `1px solid ${C.border}` : "none",
+    cursor: "pointer",
+  });
+  const tituloStyle = {
+    fontFamily: sans,
+    fontSize: isMobile ? 14.5 : 15.5,
+    fontWeight: 600,
+    color: C.text,
+    width: isMobile ? 134 : 190,
+    flexShrink: 0,
+    whiteSpace: "nowrap",
+  };
+  const textoStyle = { fontFamily: sans, fontSize: isMobile ? 13 : 14, color: C.muted, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" };
   return (
     <div>
-      <h1 style={{ fontFamily: serif, fontWeight: 600, color: C.text, fontSize: 33, margin: 0 }}>
+      <h1 style={{ fontFamily: serif, fontWeight: 600, color: C.text, fontSize: isMobile ? 26 : 30, margin: 0 }}>
         Palabra Justa
       </h1>
-      <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, margin: "6px 0 0 0" }}>
-        Elige una semana en el menú o empieza a practicar.
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: isMobile ? 14.5 : 15.5, lineHeight: 1.4, margin: "4px 0 0 0" }}>
+        Organiza y practica las ocho semanas del curso de intérprete judicial.
       </p>
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: 12,
-          marginTop: 24,
+          marginTop: isMobile ? 10 : 18,
+          backgroundColor: C.card,
+          border: `1px solid ${C.border}`,
+          borderRadius: 10,
+          overflow: "hidden",
         }}
       >
-        {accesos.map(({ id, icon: Icon, titulo, texto }) => (
-          <button
-            key={id}
-            onClick={() => irA(id)}
-            style={{
-              textAlign: "left",
-              display: "flex",
-              gap: 12,
-              alignItems: "flex-start",
-              padding: "16px 16px",
-              backgroundColor: C.card,
-              border: `1px solid ${C.border}`,
-              borderLeft: `4px solid ${C.clay}`,
-              borderRadius: 10,
-              cursor: "pointer",
-            }}
-          >
-            <Icon size={20} color={C.accent} style={{ flexShrink: 0, marginTop: 2 }} />
-            <span>
-              <span style={{ display: "block", fontFamily: sans, fontSize: 16, fontWeight: 600, color: C.text }}>
-                {titulo}
-              </span>
-              <span style={{ display: "block", fontFamily: sans, fontSize: 14, color: C.muted, marginTop: 2 }}>
-                {texto}
-              </span>
-            </span>
+        <div style={{ ...fila(0), cursor: "default", flexWrap: isMobile ? "wrap" : "nowrap", rowGap: 8 }}>
+          <BookOpen size={19} color={C.accent} style={{ flexShrink: 0 }} />
+          <span style={{ ...tituloStyle, width: isMobile ? "auto" : 190 }}>Contenido por semana</span>
+          <span style={{ display: "flex", gap: isMobile ? 5 : 6, flexWrap: "nowrap", marginLeft: isMobile ? 31 : 0 }}>
+            {WEEKS.map((w) => (
+              <button
+                key={w}
+                onClick={() => irA(`semana-${w}`)}
+                aria-label={`Semana ${w}`}
+                style={{
+                  width: isMobile ? 30 : 32,
+                  height: isMobile ? 28 : 30,
+                  borderRadius: 8,
+                  border: `1px solid ${C.border}`,
+                  backgroundColor: C.accentSoft,
+                  color: C.accent,
+                  fontFamily: sans,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                {w}
+              </button>
+            ))}
+          </span>
+        </div>
+        {SECCIONES.map(({ id, icon: Icon, titulo, texto, corto }, i) => (
+          <button key={id} onClick={() => irA(id)} style={fila(i + 1)}>
+            <Icon size={19} color={C.accent} style={{ flexShrink: 0 }} />
+            <span style={tituloStyle}>{titulo}</span>
+            <span style={textoStyle}>{isMobile && corto ? corto : texto}</span>
           </button>
         ))}
       </div>
@@ -1592,11 +1628,16 @@ export default function App() {
             gap: 8,
           }}
         >
-          <div className="flex items-center gap-2">
+          <button
+            onClick={() => setSection("inicio")}
+            aria-label="Ir al inicio"
+            className="flex items-center gap-2"
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}
+          >
             <img
               src={LOGO_URI}
               alt=""
-              style={{ width: 56, height: 56, opacity: 0.95, flexShrink: 0 }}
+              style={{ width: isMobile ? 42 : 56, height: isMobile ? 42 : 56, opacity: 0.95, flexShrink: 0 }}
             />
             <div>
               <p
@@ -1623,10 +1664,46 @@ export default function App() {
                 Inglés – Español
               </p>
             </div>
-          </div>
+          </button>
 
+          {!isMobile && (
+            <button
+              onClick={() => setSection("inicio")}
+              aria-label="Inicio"
+              title="Inicio"
+              className="flex items-center justify-center rounded"
+              style={{
+                width: 38,
+                height: 38,
+                border: `1px solid ${C.border}`,
+                backgroundColor: section === "inicio" ? C.accentSoft : C.card,
+                color: C.accent,
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              <Home size={18} />
+            </button>
+          )}
           {isMobile && (
             <div className="flex items-center gap-2">
+            <button
+              onClick={() => setSection("inicio")}
+              aria-label="Inicio"
+              title="Inicio"
+              className="flex items-center justify-center rounded"
+              style={{
+                width: 38,
+                height: 38,
+                border: `1px solid ${C.border}`,
+                backgroundColor: section === "inicio" ? C.accentSoft : C.card,
+                color: C.accent,
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              <Home size={18} />
+            </button>
             <TamanoLetra nivel={nivelLetra} setNivel={setNivelLetra} />
             <button
               onClick={() => setNavOpen((v) => !v)}
@@ -1658,13 +1735,6 @@ export default function App() {
             marginTop: isMobile ? 8 : 0,
           }}
         >
-          <NavButton
-            icon={Home}
-            active={section === "inicio"}
-            onClick={() => setSection("inicio")}
-          >
-            Inicio
-          </NavButton>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -1708,18 +1778,18 @@ export default function App() {
           )}
 
           <NavButton
-            icon={Zap}
-            active={section === "match"}
-            onClick={() => setSection("match")}
-          >
-            Relacionar
-          </NavButton>
-          <NavButton
             icon={AlertTriangle}
             active={section === "debiles"}
             onClick={() => setSection("debiles")}
           >
             Términos difíciles
+          </NavButton>
+          <NavButton
+            icon={Zap}
+            active={section === "match"}
+            onClick={() => setSection("match")}
+          >
+            Relacionar
           </NavButton>
 
           {!isMobile && (
@@ -1775,7 +1845,7 @@ export default function App() {
         }}
       >
         <div style={{ zoom: ESCALAS[nivelLetra] }}>
-        {section === "inicio" && <InicioView irA={setSection} />}
+        {section === "inicio" && <InicioView irA={setSection} isMobile={isMobile} />}
         {section.startsWith("semana-") && (
           <WeekView
             key={section}
