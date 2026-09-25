@@ -8,7 +8,7 @@ html, body, #root {
 }
 
 body {
-  background-color: #F5F7F8;
+  background-color: #FFFFFF;
   font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
@@ -16,7 +16,7 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 [role="button"]:focus-visible {
-  outline: 3px solid #C8936A;
+  outline: 3px solid #0050D3;
   outline-offset: 2px;
 }
 
@@ -24,11 +24,11 @@ select:focus-visible,
 
 /* ---------- Movimiento (rediseño) ---------- */
 .pj-tile { transition: transform .22s cubic-bezier(.2,.7,.3,1), box-shadow .22s ease, border-color .22s ease; }
-.pj-tile:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(38,48,58,.08); border-color: #C9D3DC !important; }
+.pj-tile:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(38,48,58,.08); border-color: #B9C7DB !important; }
 .pj-tile:active { transform: translateY(0) scale(.97); transition-duration: .08s; }
 .pj-tile .pj-ic { transition: background-color .22s ease, color .22s ease; }
-.pj-tile:hover .pj-ic, .pj-tile:active .pj-ic { background-color: #F7EEE6 !important; color: #9A6A45 !important; }
-.pj-tile:hover .pj-ic svg, .pj-tile:active .pj-ic svg { color: #9A6A45 !important; stroke: #9A6A45 !important; }
+.pj-tile:hover .pj-ic, .pj-tile:active .pj-ic { background-color: #FFF4DB !important; color: #9A6200 !important; }
+.pj-tile:hover .pj-ic svg, .pj-tile:active .pj-ic svg { color: #9A6200 !important; stroke: #9A6200 !important; }
 
 .pj-in { animation: pjSube .42s cubic-bezier(.2,.7,.3,1) both; }
 @keyframes pjSube { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
@@ -37,11 +37,11 @@ select:focus-visible,
 @keyframes pjFunde { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 .pj-chip { transition: background-color .16s ease, color .16s ease, transform .1s ease, border-color .16s ease; }
-.pj-chip:hover { background-color: #4F7090 !important; color: #FFFFFF !important; border-color: #4F7090 !important; }
+.pj-chip:hover { background-color: #0050D3 !important; color: #FFFFFF !important; border-color: #0050D3 !important; }
 .pj-chip:active { transform: scale(.93); }
 
 .pj-nav { transition: background-color .18s ease, color .18s ease; }
-.pj-nav:hover { background-color: rgba(79,112,144,.07) !important; }
+.pj-nav:hover { background-color: rgba(0,80,211,.06) !important; }
 .pj-ind { transition: transform .3s cubic-bezier(.2,.7,.3,1), height .3s cubic-bezier(.2,.7,.3,1), opacity .2s ease; }
 
 .pj-despliega { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s cubic-bezier(.2,.7,.3,1); }
