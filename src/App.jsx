@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useLayoutEffect, useRef } from "react";
 import {
   BookOpen,
   Scale,
@@ -14,6 +14,8 @@ import {
   PenLine,
   Home,
   ChevronDown,
+  Menu,
+  X,
 } from "lucide-react";
 import ConsecutivaSection from "./components/Consecutiva/ConsecutivaSection.jsx";
 
@@ -453,13 +455,15 @@ function NavButton({ active, onClick, children, icon: Icon }) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-3 py-2 flex items-center gap-2 transition-colors"
+      data-nav-activo={active ? "true" : undefined}
+      aria-current={active ? "page" : undefined}
+      className="pj-nav w-full text-left px-3 py-2 flex items-center gap-2"
       style={{
         fontFamily: sans,
         fontSize: 15,
         color: active ? C.accent : C.text,
         backgroundColor: active ? C.accentSoft : "transparent",
-        borderLeft: `3px solid ${active ? C.highlight : "transparent"}`,
+        borderLeft: "3px solid transparent",
         borderTop: "none",
         borderRight: "none",
         borderBottom: "none",
@@ -471,6 +475,49 @@ function NavButton({ active, onClick, children, icon: Icon }) {
       <span>{children}</span>
     </button>
   );
+}
+
+function IndicadorNav({ navRef, deps }) {
+  const pos = useIndicador(navRef, deps);
+  return (
+    <span
+      aria-hidden="true"
+      className="pj-ind"
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: 3,
+        height: pos.height,
+        borderRadius: 2,
+        backgroundColor: C.clay,
+        transform: `translateY(${pos.top}px)`,
+        opacity: pos.visible ? 1 : 0,
+        pointerEvents: "none",
+        zIndex: 1,
+      }}
+    />
+  );
+}
+
+// Barrita terracota que se desliza hasta la opción activa del menú.
+function useIndicador(ref, deps) {
+  const [pos, setPos] = useState({ top: 0, height: 0, visible: false });
+  useLayoutEffect(() => {
+    const medir = () => {
+      const nav = ref.current;
+      if (!nav) return;
+      const activo = nav.querySelector('[data-nav-activo="true"]');
+      if (!activo || activo.offsetParent === null) return setPos((p) => ({ ...p, visible: false }));
+      const a = activo.getBoundingClientRect();
+      const n = nav.getBoundingClientRect();
+      setPos({ top: a.top - n.top + 4, height: a.height - 8, visible: true });
+    };
+    medir();
+    window.addEventListener("resize", medir);
+    return () => window.removeEventListener("resize", medir);
+  }, deps); // eslint-disable-line react-hooks/exhaustive-deps
+  return pos;
 }
 
 function Eyebrow({ children }) {
@@ -1322,69 +1369,21 @@ function CaseView({ data }) {
 
 function SplashScreen() {
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: C.bg,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 9999,
-        animation: "palabraJustaSplashOut 0.7s ease forwards",
-        animationDelay: "1.9s",
-      }}
-    >
-      <style>{`
-        @keyframes palabraJustaLogoIn {
-          from { opacity: 0; transform: scale(0.82); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes palabraJustaTextIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes palabraJustaSplashOut {
-          from { opacity: 1; visibility: visible; }
-          to { opacity: 0; visibility: hidden; }
-        }
-      `}</style>
-      <img
-        src={LOGO_URI}
-        alt=""
-        style={{
-          width: 108,
-          height: 108,
-          opacity: 0,
-          animation: "palabraJustaLogoIn 0.8s cubic-bezier(0.22,1,0.36,1) forwards",
-        }}
-      />
+    <div className="pj-splash" aria-hidden="true">
+      <img className="pj-splash-logo" src={LOGO_URI} alt="" style={{ width: 112, height: 112 }} />
       <p
-        style={{
-          fontFamily: brand,
-          fontWeight: 700,
-          fontSize: 30,
-          letterSpacing: "0.2px",
-          color: C.accent,
-          margin: "18px 0 0 0",
-          opacity: 0,
-          animation: "palabraJustaTextIn 0.7s ease forwards",
-          animationDelay: "0.4s",
-        }}
+        className="pj-splash-texto"
+        style={{ fontFamily: brand, fontWeight: 600, fontSize: 32, color: C.accent, margin: "18px 0 0 0" }}
       >
         Palabra Justa
       </p>
+      <span
+        className="pj-splash-linea"
+        style={{ display: "block", width: 56, height: 3, borderRadius: 2, backgroundColor: C.clay, margin: "10px 0 0 0" }}
+      />
       <p
-        style={{
-          fontFamily: mono,
-          fontSize: 14,
-          color: C.label,
-          margin: "6px 0 0 0",
-          opacity: 0,
-          animation: "palabraJustaTextIn 0.7s ease forwards",
-          animationDelay: "0.55s",
-        }}
+        className="pj-splash-texto"
+        style={{ fontFamily: sans, fontSize: 14.5, color: "#5E7150", fontWeight: 500, margin: "10px 0 0 0" }}
       >
         Inglés · Español
       </p>
@@ -1481,96 +1480,172 @@ function TamanoLetra({ nivel, setNivel }) {
   );
 }
 
-// Todas las secciones, de mayor a menor relevancia.
-const SECCIONES = [
-  { id: "glosario", icon: ListChecks, titulo: "Glosario", texto: "Términos jurídicos" },
-  { id: "quiz", icon: ClipboardCheck, titulo: "Quiz", texto: "Opción múltiple" },
-  { id: "flashcards", icon: Layers, titulo: "Tarjetas", texto: "Repaso rápido de términos", corto: "Repaso rápido" },
-  { id: "escribir", icon: PenLine, titulo: "Escribir", texto: "Escribe la equivalencia" },
-  { id: "consecutiva", icon: Headphones, titulo: "Consecutiva", texto: "Grábate traduciendo ejemplos", corto: "Grábate traduciendo" },
-  { id: "sight", icon: Eye, titulo: "Sight Translation", texto: "Traduce un texto a la vista", corto: "Traducción a la vista" },
-  { id: "debiles", icon: AlertTriangle, titulo: "Términos difíciles", texto: "Los que más fallas" },
-  { id: "match", icon: Zap, titulo: "Relacionar", texto: "Une término y traducción", corto: "Une las parejas" },
-  { id: "caso", icon: Scale, titulo: "Caso de la semana", texto: "Un caso para analizar" },
-  { id: "canones", icon: ScrollText, titulo: "Cánones", texto: "Ética del intérprete" },
-  { id: "recursos", icon: Library, titulo: "Recursos", texto: "Enlaces y materiales" },
+// Secciones agrupadas por uso, de mayor a menor relevancia.
+const GRUPOS_INICIO = [
+  {
+    titulo: "Estudia",
+    items: [
+      { id: "glosario", icon: ListChecks, titulo: "Glosario", texto: "Términos jurídicos" },
+      { id: "caso", icon: Scale, titulo: "Caso de la semana", texto: "Un caso para analizar" },
+      { id: "recursos", icon: Library, titulo: "Recursos", texto: "Enlaces y materiales" },
+    ],
+  },
+  {
+    titulo: "Practica vocabulario",
+    items: [
+      { id: "quiz", icon: ClipboardCheck, titulo: "Quiz", texto: "Opción múltiple" },
+      { id: "flashcards", icon: Layers, titulo: "Tarjetas", texto: "Repaso rápido" },
+      { id: "escribir", icon: PenLine, titulo: "Escribir", texto: "Escribe la equivalencia" },
+      { id: "match", icon: Zap, titulo: "Relacionar", texto: "Une término y traducción" },
+      { id: "debiles", icon: AlertTriangle, titulo: "Términos difíciles", texto: "Los que más fallas" },
+    ],
+  },
+  {
+    titulo: "Interpreta",
+    items: [
+      { id: "consecutiva", icon: Headphones, titulo: "Consecutiva", texto: "Grábate traduciendo ejemplos" },
+      { id: "sight", icon: Eye, titulo: "Sight Translation", texto: "Traduce un texto a la vista" },
+      { id: "canones", icon: ScrollText, titulo: "Cánones", texto: "Ética del intérprete" },
+    ],
+  },
 ];
 
 function InicioView({ irA, isMobile }) {
-  const fila = (i) => ({
+  const [semanasAbiertas, setSemanasAbiertas] = useState(false);
+  let orden = 0;
+  const retraso = () => ({ animationDelay: `${60 + orden++ * 35}ms` });
+
+  const mosaico = (activo) => ({
     display: "flex",
-    alignItems: "center",
-    gap: 12,
-    width: "100%",
+    flexDirection: isMobile ? "column" : "row",
+    alignItems: isMobile ? "flex-start" : "center",
+    gap: isMobile ? 5 : 12,
     textAlign: "left",
-    padding: isMobile ? "5px 12px" : "11px 14px",
-    background: "none",
-    border: "none",
-    borderTop: i ? `1px solid ${C.border}` : "none",
+    padding: isMobile ? "8px 9px 7px 9px" : "12px 14px",
+    backgroundColor: activo ? C.accentSoft : C.card,
+    border: `1px solid ${activo ? C.accent : C.border}`,
+    borderRadius: 12,
     cursor: "pointer",
+    minWidth: 0,
+    position: "relative",
   });
-  const tituloStyle = {
-    fontFamily: sans,
-    fontSize: isMobile ? 14.5 : 15.5,
-    fontWeight: 600,
-    color: C.text,
-    width: isMobile ? 134 : 190,
-    flexShrink: 0,
-    whiteSpace: "nowrap",
-  };
-  const textoStyle = { fontFamily: sans, fontSize: isMobile ? 13 : 14, color: C.muted, flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" };
+  const icono = (Icon) => (
+    <span
+      className="pj-ic"
+      style={{
+        width: isMobile ? 28 : 36,
+        height: isMobile ? 28 : 36,
+        borderRadius: 9,
+        backgroundColor: C.accentSoft,
+        color: C.accent,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}
+    >
+      <Icon size={isMobile ? 16 : 19} />
+    </span>
+  );
+  const textos = (titulo, texto) => (
+    <span style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+      <span style={{ fontFamily: sans, fontSize: isMobile ? 13.5 : 15.5, fontWeight: 600, color: C.text, lineHeight: 1.25 }}>
+        {titulo}
+      </span>
+      {!isMobile && <span style={{ fontFamily: sans, fontSize: 13.5, color: C.muted, lineHeight: 1.3 }}>{texto}</span>}
+    </span>
+  );
+  const encabezado = (t) => (
+    <p style={{ fontFamily: sans, fontSize: isMobile ? 13 : 13.5, fontWeight: 600, color: C.label, margin: isMobile ? "0 0 5px 2px" : "0 0 8px 2px" }}>{t}</p>
+  );
+  const rejilla = { display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: isMobile ? 7 : 10 };
+
   return (
     <div>
-      <h1 style={{ fontFamily: serif, fontWeight: 600, color: C.text, fontSize: isMobile ? 26 : 30, margin: 0 }}>
-        Palabra Justa
-      </h1>
-      <p style={{ fontFamily: sans, color: C.muted, fontSize: isMobile ? 14.5 : 15.5, lineHeight: 1.4, margin: "4px 0 0 0" }}>
-        Organiza y practica las ocho semanas del curso de intérprete judicial.
+      {!isMobile && (
+        <h1 style={{ fontFamily: serif, fontWeight: 600, color: C.text, fontSize: 32, margin: 0 }}>
+          Palabra Justa
+        </h1>
+      )}
+      <p style={{ fontFamily: sans, color: C.muted, fontSize: isMobile ? 14.5 : 16, lineHeight: 1.4, margin: "2px 0 0 0" }}>
+        De estudiante a intérprete judicial en ocho semanas.
       </p>
-      <div
-        style={{
-          marginTop: isMobile ? 10 : 18,
-          backgroundColor: C.card,
-          border: `1px solid ${C.border}`,
-          borderRadius: 10,
-          overflow: "hidden",
-        }}
-      >
-        <div style={{ ...fila(0), cursor: "default", flexWrap: isMobile ? "wrap" : "nowrap", rowGap: 8 }}>
-          <BookOpen size={19} color={C.accent} style={{ flexShrink: 0 }} />
-          <span style={{ ...tituloStyle, width: isMobile ? "auto" : 190 }}>Contenido por semana</span>
-          <span style={{ display: "flex", gap: isMobile ? 5 : 6, flexWrap: "nowrap", marginLeft: isMobile ? 31 : 0 }}>
-            {WEEKS.map((w) => (
+
+      {GRUPOS_INICIO.map((g, gi) => (
+        <section key={g.titulo} className="pj-in" style={{ ...retraso(), marginTop: isMobile ? (gi ? 10 : 12) : 22 }}>
+          {encabezado(g.titulo)}
+          <div style={rejilla}>
+            {gi === 0 && (
               <button
-                key={w}
-                onClick={() => irA(`semana-${w}`)}
-                aria-label={`Semana ${w}`}
-                style={{
-                  width: isMobile ? 30 : 32,
-                  height: isMobile ? 28 : 30,
-                  borderRadius: 8,
-                  border: `1px solid ${C.border}`,
-                  backgroundColor: C.accentSoft,
-                  color: C.accent,
-                  fontFamily: sans,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
+                className="pj-tile pj-in"
+                onClick={() => setSemanasAbiertas((v) => !v)}
+                aria-expanded={semanasAbiertas}
+                style={{ ...mosaico(semanasAbiertas), ...retraso() }}
               >
-                {w}
+                {icono(BookOpen)}
+                {textos("Contenido por semana", "Temas de cada clase")}
+                <ChevronDown
+                  size={isMobile ? 16 : 17}
+                  color={C.label}
+                  style={{
+                    flexShrink: 0,
+                    transition: "transform .3s cubic-bezier(.2,.7,.3,1)",
+                    transform: semanasAbiertas ? "rotate(180deg)" : "none",
+                    ...(isMobile ? { position: "absolute", top: 11, right: 9 } : {}),
+                  }}
+                />
+              </button>
+            )}
+            {g.items.map(({ id, icon: Icon, titulo, texto }) => (
+              <button key={id} className="pj-tile pj-in" onClick={() => irA(id)} style={{ ...mosaico(false), ...retraso() }}>
+                {icono(Icon)}
+                {textos(titulo, texto)}
               </button>
             ))}
-          </span>
-        </div>
-        {SECCIONES.map(({ id, icon: Icon, titulo, texto, corto }, i) => (
-          <button key={id} onClick={() => irA(id)} style={fila(i + 1)}>
-            <Icon size={19} color={C.accent} style={{ flexShrink: 0 }} />
-            <span style={tituloStyle}>{titulo}</span>
-            <span style={textoStyle}>{isMobile && corto ? corto : texto}</span>
-          </button>
-        ))}
-      </div>
+          </div>
+          {gi === 0 && (
+            <div className={semanasAbiertas ? "pj-despliega abierto" : "pj-despliega"}>
+              <div className="pj-dentro">
+                <div
+                  style={{
+                    marginTop: isMobile ? 7 : 10,
+                    padding: isMobile ? 10 : 12,
+                    backgroundColor: C.card,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 12,
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${isMobile ? 4 : 8}, minmax(0, 1fr))`,
+                    gap: 8,
+                  }}
+                >
+                  {WEEKS.map((w, i) => (
+                    <button
+                      key={w}
+                      className="pj-chip pj-cascada"
+                      onClick={() => irA(`semana-${w}`)}
+                      tabIndex={semanasAbiertas ? 0 : -1}
+                      style={{
+                        animationDelay: `${i * 30}ms`,
+                        height: 44,
+                        borderRadius: 9,
+                        border: `1px solid ${C.border}`,
+                        backgroundColor: C.accentSoft,
+                        color: C.accent,
+                        fontFamily: sans,
+                        fontSize: isMobile ? 13.5 : 14,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Semana {w}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      ))}
     </div>
   );
 }
@@ -1580,11 +1655,12 @@ export default function App() {
   const [navOpen, setNavOpen] = useState(false);
   const [semanasAbiertas, setSemanasAbiertas] = useState(false);
   const [nivelLetra, setNivelLetra] = useEscala();
+  const navRef = useRef(null);
   const [showSplash, setShowSplash] = useState(true);
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    const t = setTimeout(() => setShowSplash(false), 2600);
+    const t = setTimeout(() => setShowSplash(false), 1550);
     return () => clearTimeout(t);
   }, []);
 
@@ -1637,7 +1713,7 @@ export default function App() {
             <img
               src={LOGO_URI}
               alt=""
-              style={{ width: isMobile ? 42 : 56, height: isMobile ? 42 : 56, opacity: 0.95, flexShrink: 0 }}
+              style={{ width: isMobile ? 36 : 52, height: isMobile ? 36 : 52, opacity: 0.95, flexShrink: 0 }}
             />
             <div>
               <p
@@ -1645,7 +1721,7 @@ export default function App() {
                   fontFamily: brand,
                   fontWeight: 700,
                   color: C.text,
-                  fontSize: 20,
+                  fontSize: isMobile ? 19 : 20,
                   letterSpacing: "-0.2px",
                   whiteSpace: "nowrap",
                   margin: 0,
@@ -1653,7 +1729,7 @@ export default function App() {
               >
                 Palabra Justa
               </p>
-              <p
+              {!isMobile && <p
                 style={{
                   fontFamily: sans,
                   color: C.label,
@@ -1662,86 +1738,85 @@ export default function App() {
                 }}
               >
                 Inglés – Español
-              </p>
+              </p>}
             </div>
           </button>
 
-          {!isMobile && (
-            <button
-              onClick={() => setSection("inicio")}
-              aria-label="Inicio"
-              title="Inicio"
-              className="flex items-center justify-center rounded"
-              style={{
-                width: 38,
-                height: 38,
-                border: `1px solid ${C.border}`,
-                backgroundColor: section === "inicio" ? C.accentSoft : C.card,
-                color: C.accent,
-                cursor: "pointer",
-                flexShrink: 0,
-              }}
-            >
-              <Home size={18} />
-            </button>
-          )}
           {isMobile && (
-            <div className="flex items-center gap-2">
-            <button
-              onClick={() => setSection("inicio")}
-              aria-label="Inicio"
-              title="Inicio"
-              className="flex items-center justify-center rounded"
-              style={{
-                width: 38,
-                height: 38,
-                border: `1px solid ${C.border}`,
-                backgroundColor: section === "inicio" ? C.accentSoft : C.card,
-                color: C.accent,
+            <div className="flex items-center" style={{ gap: 4 }}>
+              <button
+                onClick={() => {
+                  setSection("inicio");
+                  setNavOpen(false);
+                }}
+                aria-label="Inicio"
+                className="pj-icbtn flex items-center justify-center"
+                style={{
+                width: 40,
+                height: 40,
+                border: "none",
+                borderRadius: 10,
+                backgroundColor: section === "inicio" && !navOpen ? C.accentSoft : "transparent",
+                color: section === "inicio" && !navOpen ? C.accent : C.text,
                 cursor: "pointer",
                 flexShrink: 0,
               }}
-            >
-              <Home size={18} />
-            </button>
-            <TamanoLetra nivel={nivelLetra} setNivel={setNivelLetra} />
-            <button
-              onClick={() => setNavOpen((v) => !v)}
-              className="flex items-center justify-center rounded"
-              aria-label="Menú"
-              style={{
-                width: 46,
-                height: 46,
-                border: `1px solid ${C.border}`,
-                backgroundColor: navOpen ? C.accent : "transparent",
-                color: navOpen ? C.bg : C.text,
-                fontSize: 22,
+              >
+                <Home size={21} />
+              </button>
+              <button
+                onClick={() => setNavOpen((v) => !v)}
+                aria-label={navOpen ? "Cerrar menú" : "Menú"}
+                aria-expanded={navOpen}
+                className="pj-icbtn flex items-center justify-center"
+                style={{
+                width: 40,
+                height: 40,
+                border: "none",
+                borderRadius: 10,
+                backgroundColor: navOpen ? C.accentSoft : "transparent",
+                color: navOpen ? C.accent : C.text,
                 cursor: "pointer",
                 flexShrink: 0,
               }}
-            >
-              {navOpen ? "✕" : "☰"}
-            </button>
+              >
+                {navOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
             </div>
           )}
         </div>
 
+        <div className={isMobile ? (navOpen ? "pj-despliega abierto" : "pj-despliega") : undefined}>
+        <div className={isMobile ? "pj-dentro" : undefined}>
         <div
+          ref={navRef}
           onClick={() => isMobile && setNavOpen(false)}
           style={{
-            display: isMobile ? (navOpen ? "flex" : "none") : "flex",
+            display: "flex",
             flexDirection: "column",
             gap: 4,
             marginTop: isMobile ? 8 : 0,
+            position: "relative",
           }}
         >
+          <IndicadorNav navRef={navRef} deps={[section, semanasAbiertas, navOpen, isMobile, nivelLetra]} />
+          {!isMobile && (
+            <NavButton
+              icon={Home}
+              active={section === "inicio"}
+              onClick={() => setSection("inicio")}
+            >
+              Inicio
+            </NavButton>
+          )}
           <button
             onClick={(e) => {
               e.stopPropagation();
               setSemanasAbiertas((v) => !v);
             }}
             aria-expanded={semanasAbiertas}
-            className="w-full text-left px-3 py-2 flex items-center gap-2"
+            data-nav-activo={section.startsWith("semana-") && !semanasAbiertas ? "true" : undefined}
+            className="pj-nav w-full text-left px-3 py-2 flex items-center gap-2"
             style={{
               fontFamily: sans,
               fontSize: 15,
@@ -1818,11 +1893,15 @@ export default function App() {
             Recursos
           </NavButton>
         </div>
-        {!isMobile && (
+        </div>
+        </div>
+        {(!isMobile || navOpen) && (
           <div
             style={{
-              marginTop: 20,
-              paddingTop: 14,
+              marginTop: isMobile ? 10 : 20,
+              paddingTop: isMobile ? 10 : 14,
+              paddingLeft: isMobile ? 12 : 0,
+              paddingRight: isMobile ? 4 : 0,
               borderTop: `1px solid ${C.border}`,
               display: "flex",
               alignItems: "center",
@@ -1841,10 +1920,10 @@ export default function App() {
           flex: 1,
           padding: isMobile ? 16 : 32,
           width: "100%",
-          maxWidth: isMobile ? "100%" : 672,
+          maxWidth: isMobile ? "100%" : section === "inicio" ? 820 : 672,
         }}
       >
-        <div style={{ zoom: ESCALAS[nivelLetra] }}>
+        <div key={section} className="pj-fade" style={{ zoom: ESCALAS[nivelLetra] }}>
         {section === "inicio" && <InicioView irA={setSection} isMobile={isMobile} />}
         {section.startsWith("semana-") && (
           <WeekView
