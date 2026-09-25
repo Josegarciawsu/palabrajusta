@@ -453,10 +453,10 @@ function NavButton({ active, onClick, children, icon: Icon }) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-4 py-2 flex items-center gap-2 transition-colors"
+      className="w-full text-left px-3 py-2 flex items-center gap-2 transition-colors"
       style={{
         fontFamily: sans,
-        fontSize: 16,
+        fontSize: 15,
         color: active ? C.accent : C.text,
         backgroundColor: active ? C.accentSoft : "transparent",
         borderLeft: `3px solid ${active ? C.highlight : "transparent"}`,
@@ -1485,8 +1485,10 @@ function InicioView({ irA }) {
   const accesos = [
     { id: "glosario", icon: ListChecks, titulo: "Glosario", texto: "Términos jurídicos" },
     { id: "quiz", icon: ClipboardCheck, titulo: "Quiz", texto: "Opción múltiple" },
+    { id: "flashcards", icon: Layers, titulo: "Tarjetas", texto: "Repasa 20 términos por sesión" },
     { id: "escribir", icon: PenLine, titulo: "Escribir", texto: "Escribe la equivalencia" },
     { id: "consecutiva", icon: Headphones, titulo: "Consecutiva", texto: "Grábate traduciendo ejemplos" },
+    { id: "sight", icon: Eye, titulo: "Sight Translation", texto: "Traduce un texto a la vista" },
   ];
   return (
     <div>
@@ -1572,7 +1574,7 @@ export default function App() {
     >
             <aside
         style={{
-          width: isMobile ? "100%" : 224,
+          width: isMobile ? "100%" : 276,
           flexShrink: 0,
           padding: isMobile ? 12 : 16,
           display: "flex",
@@ -1669,10 +1671,11 @@ export default function App() {
               setSemanasAbiertas((v) => !v);
             }}
             aria-expanded={semanasAbiertas}
-            className="w-full text-left px-4 py-2 flex items-center gap-2"
+            className="w-full text-left px-3 py-2 flex items-center gap-2"
             style={{
               fontFamily: sans,
-              fontSize: 16,
+              fontSize: 15,
+              whiteSpace: "nowrap",
               color: section.startsWith("semana-") ? C.accent : C.text,
               background: "none",
               border: "none",
@@ -1681,11 +1684,11 @@ export default function App() {
             }}
           >
             <BookOpen size={17} strokeWidth={2} style={{ flexShrink: 0 }} />
-            <span style={{ flex: 1 }}>Semanas</span>
+            <span style={{ flex: 1 }}>Contenido por semana</span>
             <ChevronDown
-              size={16}
+              size={15}
               color={C.label}
-              style={{ transform: semanasAbiertas ? "rotate(180deg)" : "none", transition: "transform .15s" }}
+              style={{ flexShrink: 0, transform: semanasAbiertas ? "rotate(180deg)" : "none", transition: "transform .15s" }}
             />
           </button>
           {semanasAbiertas &&
@@ -1699,6 +1702,25 @@ export default function App() {
                 </NavButton>
               </div>
             ))}
+
+          {!isMobile && (
+            <div className="my-2" style={{ borderTop: `1px solid ${C.border}` }} />
+          )}
+
+          <NavButton
+            icon={Zap}
+            active={section === "match"}
+            onClick={() => setSection("match")}
+          >
+            Relacionar
+          </NavButton>
+          <NavButton
+            icon={AlertTriangle}
+            active={section === "debiles"}
+            onClick={() => setSection("debiles")}
+          >
+            Términos difíciles
+          </NavButton>
 
           {!isMobile && (
             <div className="my-2" style={{ borderTop: `1px solid ${C.border}` }} />
@@ -1719,72 +1741,11 @@ export default function App() {
             Cánones
           </NavButton>
           <NavButton
-            icon={Eye}
-            active={section === "sight"}
-            onClick={() => setSection("sight")}
-          >
-            Sight Translation
-          </NavButton>
-          <NavButton
             icon={Library}
             active={section === "recursos"}
             onClick={() => setSection("recursos")}
           >
             Recursos
-          </NavButton>
-
-          {!isMobile && (
-            <div className="my-2" style={{ borderTop: `1px solid ${C.border}` }} />
-          )}
-
-          <NavButton
-            icon={ListChecks}
-            active={section === "glosario"}
-            onClick={() => setSection("glosario")}
-          >
-            Glosario
-          </NavButton>
-          <NavButton
-            icon={Layers}
-            active={section === "flashcards"}
-            onClick={() => setSection("flashcards")}
-          >
-            Tarjetas
-          </NavButton>
-          <NavButton
-            icon={Zap}
-            active={section === "match"}
-            onClick={() => setSection("match")}
-          >
-            Relacionar
-          </NavButton>
-          <NavButton
-            icon={ClipboardCheck}
-            active={section === "quiz"}
-            onClick={() => setSection("quiz")}
-          >
-            Quiz
-          </NavButton>
-          <NavButton
-            icon={PenLine}
-            active={section === "escribir"}
-            onClick={() => setSection("escribir")}
-          >
-            Escribir
-          </NavButton>
-          <NavButton
-            icon={AlertTriangle}
-            active={section === "debiles"}
-            onClick={() => setSection("debiles")}
-          >
-            Términos difíciles
-          </NavButton>
-            <NavButton
-            icon={Headphones}
-            active={section === "consecutiva"}
-            onClick={() => setSection("consecutiva")}
-          >
-            Consecutiva
           </NavButton>
         </div>
         {!isMobile && (
