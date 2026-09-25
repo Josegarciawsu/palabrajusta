@@ -108,7 +108,7 @@ function alternarDificil(t) {
 function Titulo({ children, sub }) {
   return (
     <>
-      <h1 style={{ fontFamily: serif, fontWeight: 600, color: C.text, fontSize: 33, lineHeight: 1.15, margin: 0 }}>
+      <h1 style={{ fontFamily: serif, fontWeight: 600, color: C.navy, fontSize: 33, lineHeight: 1.15, margin: 0 }}>
         {children}
       </h1>
       {sub && (
@@ -439,7 +439,7 @@ const idiomaDe = (dir, lado) =>
 const NOMBRE_FUENTE = { courts: "U.S. Courts", juvenil: "Corte Juvenil" };
 
 // Ícono de joven para los términos propios de la Corte Juvenil.
-function IconoJoven({ size = 16, color = C.clay }) {
+function IconoJoven({ size = 16, color = C.clayText }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
       <path d="M8.5 7.5a3.5 3.5 0 0 1 7 0v1a3.5 3.5 0 0 1-7 0z" />
@@ -639,7 +639,7 @@ export function GlosarioView() {
                       <span style={{ fontSize: 14.5, color: C.text }}>
                         {f.es}
                         {f.esFuente === "propia" && (
-                          <span style={{ display: "block", fontSize: 12, color: C.clay, marginTop: 2 }}>Traducción propia</span>
+                          <span style={{ display: "block", fontSize: 12, color: C.clayText, marginTop: 2 }}>Traducción propia</span>
                         )}
                       </span>
                     )}
@@ -656,7 +656,7 @@ export function GlosarioView() {
                         setDificiles(cargarDificiles());
                       }}
                       aria-label={dificiles[f.libro.en] ? `Quitar ${f.en} de difíciles` : `Marcar ${f.en} como difícil`}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: C.clay, padding: 4, display: "flex", flexShrink: 0 }}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: C.clayText, padding: 4, display: "flex", flexShrink: 0 }}
                     >
                       <Star size={17} fill={dificiles[f.libro.en] ? C.clay : "none"} />
                     </button>
@@ -724,9 +724,9 @@ export function TarjetasView({ fijo, titulo = "Tarjetas" }) {
               </span>
               <span
                 className="pj-cara pj-reverso"
-                style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 8, padding: "26px 24px", boxSizing: "border-box", backgroundColor: C.claySoft, border: "1px solid #E8D5C4", borderRadius: 14, overflow: "auto" }}
+                style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 8, padding: "26px 24px", boxSizing: "border-box", backgroundColor: C.claySoft, border: "1px solid #F2D58E", borderRadius: 14, overflow: "auto" }}
               >
-                <span style={{ fontFamily: sans, fontSize: 13, color: "#8A6242" }}>{idiomaDe(dir, "respuesta")}</span>
+                <span style={{ fontFamily: sans, fontSize: 13, color: "#9A6200" }}>{idiomaDe(dir, "respuesta")}</span>
                 <span style={{ fontFamily: serif, fontSize: 22, fontWeight: 600, lineHeight: 1.35, color: C.text }}>{respuesta(ronda.actual, dir)}</span>
               </span>
             </button>
@@ -1084,7 +1084,7 @@ export function DificilesView() {
               <div key={t.en} style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr) auto", gap: 12, alignItems: "center", padding: "10px 14px", borderTop: i ? `1px solid ${C.border}` : "none", fontFamily: sans, fontSize: 14.5 }}>
                 <span style={{ fontWeight: 600, color: C.accent }}>{t.en}</span>
                 <span style={{ color: C.text }}>{t.es}</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: C.clay }}>{t.fallas}×</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: C.clayText }}>{t.fallas}×</span>
               </div>
             ))}
           </div>
