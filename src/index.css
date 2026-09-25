@@ -20,6 +20,54 @@ select:focus-visible,
   outline-offset: 2px;
 }
 
+
+
+/* ---------- Movimiento (rediseño) ---------- */
+.pj-tile { transition: transform .22s cubic-bezier(.2,.7,.3,1), box-shadow .22s ease, border-color .22s ease; }
+.pj-tile:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(38,48,58,.08); border-color: #C9D3DC !important; }
+.pj-tile:active { transform: translateY(0) scale(.97); transition-duration: .08s; }
+.pj-tile .pj-ic { transition: background-color .22s ease, color .22s ease; }
+.pj-tile:hover .pj-ic, .pj-tile:active .pj-ic { background-color: #F7EEE6 !important; color: #9A6A45 !important; }
+.pj-tile:hover .pj-ic svg, .pj-tile:active .pj-ic svg { color: #9A6A45 !important; stroke: #9A6A45 !important; }
+
+.pj-in { animation: pjSube .42s cubic-bezier(.2,.7,.3,1) both; }
+@keyframes pjSube { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.pj-fade { animation: pjFunde .26s ease both; }
+@keyframes pjFunde { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.pj-chip { transition: background-color .16s ease, color .16s ease, transform .1s ease, border-color .16s ease; }
+.pj-chip:hover { background-color: #4F7090 !important; color: #FFFFFF !important; border-color: #4F7090 !important; }
+.pj-chip:active { transform: scale(.93); }
+
+.pj-nav { transition: background-color .18s ease, color .18s ease; }
+.pj-nav:hover { background-color: rgba(79,112,144,.07) !important; }
+.pj-ind { transition: transform .3s cubic-bezier(.2,.7,.3,1), height .3s cubic-bezier(.2,.7,.3,1), opacity .2s ease; }
+
+.pj-despliega { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s cubic-bezier(.2,.7,.3,1); }
+.pj-despliega.abierto { grid-template-rows: 1fr; }
+.pj-despliega > .pj-dentro { overflow: hidden; min-height: 0; }
+.pj-despliega.abierto .pj-cascada { animation: pjSube .32s cubic-bezier(.2,.7,.3,1) both; }
+
+.pj-icbtn { transition: background-color .18s ease, transform .1s ease; }
+.pj-icbtn:active { transform: scale(.9); }
+
+.pj-btn { transition: background-color .18s ease, transform .1s ease, box-shadow .18s ease; }
+.pj-btn:hover:not(:disabled) { box-shadow: 0 4px 12px rgba(38,48,58,.10); }
+.pj-btn:active:not(:disabled) { transform: scale(.96); }
+
+.pj-flip { perspective: 1200px; }
+.pj-flip-in { position: relative; transition: transform .5s cubic-bezier(.2,.7,.3,1); transform-style: preserve-3d; }
+.pj-flip-in.volteada { transform: rotateY(180deg); }
+.pj-cara { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.pj-reverso { transform: rotateY(180deg); }
+
+.pj-pulso { animation: pjPulso .6s ease-out; }
+@keyframes pjPulso { 0% { box-shadow: 0 0 0 0 rgba(30,158,107,.45); } 100% { box-shadow: 0 0 0 12px rgba(30,158,107,0); } }
+.pj-tiembla { animation: pjTiembla .38s ease; }
+@keyframes pjTiembla { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-7px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(3px); } }
+
+/* Quien activa "reducir movimiento" en su dispositivo ve todo sin animación */
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; animation-duration: 0.01ms !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition: none !important; }
 }
