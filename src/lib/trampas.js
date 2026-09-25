@@ -105,14 +105,30 @@ export function trampas(t, lista, dir, n = 3) {
     candidatos.push({ x, puntos });
   }
   candidatos.sort((a, b) => b.puntos - a.puntos);
-  const fuertes = candidatos.filter((c) => c.puntos > 0.5).slice(0, 7);
-  const elegidos = mezclar(fuertes).slice(0, n).map((c) => c.x);
+  // Nunca dos opciones con el mismo texto visible.
+  const vistos = new Set([resp]);
+  const texto = (x) => limpiar(principal(dir === "en" ? x.es : x.en)).replace(/\s+/g, " ").trim();
+  const unico = (x) => {
+    const t = texto(x);
+    if (vistos.has(t)) return false;
+    vistos.add(t);
+    return true;
+  };
+  const fuertes = candidatos.filter((c) => c.puntos > 0.5).slice(0, 10);
+  const elegidos = [];
+  for (const c of mezclar(fuertes)) {
+    if (elegidos.length === n) break;
+    if (unico(c.x)) elegidos.push(c.x);
+  }
   if (elegidos.length < n) {
     // Relleno: opciones de largo parecido para no delatar la correcta.
     const resto = candidatos.filter((c) => !elegidos.includes(c.x));
     const largo = (c) => Math.abs(principal(dir === "en" ? c.x.es : c.x.en).length - respuesta.length);
     resto.sort((a, b) => largo(a) - largo(b));
-    elegidos.push(...mezclar(resto.slice(0, 10)).slice(0, n - elegidos.length).map((c) => c.x));
+    for (const c of mezclar(resto.slice(0, 30))) {
+      if (elegidos.length === n) break;
+      if (unico(c.x)) elegidos.push(c.x);
+    }
   }
   return elegidos;
 }
