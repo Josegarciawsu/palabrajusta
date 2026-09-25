@@ -209,26 +209,39 @@ function poolDe(grupo) {
   });
 }
 
-function Controles({ dir, setDir, grupo, setGrupo }) {
+function Controles({ dir, setDir }) {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 16px", alignItems: "center", margin: "20px 0 18px 0", fontFamily: sans, fontSize: 14, color: C.muted }}>
+    <div style={{ margin: "0 0 14px 0" }}>
       <Segmento
-        etiqueta="Dirección"
+        etiqueta="Idioma"
         valor={dir}
         onChange={setDir}
         opciones={[["en", "Inglés → Español"], ["es", "Español → Inglés"]]}
       />
-      <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        Grupo
-        <select value={grupo} onChange={(e) => setGrupo(e.target.value)} style={selectStyle}>
-          {GRUPOS.map(([v, l]) => (
-            <option key={v} value={v}>{l}</option>
-          ))}
-        </select>
-      </label>
     </div>
   );
 }
+
+// Pantalla de instrucciones antes de empezar.
+function Intro({ titulo, pasos, onEmpezar }) {
+  return (
+    <div>
+      <Titulo>{titulo}</Titulo>
+      <div style={{ backgroundColor: C.card, border: `1px solid ${C.border}`, borderLeft: `5px solid ${C.clay}`, borderRadius: 10, padding: "20px 22px", marginTop: 18 }}>
+        <ol style={{ margin: 0, paddingLeft: 20, listStyle: "decimal", fontFamily: sans, fontSize: 16, lineHeight: 1.55, color: C.text, display: "flex", flexDirection: "column", gap: 8 }}>
+          {pasos.map((p, i) => (
+            <li key={i}>{p}</li>
+          ))}
+        </ol>
+        <div style={{ marginTop: 18 }}>
+          <Boton variante="primario" onClick={onEmpezar}>Empezar</Boton>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const PASO_IDIOMA = "Puedes cambiar de idioma en la pestaña que está arriba de la tarjeta.";
 
 function Progreso({ pos, total, aciertos }) {
   return (
@@ -325,7 +338,8 @@ function Vacio({ grupo }) {
 // sin repetir hasta terminar el grupo completo.
 const POR_SESION = 20;
 
-function useRonda(grupo, fijo) {
+function useRonda(fijo) {
+  const grupo = "todo";
   const [orden, setOrden] = useState(() => shuffle(fijo || poolDe(grupo)));
   const [inicio, setInicio] = useState(0);
   const [mazo, setMazo] = useState(() => orden.slice(0, POR_SESION));
@@ -548,7 +562,7 @@ export function GlosarioView() {
 
   return (
     <div>
-      <Titulo sub="Busca cualquier palabra en inglés o en español, o navega por pestaña y letra.">Glosario jurídico</Titulo>
+      <Titulo>Glosario jurídico</Titulo>
 
       <div style={{ marginTop: 20 }}>
         <Segmento
@@ -567,7 +581,7 @@ export function GlosarioView() {
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Buscar palabra"
+        placeholder="Busca una palabra en inglés o español"
         aria-label="Buscar"
         style={{ width: "100%", marginTop: 14, fontFamily: sans, fontSize: 16, color: C.text, backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", boxSizing: "border-box" }}
       />
@@ -661,8 +675,8 @@ export function GlosarioView() {
 
 export function TarjetasView({ fijo, titulo = "Tarjetas" }) {
   const [dir, setDir] = useState("en");
-  const [grupo, setGrupo] = useState("todo");
-  const ronda = useRonda(grupo, fijo);
+  const [empezado, setEmpezado] = useState(!!fijo);
+  const ronda = useRonda(fijo);
   const [volteada, setVolteada] = useState(false);
   useEffect(() => setVolteada(false), [ronda.pos, ronda.mazo]);
 
@@ -671,12 +685,22 @@ export function TarjetasView({ fijo, titulo = "Tarjetas" }) {
     ronda.siguiente();
   };
 
+  if (!empezado)
+    return (
+      <Intro
+        titulo="Tarjetas"
+        pasos={["Lee el término y trata de recordar su traducción.", "Toca la tarjeta para ver la respuesta y marca si la sabías.", "Son 20 términos por sesión; al terminar puedes seguir con 20 más.", PASO_IDIOMA]}
+        onEmpezar={() => setEmpezado(true)}
+      />
+    );
+
   return (
     <div>
-      <Titulo sub="20 términos por sesión. Mira el término, voltea la tarjeta y di si lo sabías.">{titulo}</Titulo>
-      {fijo ? <div style={{ height: 20 }} /> : <Controles {...{ dir, setDir, grupo, setGrupo }} />}
+      {fijo && <Titulo>{titulo}</Titulo>}
+      {fijo && <div style={{ height: 14 }} />}
+      <Controles {...{ dir, setDir }} />
       {ronda.mazo.length === 0 ? (
-        <Vacio grupo={grupo} />
+        <Vacio grupo={fijo ? "dificiles" : "todo"} />
       ) : ronda.fin ? (
         <Resultado ronda={ronda} />
       ) : (
@@ -708,8 +732,8 @@ export function TarjetasView({ fijo, titulo = "Tarjetas" }) {
 
 export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
   const [dir, setDir] = useState("en");
-  const [grupo, setGrupo] = useState("todo");
-  const ronda = useRonda(grupo, fijo);
+  const [empezado, setEmpezado] = useState(!!fijo);
+  const ronda = useRonda(fijo);
   const [elegida, setElegida] = useState(null);
 
   const opciones = useMemo(
@@ -724,12 +748,22 @@ export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
     ronda.contestar(ronda.actual, o === ronda.actual);
   };
 
+  if (!empezado)
+    return (
+      <Intro
+        titulo="Quiz"
+        pasos={["Escoge la traducción correcta entre las cuatro opciones.", "Cuidado: las otras tres son términos parecidos.", PASO_IDIOMA]}
+        onEmpezar={() => setEmpezado(true)}
+      />
+    );
+
   return (
     <div>
-      <Titulo sub="Elige la equivalencia correcta. Las otras opciones son términos parecidos: fíjate bien.">{titulo}</Titulo>
-      {fijo ? <div style={{ height: 20 }} /> : <Controles {...{ dir, setDir, grupo, setGrupo }} />}
+      {fijo && <Titulo>{titulo}</Titulo>}
+      {fijo && <div style={{ height: 14 }} />}
+      <Controles {...{ dir, setDir }} />
       {ronda.mazo.length === 0 ? (
-        <Vacio grupo={grupo} />
+        <Vacio grupo={fijo ? "dificiles" : "todo"} />
       ) : ronda.fin ? (
         <Resultado ronda={ronda} />
       ) : (
@@ -785,14 +819,24 @@ export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
 
 export function EscribirView({ fijo, titulo = "Escribir" }) {
   const [dir, setDir] = useState("en");
-  const [grupo, setGrupo] = useState("todo");
-  const ronda = useRonda(grupo, fijo);
+  const [empezado, setEmpezado] = useState(!!fijo);
+  const ronda = useRonda(fijo);
   const [texto, setTexto] = useState("");
   const [estado, setEstado] = useState(null); // null | "ok" | "casi" | "no"
+  const campo = useRef(null);
+  // Al empezar una sesión nueva se limpia la casilla.
   useEffect(() => {
     setTexto("");
     setEstado(null);
-  }, [ronda.pos, ronda.mazo]);
+  }, [ronda.mazo]);
+
+  // Se limpia en el mismo toque que avanza, así el teclado del celular sigue activo.
+  const avanzar = () => {
+    setTexto("");
+    setEstado(null);
+    ronda.siguiente();
+    if (campo.current) campo.current.focus();
+  };
 
   const comprobar = (saltar) => {
     if (estado) return;
@@ -802,12 +846,22 @@ export function EscribirView({ fijo, titulo = "Escribir" }) {
     ronda.contestar(ronda.actual, r !== "no");
   };
 
+  if (!empezado)
+    return (
+      <Intro
+        titulo="Escribir"
+        pasos={["Escribe la traducción del término que aparece en la tarjeta.", "Se acepta cualquiera de las traducciones del libro; no importan los acentos ni los artículos.", PASO_IDIOMA]}
+        onEmpezar={() => setEmpezado(true)}
+      />
+    );
+
   return (
     <div>
-      <Titulo sub="Escribe la equivalencia. Se acepta cualquiera de las que da el libro, sin importar acentos ni artículos.">{titulo}</Titulo>
-      {fijo ? <div style={{ height: 20 }} /> : <Controles {...{ dir, setDir, grupo, setGrupo }} />}
+      {fijo && <Titulo>{titulo}</Titulo>}
+      {fijo && <div style={{ height: 14 }} />}
+      <Controles {...{ dir, setDir }} />
       {ronda.mazo.length === 0 ? (
-        <Vacio grupo={grupo} />
+        <Vacio grupo={fijo ? "dificiles" : "todo"} />
       ) : ronda.fin ? (
         <Resultado ronda={ronda} />
       ) : (
@@ -817,12 +871,15 @@ export function EscribirView({ fijo, titulo = "Escribir" }) {
             <Termino texto={pregunta(ronda.actual, dir)} idioma={idiomaDe(dir, "pregunta")} />
           </Tarjeta>
           <input
-            key={ronda.pos}
+            ref={campo}
             value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && (estado ? ronda.siguiente() : comprobar(false))}
-            readOnly={!!estado}
-            autoFocus
+            onChange={(e) => !estado && setTexto(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), estado ? avanzar() : comprobar(false))}
+            type="text"
+            inputMode="text"
+            enterKeyHint={estado ? "next" : "done"}
+            autoCorrect="off"
+            autoCapitalize="none"
             autoComplete="off"
             spellCheck={false}
             aria-label="Tu respuesta"
@@ -841,7 +898,7 @@ export function EscribirView({ fijo, titulo = "Escribir" }) {
                 <b style={{ color: C.text }}>{respuesta(ronda.actual, dir)}</b>
               </Aviso>
               <div style={{ marginTop: 14 }}>
-                <Boton variante="primario" onClick={ronda.siguiente}>Siguiente</Boton>
+                <Boton variante="primario" onClick={avanzar}>Siguiente</Boton>
               </div>
             </>
           )}
@@ -869,7 +926,7 @@ function elegirPares(pool, dir) {
 
 export function RelacionarView() {
   const [dir, setDir] = useState("en");
-  const [grupo, setGrupo] = useState("todo");
+  const grupo = "todo";
   const [pares, setPares] = useState([]);
   const [derecha, setDerecha] = useState([]);
   const [sel, setSel] = useState(null);
@@ -916,7 +973,8 @@ export function RelacionarView() {
   return (
     <div>
       <Titulo sub="Toca un término y luego su equivalencia.">Relacionar</Titulo>
-      <Controles {...{ dir, setDir, grupo, setGrupo }} />
+      <div style={{ height: 16 }} />
+      <Controles {...{ dir, setDir }} />
       {pares.length === 0 ? (
         <Vacio grupo={grupo} />
       ) : fin ? (
