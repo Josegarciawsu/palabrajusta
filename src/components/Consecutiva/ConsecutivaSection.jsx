@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Play, ClipboardCheck, BarChart3, Trash2 } from "lucide-react";
+import { Play, ClipboardCheck, BarChart3, Trash2 } from "./icons.jsx";
 import { C, F } from "../../lib/consecutiva/tokens.js";
 import { prepararEjercicio } from "../../lib/consecutiva/parse.js";
 import {
@@ -10,20 +10,28 @@ import {
   calcularPuntaje,
 } from "../../lib/consecutiva/storage.js";
 import { borrarAudiosDeIntento } from "../../lib/consecutiva/audioStore.js";
-import { EJERCICIOS_CONSECUTIVA } from "../../content/consecutiva/index.js";
+import { EJERCICIOS_EN_ES, EJERCICIOS_ES_EN } from "../../content/consecutiva/index.js";
 import { Boton, Tarjeta, Titulo } from "./ui.jsx";
 import Practica from "./Practica.jsx";
 import Evaluacion from "./Evaluacion.jsx";
 import Resultados from "./Resultados.jsx";
 
 const PASOS = [
-  ["Interpreta", "Escuchas cada turno sin ver el texto, tomas notas y grabas tu interpretación."],
+  ["Interpreta", "Escuchas cada segmento sin ver el texto, tomas notas y grabas tu interpretación."],
   ["Califícate", "Revisas cada unidad de puntuación: escribes lo que dijiste y decides si fue correcto, incorrecto u omisión."],
   ["Revisa", "Ves tu porcentaje, tus puntos débiles por tipo de unidad y tus errores para repasar."],
 ];
 
 export default function ConsecutivaSection() {
-  const ejercicios = useMemo(() => EJERCICIOS_CONSECUTIVA.map(prepararEjercicio), []);
+  const grupos = useMemo(
+    () => ({
+      "en-es": EJERCICIOS_EN_ES.map(prepararEjercicio),
+      "es-en": EJERCICIOS_ES_EN.map(prepararEjercicio),
+    }),
+    []
+  );
+  const ejercicios = useMemo(() => [...grupos["en-es"], ...grupos["es-en"]], [grupos]);
+  const [direccion, setDireccion] = useState("en-es");
   const [intentos, setIntentos] = useState(leerIntentos);
   const [actual, setActual] = useState(null); // intento abierto
 
@@ -51,7 +59,7 @@ export default function ConsecutivaSection() {
     color: C.tinta,
     maxWidth: 760,
     margin: "0 auto",
-    padding: "24px 16px 48px",
+    padding: "0 0 48px",
   };
 
   if (actual && ejercicio) {
@@ -104,15 +112,44 @@ export default function ConsecutivaSection() {
         ))}
       </ol>
 
-      {ejercicios.map((ej) => {
+      <div role="tablist" aria-label="Dirección de interpretación" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {[
+          ["en-es", "Inglés → Español"],
+          ["es-en", "Español → Inglés"],
+        ].map(([valor, etiqueta]) => {
+          const sel = direccion === valor;
+          return (
+            <button
+              key={valor}
+              role="tab"
+              aria-selected={sel}
+              onClick={() => setDireccion(valor)}
+              style={{
+                fontFamily: F.cuerpo,
+                fontSize: 15,
+                fontWeight: 600,
+                padding: "10px 18px",
+                borderRadius: 999,
+                cursor: "pointer",
+                border: `1px solid ${sel ? C.azul : C.borde}`,
+                background: sel ? C.azul : C.superficie,
+                color: sel ? "#fff" : C.tinta,
+              }}
+            >
+              {etiqueta}
+            </button>
+          );
+        })}
+      </div>
+
+      {grupos[direccion].map((ej) => {
         const propios = intentos.filter((i) => i.ejercicioId === ej.id);
         return (
           <Tarjeta key={ej.id} style={{ display: "grid", gap: 14 }}>
             <div style={{ display: "grid", gap: 4 }}>
               <Titulo nivel={2}>{ej.titulo}</Titulo>
-              {ej.descripcion && <p style={{ margin: 0, fontSize: 14, color: C.suave }}>{ej.descripcion}</p>}
               <p style={{ margin: 0, fontSize: 14, color: C.suave }}>
-                {ej.turnos.length} turnos · {ej.unidades.length} unidades de puntuación
+                {ej.tema} · {ej.formato} · {ej.turnos.length} segmentos · {ej.unidades.length} unidades de puntuación
               </p>
             </div>
             <div>

@@ -65,7 +65,7 @@ export function ChipCategoria({ cat }) {
 }
 
 export function Titulo({ children, nivel = 1 }) {
-  const size = nivel === 1 ? 26 : 19;
+  const size = nivel === 1 ? 30 : 19;
   return (
     <h2
       style={{
@@ -84,4 +84,5 @@ export function Titulo({ children, nivel = 1 }) {
 
 export const idiomaNombre = (i) => (i === "es" ? "español" : "inglés");
 export const destino = (i) => (i === "es" ? "inglés" : "español");
-export const hablanteNombre = (h) => (h === "P" ? "Pregunta" : "Respuesta");
+export const hablanteNombre = (h) =>
+  h === "P" ? "Pregunta" : h === "R" ? "Respuesta" : "Testimonio";

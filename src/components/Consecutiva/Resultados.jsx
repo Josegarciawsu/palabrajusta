@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, BookmarkPlus, Check } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, Check } from "./icons.jsx";
 import { C, F } from "../../lib/consecutiva/tokens.js";
 import { categoria } from "../../lib/consecutiva/categorias.js";
 import { calcularPuntaje, agregarErrores, leerIntentos } from "../../lib/consecutiva/storage.js";

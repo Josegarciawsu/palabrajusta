@@ -1,20 +1,20 @@
-// Colores y tipografía del módulo. Ajusta aquí si cambian los de la app.
+// Colores y tipografía del módulo, iguales a los de src/App.jsx (paleta Wasatch).
 export const C = {
   fondo: "#F3EEE4",
-  superficie: "#FFFFFF",
-  tinta: "#1C2230",
-  suave: "#5B6475",
-  borde: "#E2DACB",
+  superficie: "#FBF9F4",
+  tinta: "#1E2430",
+  suave: "#5C6470",
+  borde: "#E2DBC9",
   azul: "#0050D3",
   azulSuave: "#E4EEFC",
-  verde: "#17805A",
+  verde: "#146B44",
   verdeSuave: "#E3F4EC",
-  coral: "#C63B3A",
+  coral: "#C0392B",
   coralSuave: "#FBE7E6",
   ambar: "#F5A623",
 };
 
 export const F = {
-  titulo: "'Libre Baskerville', Georgia, serif",
-  cuerpo: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+  titulo: "Georgia, 'Times New Roman', serif",
+  cuerpo: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
 };

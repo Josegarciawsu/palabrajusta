@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check, X, MinusCircle, ChevronLeft, ChevronRight, Lightbulb, Plus, ArrowLeft } from "lucide-react";
+import { Check, X, MinusCircle, ChevronLeft, ChevronRight, Lightbulb, Plus, ArrowLeft } from "./icons.jsx";
 import { C, F } from "../../lib/consecutiva/tokens.js";
 import { claveAudio, leerAudio } from "../../lib/consecutiva/audioStore.js";
 import { sugerir, estaEnLista } from "../../lib/consecutiva/match.js";
@@ -253,7 +253,7 @@ export default function Evaluacion({ ejercicio, intento, onCambio, onTerminar, o
       <Tarjeta style={{ display: "grid", gap: 16 }}>
         <div>
           <p style={{ margin: 0, color: C.suave, fontSize: 14 }}>
-            Turno {idx + 1} de {ejercicio.turnos.length}
+            Segmento {idx + 1} de {ejercicio.turnos.length}
           </p>
           <Titulo nivel={2}>
             {hablanteNombre(turno.hablante)} · interpretado al {destino(turno.idioma)}
@@ -266,10 +266,16 @@ export default function Evaluacion({ ejercicio, intento, onCambio, onTerminar, o
             <audio controls src={url} style={{ width: "100%" }} />
           ) : (
             <p style={{ margin: 0, fontSize: 14, color: C.suave }}>
-              No hay grabación para este turno en este navegador.
+              No hay grabación para este segmento en este navegador.
             </p>
           )}
         </div>
+
+        {turno.contexto && (
+          <p style={{ margin: 0, fontSize: 14, color: C.suave, fontStyle: "italic" }}>
+            Contexto: {turno.contexto}
+          </p>
+        )}
 
         <div style={{ borderLeft: `3px solid ${C.azul}`, paddingLeft: 14 }}>
           <GuionMarcado
@@ -311,11 +317,11 @@ export default function Evaluacion({ ejercicio, intento, onCambio, onTerminar, o
 
       <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
         <Boton variante="fantasma" onClick={() => setIdx(idx - 1)} disabled={idx === 0}>
-          <ChevronLeft size={18} /> Turno anterior
+          <ChevronLeft size={18} /> Segmento anterior
         </Boton>
         {idx < ejercicio.turnos.length - 1 ? (
           <Boton onClick={() => { setIdx(idx + 1); setActiva(null); window.scrollTo({ top: 0 }); }}>
-            Siguiente turno <ChevronRight size={18} />
+            Siguiente segmento <ChevronRight size={18} />
           </Boton>
         ) : (
           <Boton onClick={onTerminar} disabled={pendientes > 0} title={pendientes ? "Evalúa todas las unidades primero" : ""}>

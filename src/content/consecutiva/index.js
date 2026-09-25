@@ -1,6 +1,8 @@
-// Lista de ejercicios de consecutiva. Para agregar uno nuevo:
-// 1. Crea ejercicio-02.js copiando el formato de ejercicio-01.js
-// 2. Impórtalo aquí y agrégalo al arreglo.
-import ejercicio01 from "./ejercicio-01.js";
+// Ejercicios de consecutiva, separados por dirección.
+// Para agregar uno, cópialo dentro del archivo que corresponda.
+import inglesEspanol from "./ingles-espanol.js";
+import espanolIngles from "./espanol-ingles.js";
 
-export const EJERCICIOS_CONSECUTIVA = [ejercicio01];
+export const EJERCICIOS_EN_ES = inglesEspanol;
+export const EJERCICIOS_ES_EN = espanolIngles;
+export const EJERCICIOS_CONSECUTIVA = [...inglesEspanol, ...espanolIngles];

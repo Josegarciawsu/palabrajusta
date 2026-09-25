@@ -37,8 +37,10 @@ export function textoPlano(texto) {
 
 // Prepara un ejercicio completo: segmentos por turno y lista plana de unidades.
 export function prepararEjercicio(ej) {
+  const idiomaOrigen = ej.direccion === "es-en" ? "es" : "en";
   const turnos = ej.turnos.map((t, i) => ({
     ...t,
+    idioma: t.idioma || idiomaOrigen,
     segmentos: parseTurno(t.texto, i),
     plano: textoPlano(t.texto),
   }));
