@@ -127,6 +127,7 @@ function Boton({ children, onClick, variante = "secundario", disabled, autoFocus
   }[variante];
   return (
     <button
+      className="pj-btn"
       onClick={onClick}
       disabled={disabled}
       autoFocus={autoFocus}
@@ -678,6 +679,7 @@ export function TarjetasView({ fijo, titulo = "Tarjetas" }) {
   const [empezado, setEmpezado] = useState(!!fijo);
   const ronda = useRonda(fijo);
   const [volteada, setVolteada] = useState(false);
+  // Cada tarjeta nueva entra sin voltear (así no se asoma la respuesta de la siguiente).
   useEffect(() => setVolteada(false), [ronda.pos, ronda.mazo]);
 
   const marcar = (ok) => {
@@ -706,18 +708,31 @@ export function TarjetasView({ fijo, titulo = "Tarjetas" }) {
       ) : (
         <>
           <Progreso pos={ronda.pos} total={ronda.mazo.length} aciertos={ronda.aciertos} />
-          <Tarjeta borde={volteada ? C.clay : C.accent} onClick={() => setVolteada(true)} etiqueta="Voltear tarjeta">
-            <Termino texto={pregunta(ronda.actual, dir)} idioma={idiomaDe(dir, "pregunta")} />
-            {volteada ? (
-              <p style={{ fontFamily: serif, fontSize: 20, lineHeight: 1.4, color: C.accent, margin: "18px 0 0 0", paddingTop: 16, borderTop: `1px dashed ${C.border}` }}>
-                {respuesta(ronda.actual, dir)}
-              </p>
-            ) : (
-              <p style={{ fontFamily: sans, fontSize: 13.5, color: C.muted, margin: "16px 0 0 0" }}>Toca la tarjeta para ver la respuesta.</p>
-            )}
-          </Tarjeta>
+          <div key={ronda.pos} className="pj-flip pj-in">
+            <button
+              className={volteada ? "pj-flip-in volteada" : "pj-flip-in"}
+              onClick={() => setVolteada((v) => !v)}
+              aria-label={volteada ? "Ver el término" : "Voltear tarjeta"}
+              style={{ display: "block", width: "100%", height: 240, padding: 0, border: "none", background: "none", cursor: "pointer", textAlign: "left" }}
+            >
+              <span
+                className="pj-cara"
+                style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: "26px 24px", boxSizing: "border-box", backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: 14, boxShadow: "0 6px 18px rgba(38,48,58,.06)" }}
+              >
+                <Termino texto={pregunta(ronda.actual, dir)} idioma={idiomaDe(dir, "pregunta")} />
+                <span style={{ fontFamily: sans, fontSize: 13.5, color: C.muted, marginTop: 16 }}>Toca la tarjeta para ver la traducción.</span>
+              </span>
+              <span
+                className="pj-cara pj-reverso"
+                style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 8, padding: "26px 24px", boxSizing: "border-box", backgroundColor: C.claySoft, border: "1px solid #E8D5C4", borderRadius: 14, overflow: "auto" }}
+              >
+                <span style={{ fontFamily: sans, fontSize: 13, color: "#8A6242" }}>{idiomaDe(dir, "respuesta")}</span>
+                <span style={{ fontFamily: serif, fontSize: 22, fontWeight: 600, lineHeight: 1.35, color: C.text }}>{respuesta(ronda.actual, dir)}</span>
+              </span>
+            </button>
+          </div>
           {volteada && (
-            <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+            <div className="pj-fade" style={{ display: "flex", gap: 10, marginTop: 16 }}>
               <Boton variante="mal" onClick={() => marcar(false)}><X size={17} /> Repasar</Boton>
               <Boton variante="bien" onClick={() => marcar(true)}><Check size={17} /> Lo sé</Boton>
             </div>
@@ -769,9 +784,11 @@ export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
       ) : (
         <>
           <Progreso pos={ronda.pos} total={ronda.mazo.length} aciertos={ronda.aciertos} />
-          <Tarjeta>
-            <Termino texto={pregunta(ronda.actual, dir)} idioma={idiomaDe(dir, "pregunta")} />
-          </Tarjeta>
+          <div key={ronda.pos} className="pj-in">
+            <Tarjeta>
+              <Termino texto={pregunta(ronda.actual, dir)} idioma={idiomaDe(dir, "pregunta")} />
+            </Tarjeta>
+          </div>
           <div style={{ display: "grid", gap: 10, marginTop: 16 }}>
             {opciones.map((o, i) => {
               const correcta = o === ronda.actual;
@@ -780,9 +797,10 @@ export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
               return (
                 <button
                   key={o.en}
+                  className={elegida && correcta && elegida === ronda.actual ? "pj-pulso" : elegida === o && !correcta ? "pj-tiembla" : undefined}
                   onClick={() => elegir(o)}
                   disabled={!!elegida}
-                  style={{ textAlign: "left", display: "flex", gap: 12, alignItems: "flex-start", fontFamily: sans, fontSize: 15.5, lineHeight: 1.35, color: C.text, backgroundColor: bg, border: `1px solid ${bd}`, borderRadius: 8, padding: "12px 14px", cursor: elegida ? "default" : "pointer" }}
+                  style={{ textAlign: "left", display: "flex", gap: 12, alignItems: "flex-start", fontFamily: sans, fontSize: 15.5, lineHeight: 1.35, color: C.text, backgroundColor: bg, border: `1px solid ${bd}`, borderRadius: 8, padding: "12px 14px", cursor: elegida ? "default" : "pointer", transition: "background-color .2s ease, border-color .2s ease" }}
                 >
                   <span style={{ flexShrink: 0, width: 22, height: 22, borderRadius: "50%", backgroundColor: C.accentSoft, color: C.accent, fontSize: 12, fontWeight: 600, lineHeight: "22px", textAlign: "center" }}>{i + 1}</span>
                   <span style={{ flex: 1 }}>{principal(respuesta(o, dir))}</span>
@@ -793,7 +811,7 @@ export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
             })}
           </div>
           {elegida && (
-            <>
+            <div className="pj-fade">
               <Aviso ok={elegida === ronda.actual}>
                 {elegida === ronda.actual ? "Correcto. " : "La respuesta es "}
                 <b style={{ color: C.text }}>{respuesta(ronda.actual, dir)}</b>
@@ -807,7 +825,7 @@ export function OpcionMultipleView({ fijo, titulo = "Quiz" }) {
               <div style={{ marginTop: 14 }}>
                 <Boton variante="primario" onClick={ronda.siguiente}>Siguiente</Boton>
               </div>
-            </>
+            </div>
           )}
         </>
       )}
@@ -867,11 +885,14 @@ export function EscribirView({ fijo, titulo = "Escribir" }) {
       ) : (
         <>
           <Progreso pos={ronda.pos} total={ronda.mazo.length} aciertos={ronda.aciertos} />
-          <Tarjeta>
-            <Termino texto={pregunta(ronda.actual, dir)} idioma={idiomaDe(dir, "pregunta")} />
-          </Tarjeta>
+          <div key={ronda.pos} className="pj-in">
+            <Tarjeta>
+              <Termino texto={pregunta(ronda.actual, dir)} idioma={idiomaDe(dir, "pregunta")} />
+            </Tarjeta>
+          </div>
           <input
             ref={campo}
+            className={estado === "no" ? "pj-tiembla" : undefined}
             value={texto}
             onChange={(e) => !estado && setTexto(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), estado ? avanzar() : comprobar(false))}
@@ -892,7 +913,7 @@ export function EscribirView({ fijo, titulo = "Escribir" }) {
               <Boton onClick={() => comprobar(true)}>No lo sé</Boton>
             </div>
           ) : (
-            <>
+            <div className="pj-fade">
               <Aviso ok={estado !== "no"}>
                 {estado === "ok" ? "Correcto. " : estado === "casi" ? "Casi: revisa la ortografía. " : "Respuesta del libro: "}
                 <b style={{ color: C.text }}>{respuesta(ronda.actual, dir)}</b>
@@ -900,7 +921,7 @@ export function EscribirView({ fijo, titulo = "Escribir" }) {
               <div style={{ marginTop: 14 }}>
                 <Boton variante="primario" onClick={avanzar}>Siguiente</Boton>
               </div>
-            </>
+            </div>
           )}
         </>
       )}
