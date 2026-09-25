@@ -1367,9 +1367,47 @@ function CaseView({ data }) {
   );
 }
 
+// Presentación: el logo aparece y se disuelve con desenfoque (1.5 s en total).
+// Lleva sus propios estilos para no depender de ningún otro archivo.
+const SPLASH_CSS = `
+.pj-splash { position: fixed; inset: 0; z-index: 9999; background-color: #F5F7F8; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; animation: pjSplashFondo 1.5s ease forwards; }
+.pj-splash-logo { animation: pjSplashLogo 1.5s cubic-bezier(.2,.7,.3,1) forwards; will-change: transform, opacity, filter; }
+.pj-splash-texto { opacity: 0; animation: pjSplashTexto 1.5s cubic-bezier(.2,.7,.3,1) forwards; will-change: transform, opacity, filter; }
+.pj-splash-linea { transform: scaleX(0); animation: pjSplashLinea 1.5s cubic-bezier(.2,.7,.3,1) forwards; }
+@keyframes pjSplashFondo { 0% { opacity: 1; } 62% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+@keyframes pjSplashLogo {
+  0% { opacity: 0; transform: scale(.88); -webkit-filter: blur(6px); filter: blur(6px); }
+  28% { opacity: 1; transform: scale(1); -webkit-filter: blur(0); filter: blur(0); }
+  62% { opacity: 1; transform: scale(1); -webkit-filter: blur(0); filter: blur(0); }
+  100% { opacity: 0; transform: scale(1.1); -webkit-filter: blur(14px); filter: blur(14px); }
+}
+@keyframes pjSplashTexto {
+  0% { opacity: 0; transform: translateY(8px); -webkit-filter: blur(4px); filter: blur(4px); }
+  10% { opacity: 0; transform: translateY(8px); -webkit-filter: blur(4px); filter: blur(4px); }
+  36% { opacity: 1; transform: none; -webkit-filter: blur(0); filter: blur(0); }
+  62% { opacity: 1; transform: none; -webkit-filter: blur(0); filter: blur(0); }
+  100% { opacity: 0; transform: translateY(-4px); -webkit-filter: blur(10px); filter: blur(10px); }
+}
+@keyframes pjSplashLinea {
+  0% { transform: scaleX(0); opacity: 1; }
+  18% { transform: scaleX(0); opacity: 1; }
+  44% { transform: scaleX(1); opacity: 1; }
+  62% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(1.4); opacity: 0; }
+}
+@keyframes pjSplashSoloFundido { 0% { opacity: 0; } 25% { opacity: 1; } 62% { opacity: 1; } 100% { opacity: 0; } }
+/* Con "reducir movimiento": solo un fundido suave, sin zoom ni desenfoque */
+@media (prefers-reduced-motion: reduce) {
+  .pj-splash { animation: pjSplashFondo 1.5s ease forwards !important; }
+  .pj-splash-logo, .pj-splash-texto { animation: pjSplashSoloFundido 1.5s ease forwards !important; }
+  .pj-splash-linea { animation: none !important; transform: none; }
+}
+`;
+
 function SplashScreen() {
   return (
     <div className="pj-splash" aria-hidden="true">
+      <style>{SPLASH_CSS}</style>
       <img className="pj-splash-logo" src={LOGO_URI} alt="" style={{ width: 112, height: 112 }} />
       <p
         className="pj-splash-texto"
@@ -1383,7 +1421,7 @@ function SplashScreen() {
       />
       <p
         className="pj-splash-texto"
-        style={{ fontFamily: sans, fontSize: 14.5, color: "#5E7150", fontWeight: 500, margin: "10px 0 0 0" }}
+        style={{ fontFamily: sans, fontSize: 14.5, color: "#5E7150", fontWeight: 500, margin: "10px 0 0 0", animationDelay: "40ms" }}
       >
         Inglés · Español
       </p>
