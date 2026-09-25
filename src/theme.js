@@ -1,18 +1,20 @@
-// Paleta y tipografía de Palabra Justa (rediseño: azul acero, terracota y salvia).
+// Paleta de Palabra Justa: fondo blanco, el azul del logo, dorado y azul marino.
 export const C = {
-  bg: "#F5F7F8",
+  bg: "#FFFFFF",
   card: "#FFFFFF",
-  border: "#DCE2E7",
-  text: "#26303A",
-  muted: "#5F6A75",
-  label: "#6B7580",
-  accent: "#4F7090", // azul acero (texto y botones)
-  accentSoft: "#E9EFF4",
-  clay: "#C8936A", // terracota
-  claySoft: "#F7EEE6",
-  sage: "#8A9E7A", // salvia
-  sageSoft: "#EEF2EA",
-  highlight: "#C8936A",
+  border: "#E1E5EA",
+  text: "#1E2430",
+  muted: "#5C6470",
+  label: "#6B7280",
+  accent: "#0050D3", // azul del logo
+  accentSoft: "#EAF1FD",
+  navy: "#0B2545", // títulos y nombre de la app
+  clay: "#E8A317", // dorado: acentos (indicador del menú, estrellas, notas juveniles)
+  claySoft: "#FFF4DB",
+  clayText: "#9A6200", // dorado oscuro para letras e íconos sobre blanco
+  sage: "#0050D3", // barras de progreso
+  sageSoft: "#EAF1FD",
+  highlight: "#E8A317",
   success: "#1E9E6B",
   successSoft: "#E4F4EC",
   error: "#E15554",
