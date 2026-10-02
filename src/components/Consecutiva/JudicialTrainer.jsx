@@ -42,17 +42,25 @@ export default function JudicialTrainer({onBack}){
  async function listen(){
   setError('');if(!window.speechSynthesis){setError('Audio no disponible.');return;}
   const g=++generation.current;setPhase('preparing');
+  setText('');textRef.current='';setRows(null);setIntegrity(null);if(urlRef.current)URL.revokeObjectURL(urlRef.current);urlRef.current=null;setAudio(null);
+  const estimate=Math.ceil((turn.source.trim().split(/\s+/).length/(turn.language==='en'?170:155))*60/(prefs.velocidad||0.95));
+  let started=0;
+  // Start speech directly in the tap handler, before any permission prompt or await.
+  const playback=hablar(turn.source,turn.language,judicialVoice(voices,turn.language,prefs),prefs.velocidad,pos=>{
+   if(g!==generation.current)return;
+   if(!started){started=Date.now();setPhase('listening');setSpeaking(true);setListened(true);countdown(estimate);}
+   setHighlight(pos);
+  },{single:true,watchdog:Math.max(30000,(estimate*2+15)*1000)});
+  const result=await playback;
+  if(g!==generation.current)return;
+  clearTimer();setSpeaking(false);setHighlight(null);
+  if(!result?.ok){setPhase('idle');setError('No se pudo reproducir. Pulsa Escuchar otra vez.');return;}
+  const duration=started?(Date.now()-started)/1000:estimate;
+  const extra=Math.max(10,duration*(turn.language==='en'?0.30:0.25));
+  setPhase('preparing');
   let acquired;try{acquired=await navigator.mediaDevices.getUserMedia({audio:true});}catch{if(g===generation.current){setPhase('idle');setError('Permite el micrófono para empezar.');}return;}
   if(g!==generation.current){acquired.getTracks().forEach(t=>t.stop());return;}
   prepared.current=acquired;
-  setText('');textRef.current='';setRows(null);setIntegrity(null);if(urlRef.current)URL.revokeObjectURL(urlRef.current);urlRef.current=null;setAudio(null);
-  const estimate=Math.ceil((turn.source.trim().split(/\s+/).length/(turn.language==='en'?170:155))*60/(prefs.velocidad||0.95));
-  const started=Date.now();setPhase('listening');setSpeaking(true);setListened(true);countdown(estimate);
-  await hablar(turn.source,turn.language,judicialVoice(voices,turn.language,prefs),prefs.velocidad,pos=>{if(g===generation.current)setHighlight(pos);});
-  if(g!==generation.current)return;
-  clearTimer();setSpeaking(false);setHighlight(null);
-  const duration=(Date.now()-started)/1000;
-  const extra=Math.max(10,duration*(turn.language==='en'?0.30:0.25));
   setPhase('ready');countdown(3,async()=>{
    if(g!==generation.current)return;
    const stream=prepared.current;prepared.current=null;

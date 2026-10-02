@@ -74,18 +74,22 @@ export function detener() {
   finishPlayback?.();
   finishPlayback = null;
 }
-export function hablar(texto, idioma, voz, velocidad = 0.95, onProgress) {
+export function hablar(texto, idioma, voz, velocidad = 0.95, onProgress, options = {}) {
   detener();
   const token = playback;
   return new Promise(resolve => {
     const synth = window.speechSynthesis;
-    if (!synth) return resolve();
-    const parts = speechParts(texto);
-    let i = 0;
-    const finish = () => { if (token === playback) finishPlayback = null; resolve(); };
-    finishPlayback = finish;
+    if (!synth) return resolve({ok:false});
+    const parts = options.single ? [{text:texto.trim(),start:texto.search(/\S/)}] : speechParts(texto);
+    let i = 0, settled=false, started=false, startTimer, endTimer, poll;
+    const finish = (result={ok:true}) => {
+      if(settled)return;settled=true;clearTimeout(startTimer);clearTimeout(endTimer);clearInterval(poll);
+      if (token === playback) finishPlayback = null;
+      resolve(result);
+    };
+    finishPlayback = () => finish({ok:false,cancelled:true});
     const siguiente = () => {
-      if (token !== playback) return finish();
+      if (token !== playback) return finish({ok:false,cancelled:true});
       if (i >= parts.length) return finish();
       const part = parts[i++];
       const u = new SpeechSynthesisUtterance(part.text);
@@ -93,16 +97,25 @@ export function hablar(texto, idioma, voz, velocidad = 0.95, onProgress) {
       if (voz) u.voice = voz;
       u.rate = velocidad;
       // Sentence fallback for phones that do not emit word boundaries.
-      u.onstart = () => { if (token === playback) onProgress?.({ start: part.start, end: part.start + part.text.length }); };
+      u.onstart = () => {
+        if (token !== playback || settled) return;
+        started=true;clearTimeout(startTimer);
+        onProgress?.({ start: part.start, end: part.start + part.text.length });
+      };
       u.onboundary = e => {
-        if (token !== playback || e.name !== 'word') return;
+        if (token !== playback || settled || e.name !== 'word') return;
         const local = e.charIndex;
         const length = part.text.slice(local).match(/^\S+/)?.[0].length || 1;
         onProgress?.({ start: part.start + local, end: part.start + local + length });
       };
       u.onend = siguiente;
-      u.onerror = finish;
-      synth.speak(u);
+      u.onerror = () => finish({ok:false});
+      try { synth.resume?.();synth.speak(u); } catch { finish({ok:false}); }
+      if(options.watchdog&&!settled){
+        startTimer=setTimeout(()=>{if(!started){finish({ok:false});synth.cancel();}},4000);
+        endTimer=setTimeout(()=>{finish({ok:false});synth.cancel();},options.watchdog);
+        poll=setInterval(()=>{if(started&&synth.speaking===false&&synth.pending===false)finish({ok:true});},300);
+      }
     };
     siguiente();
   });
