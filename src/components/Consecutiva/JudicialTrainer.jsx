@@ -85,7 +85,7 @@ export default function JudicialTrainer({onBack}){
  function practiceSegment(id){const target=judicialTurns.find(t=>t.id===id);if(!target)return;reset();setDirection(target.language);setIdx(judicialTurns.filter(t=>t.language===target.language).findIndex(t=>t.id===id));setFinished(false);}
  return <div style={{fontFamily:F.cuerpo,color:C.tinta,display:'grid',gap:18,fontSize:16,lineHeight:1.6}}>
  <Boton variante="fantasma" disabled={busy} onClick={()=>{reset();onBack();}}>Volver al inicio</Boton>
- <div><Titulo>Escucha e interpreta</Titulo>{!direction&&<p style={{margin:0}}>Escucha. Tras 3 segundos, interpreta: se grabará y evaluará automáticamente.</p>}</div>
+ <div><Titulo>Escucha e interpreta</Titulo>{!direction&&<p style={{margin:0}}>Elige intérprete e idioma. Pulsa Escuchar. Tras 3 segundos, interpreta: la app graba y evalúa.</p>}</div>
  {!interpreter&&<JudicialInterpreters onChoose={setInterpreter}/>}
  {interpreter&&!finished&&<>
  <div role="group" aria-label="Dirección de interpretación" style={{display:'flex',gap:10,flexWrap:'wrap'}}>{[['en','Inglés → Español'],['es','Español → Inglés']].map(([value,label])=><Boton key={value} aria-pressed={direction===value} disabled={busy} variante={direction===value?'primario':'secundario'} onClick={()=>{reset();setDirection(value);setIdx(0);setSession({});setIntegrity(null);}}>{label}</Boton>)}</div>

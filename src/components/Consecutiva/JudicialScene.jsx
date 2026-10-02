@@ -1,4 +1,5 @@
 import characters from '../../assets/judicial-characters.webp';
+import victoria from '../../assets/judicial-victoria.webp';
 import './JudicialScene.css';
 import { InterpreterPortrait } from './JudicialInterpreters.jsx';
 
@@ -22,13 +23,13 @@ export default function JudicialScene({ phase, remaining, language, speaking, ev
   const frame = waiting ? (remaining >= 3 ? 4 : remaining === 2 ? 5 : 6)
     : recording || phase === 'evaluating' ? 8 : evaluator ? 7 : source;
   const person = evaluator ? 'Evaluador' : recording ? 'Intérprete'
-    : language === 'en' ? 'Defensor público' : 'Acusado';
+    : language === 'en' ? 'Victoria · Defensora pública' : 'Acusado';
   const label = phase === 'ready' ? 'Prepárate' : recording ? 'Tu turno'
     : phase === 'listening' ? 'Escuchando' : phase === 'preparing' ? 'Preparando…'
     : phase === 'evaluating' ? 'Evaluando…' : evaluated ? 'Evaluación' : person;
   return <div className={`judicial-scene${phase === 'evaluating' ? ' judicial-blur' : ''}`}>
     <div className="judicial-character" role="img" aria-label={person}>
-      {recording || phase==='evaluating' ? <InterpreterPortrait interpreter={interpreter}/> : <Portrait frame={frame} />}
+      {recording || phase==='evaluating' ? <InterpreterPortrait interpreter={interpreter}/> : !evaluator&&language==='en' ? <img src={victoria} className="judicial-professor" alt=""/> : <Portrait frame={frame} />}
     </div>
     <div className="judicial-scene-status" role="status" aria-live="polite" aria-atomic="true">
       <strong>{label}</strong>

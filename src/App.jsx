@@ -1814,8 +1814,19 @@ function InicioView({ irA, isMobile, abrirSemanas = false }) {
 }
 
 export default function App() {
-  const [section, setSection] = useState("inicio");
+  const [section, setSection] = useState(() => window.location?.hash === "#practica-judicial" ? "judicial" : "inicio");
   const [navOpen, setNavOpen] = useState(false);
+  useEffect(() => {
+    const url=new URL(window.location.href);
+    if(section==='judicial')url.hash='practica-judicial';
+    else if(url.hash==='#practica-judicial')url.hash='';
+    if(url.href!==window.location.href)window.history.replaceState(null,'',url.href);
+  },[section]);
+  useEffect(() => {
+    const followLink=()=>{if(window.location.hash==='#practica-judicial')setSection('judicial');else if(!window.location.hash)setSection('inicio');setNavOpen(false);};
+    window.addEventListener('hashchange',followLink);
+    return()=>window.removeEventListener('hashchange',followLink);
+  },[]);
   const [semanasAbiertas, setSemanasAbiertas] = useState(false);
   const [volverASemanas, setVolverASemanas] = useState(false);
   // Al salir del Inicio, el panel de semanas vuelve a abrirse cerrado la próxima vez.

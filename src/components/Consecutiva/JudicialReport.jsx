@@ -13,7 +13,7 @@ export default function JudicialReport({ turn, text, rows, integrity, revise, se
     <p style={{margin:0,fontSize:14}}>Términos 60% · Contexto 30% · Integridad 10%</p>
     {integrity==null&&<p style={{margin:0,fontSize:14,color:C.suave}}>No encontrado: sin puntos hasta revisarlo. Integridad pendiente.</p>}
     <details open style={{padding:14,borderRadius:12,background:C.superficie}}><summary>Original y tu interpretación</summary>
-      <p style={{padding:14,borderRadius:10,background:C.azulSuave}} lang={turn.language}><strong>{turn.language==='en'?'El abogado':'El acusado'}:</strong> {turn.source}</p>
+      <p style={{padding:14,borderRadius:10,background:C.azulSuave}} lang={turn.language}><strong>{turn.language==='en'?'La abogada':'El acusado'}:</strong> {turn.source}</p>
       <p style={{padding:14,borderRadius:10,background:C.ambarSuave}} lang={turn.language==='en'?'es':'en'}><strong>Tu interpretación:</strong> {text}</p>
       <details><summary>Interpretación sugerida</summary><p>{turn.reference}</p></details>
     </details>

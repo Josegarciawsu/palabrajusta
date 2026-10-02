@@ -3,7 +3,7 @@ import { normalizar } from './match.js';
 const legal=(label,accepted,wrong=[],critical=false)=>({label,accepted,wrong,critical,kind:'legal'});
 const meaning=(label,accepted,wrong=[],critical=false)=>({label,accepted,wrong,critical,kind:'meaning'});
 const units=[
-[legal('Public defender',['defensor publico','abogado de oficio']),meaning('Full name',['nombre completo']),meaning('Date of birth',['fecha de nacimiento']),meaning('Current address',['domicilio actual','direccion actual'])],
+[legal('Public defender',['defensora publica','abogada de oficio','defensor publico','abogado de oficio']),meaning('Full name',['nombre completo']),meaning('Date of birth',['fecha de nacimiento']),meaning('Current address',['domicilio actual','direccion actual'])],
 [meaning('Full name',['luis alberto santos garcia']),meaning('Date of birth',['march 14 1992','14 march 1992']),meaning('Address',['245 madison avenue'])],
 [legal('Misdemeanor',['delito menor']),legal('Without a valid license',['sin una licencia valida','sin licencia valida']),legal('Plea options',['opciones de declaracion','opciones para declararse']),meaning('The decision is yours',['decision es suya','usted decide'])],
 [legal('Not guilty',['pleading not guilty','plead not guilty'],['pleading guilty'],true),meaning('Officer’s account',['officer says','officer said','officers account'])],

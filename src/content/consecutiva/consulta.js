@@ -2,10 +2,10 @@ export default [
   {
     "id": "consulta-1",
     "title": "Presentación y datos personales",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
-    "source": "Good morning, Mr. Santos. My name is David Miller, and I’m your public defender. Please confirm your full name, date of birth, and current address for my file.",
-    "reference": "Buenos días, señor Santos. Me llamo David Miller y soy su defensor público. Confirme su nombre completo, fecha de nacimiento y domicilio actual para mi expediente."
+    "source": "Good morning, Mr. Santos. My name is Victoria, and I’m your public defender. Please confirm your full name, date of birth, and current address for my file.",
+    "reference": "Buenos días, señor Santos. Me llamo Victoria y soy su defensora pública. Confirme su nombre completo, fecha de nacimiento y domicilio actual para mi expediente."
   },
   {
     "id": "consulta-2",
@@ -18,7 +18,7 @@ export default [
   {
     "id": "consulta-3",
     "title": "El cargo y el papel del abogado",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "You are charged with a misdemeanor for driving without a valid license. Before we enter the courtroom, we need to discuss your plea options. My role is to advise you, but the decision is yours.",
     "reference": "Se le acusa de un delito menor por conducir sin una licencia válida. Antes de entrar a la sala de audiencias, debemos hablar sobre sus opciones de declaración. Mi función es asesorarlo, pero la decisión es suya."
@@ -34,7 +34,7 @@ export default [
   {
     "id": "consulta-5",
     "title": "Declararse no culpable",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "A not guilty plea means you are not admitting the charge. It preserves your rights and requires the prosecution to prove its case. It also gives us time to review the evidence and discuss possible resolutions.",
     "reference": "Una declaración de no culpable significa que no está admitiendo el cargo. Preserva sus derechos y exige que la fiscalía pruebe su caso. También nos da tiempo para revisar las pruebas y hablar sobre posibles formas de resolverlo."
@@ -50,7 +50,7 @@ export default [
   {
     "id": "consulta-7",
     "title": "Cambiar la declaración y admitir el cargo",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "Yes. If we later reach an agreement, you may change your plea, subject to the court’s approval. If you plead guilty, you admit the charge and give up certain rights, including the right to a trial on that charge.",
     "reference": "Sí. Si posteriormente llegamos a un acuerdo, podrá cambiar su declaración, sujeto a la aprobación del tribunal. Si se declara culpable, admite el cargo y renuncia a ciertos derechos, incluido el derecho a un juicio respecto de ese cargo."
@@ -66,7 +66,7 @@ export default [
   {
     "id": "consulta-9",
     "title": "No impugnar los cargos",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "A no contest plea means you are not admitting guilt, but you are not contesting the charge. For this criminal case, it has the same effect as a guilty plea and results in a conviction if accepted. The court must approve it.",
     "reference": "Una declaración de no impugnar los cargos significa que no admite culpabilidad, pero tampoco controvierte el cargo. En este caso penal, tiene el mismo efecto que una declaración de culpabilidad y da lugar a una condena si se acepta. El tribunal debe aprobarla."
@@ -82,7 +82,7 @@ export default [
   {
     "id": "consulta-11",
     "title": "Hechos y documentos para la defensa",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "I need to review the applicable law and the evidence before determining how that fact affects your case. Please bring your license, the citation, and any renewal notices. Tell me when you first learned it had expired.",
     "reference": "Necesito revisar la ley aplicable y las pruebas antes de determinar cómo afecta ese hecho a su caso. Traiga su licencia, la citación y cualquier aviso de renovación. Dígame cuándo se enteró de que estaba vencida."
@@ -98,7 +98,7 @@ export default [
   {
     "id": "consulta-13",
     "title": "Descubrimiento de pruebas",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "If you plead not guilty today, we can request discovery and review the officer’s report and any available recordings. We will examine whether the traffic stop and citation were lawful and whether there are procedural issues to raise.",
     "reference": "Si se declara no culpable hoy, podemos solicitar el descubrimiento de pruebas y revisar el informe del agente y cualquier grabación disponible. Examinaremos si la parada de tránsito y la citación fueron legales, y si hay cuestiones procesales que podamos plantear."
@@ -114,7 +114,7 @@ export default [
   {
     "id": "consulta-15",
     "title": "Negociaciones con la fiscalía",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "Not necessarily. A not guilty plea does not automatically mean there will be a trial. I can speak with the prosecutor about whether the charge can be reduced, dismissed, or resolved through an agreement. I cannot promise a particular outcome.",
     "reference": "No necesariamente. Una declaración de no culpable no significa que automáticamente habrá un juicio. Puedo hablar con el fiscal sobre la posibilidad de reducir o desestimar el cargo, o resolverlo mediante un acuerdo. No puedo prometer un resultado específico."
@@ -130,7 +130,7 @@ export default [
   {
     "id": "consulta-17",
     "title": "Pena y condiciones posibles",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "Yes. We will review every term before you decide. Depending on the charge and the court’s decision, consequences may include a fine, court costs, and conditions such as providing proof of a valid license or meeting a payment deadline.",
     "reference": "Sí. Revisaremos cada condición antes de que usted decida. Según el cargo y la decisión del tribunal, las consecuencias pueden incluir una multa, costas judiciales y condiciones como presentar comprobante de una licencia válida o cumplir con un plazo de pago."
@@ -146,7 +146,7 @@ export default [
   {
     "id": "consulta-19",
     "title": "Consecuencias y asesoramiento especializado",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "We need to review the potential penalties for the specific charge; I cannot guarantee there will be no jail time. A conviction can affect your record and driving privileges. If you have immigration concerns, we should obtain appropriate immigration advice before you enter a guilty or no contest plea.",
     "reference": "Debemos revisar las penas posibles para el cargo específico; no puedo garantizar que no habrá una pena de cárcel. Una condena puede afectar sus antecedentes y su derecho a conducir. Si tiene inquietudes migratorias, debemos obtener asesoramiento adecuado en materia migratoria antes de que se declare culpable o no impugne los cargos."
@@ -162,7 +162,7 @@ export default [
   {
     "id": "consulta-21",
     "title": "Decisión informada y derechos",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "Understood. The judge will ask questions to make sure you understand your rights, including your right to an attorney, your right to a trial, and your right to remain silent. Tell me if you need more time or if anything is unclear.",
     "reference": "Entendido. El juez le hará preguntas para asegurarse de que comprende sus derechos, incluidos su derecho a un abogado, su derecho a un juicio y su derecho a guardar silencio. Dígame si necesita más tiempo o si algo no está claro."
@@ -178,7 +178,7 @@ export default [
   {
     "id": "consulta-23",
     "title": "Traducción a la vista y cierre",
-    "speaker": "David Miller · Defensor público",
+    "speaker": "Victoria · Defensora pública",
     "language": "en",
     "source": "Before we go into the courtroom, I would like the interpreter to sight translate the court document so you can understand its contents. Please ask any questions before you sign anything.",
     "reference": "Antes de entrar a la sala de audiencias, quisiera que el intérprete hiciera una traducción a la vista del documento judicial para que usted comprenda su contenido. Haga cualquier pregunta antes de firmar cualquier documento."
