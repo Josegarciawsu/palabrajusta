@@ -1,7 +1,9 @@
 // Términos de cada semana, organizados por tema (guía del profesor).
 // En la app, si el término está en el libro, se muestra la traducción del libro.
 // Las definiciones son las de la guía.
+import { sections as semana5 } from './semana5.js';
 export default {
+  5: semana5,
   "1": [
     {
       "title": "Judicial purpose and interpretation theory",

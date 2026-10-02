@@ -42,6 +42,7 @@ export function useRecorder() {
       const r = { stream };
       if (Ctx) {
         const ctx = new Ctx();
+        ctx.resume().catch(() => {});
         const analizador = ctx.createAnalyser();
         analizador.fftSize = 512;
         ctx.createMediaStreamSource(stream).connect(analizador);

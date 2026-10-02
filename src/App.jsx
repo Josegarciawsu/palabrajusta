@@ -22,6 +22,7 @@ import JudicialTrainer from "./components/Consecutiva/JudicialTrainer.jsx";
 
 import { C, serif, sans, brand, mono } from "./theme.js";
 import TERMINOS_SEMANA from "./data/terminosSemana.js";
+import { sections as WEEK5_SECTIONS, selftest as WEEK5_SELFTEST } from "./data/semana5.js";
 import { traduccionSemana } from "./data/glosarioUnificado.js";
 import {
   GlosarioView,
@@ -97,14 +98,14 @@ const WEEK_CONTENT = {
   2: { sections: WEEK2_SECTIONS },
   3: { sections: WEEK3_SECTIONS },
   4: { activities: true },
+  5: { sections: WEEK5_SECTIONS, selftest: WEEK5_SELFTEST },
 };
 
 // Calendario de las clases que aún faltan — José actualiza esto conforme avanza el curso.
 const WEEK_SCHEDULE = {
-  lastCompleted: { week: 4, date: "18 de septiembre de 2026" },
+  currentWeek: 6,
+  lastCompleted: { week: 5, date: "25 de septiembre de 2026" },
   upcoming: [
-    { week: 5, date: "25 de septiembre de 2026" },
-    { week: 6, date: "2 de octubre de 2026" },
     { week: 7, date: "9 de octubre de 2026" },
     { week: 8, date: "16 de octubre de 2026" },
   ],
@@ -609,7 +610,7 @@ function TemarioSemana({ week, titulos }) {
                         <p style={{ margin: 0, fontFamily: sans, fontSize: 15, lineHeight: 1.4 }}>
                           <span style={{ fontWeight: 600, color: C.accent }}>{t.term}</span>
                           <span style={{ color: C.label }}> · </span>
-                          <span style={{ color: C.text }}>{traduccionSemana(t.term, t.es)}</span>
+                          <span style={{ color: C.text }}>{week === 5 ? t.es : traduccionSemana(t.term, t.es)}</span>
                         </p>
                         {t.definition && (
                           <p style={{ margin: "4px 0 0 0", fontFamily: sans, fontSize: 14, lineHeight: 1.5, color: C.muted }}>
@@ -673,7 +674,7 @@ function WeekView({ week, onVolver }) {
           ? "Toca un tema para ver sus términos, traducción y definición."
           : content && content.activities
           ? "Ética profesional y práctica de sight translation"
-          : "Aún no hay contenido cargado para esta semana."}
+          : week === 6 ? "Contenido de la clase 6 disponible próximamente." : "Aún no hay contenido cargado para esta semana."}
       </p>
 
       {content && content.sections ? (
@@ -689,6 +690,7 @@ function WeekView({ week, onVolver }) {
             Temario de la clase
           </h2>
           <TemarioSemana week={week} titulos={content.sections.map((x) => x.title)} />
+          {week===5&&<section style={{marginTop:24}}><h2 style={{fontFamily:serif,color:C.accent,fontSize:19}}>Autoevaluación</h2><p style={{fontFamily:sans,color:C.muted,fontSize:14}}>Responde antes de abrir la respuesta.</p>{WEEK5_SELFTEST.map((q,i)=><details key={q.question} style={{padding:14,marginBottom:8,border:`1px solid ${C.border}`,borderRadius:12,background:C.card,fontFamily:sans}}><summary style={{cursor:'pointer',fontWeight:500}}>{i+1}. {q.question}</summary><p style={{margin:'10px 0 0',color:C.muted,lineHeight:1.6}}>{q.answer}</p></details>)}</section>}
         </section>
       ) : content && content.activities ? (
         <>
@@ -740,14 +742,14 @@ function WeekView({ week, onVolver }) {
             scenarios={ROLEPLAY_SCENARIOS}
           />
         </>
-      ) : (
+      ) : week === 6 ? null : (
         <section className="mt-6">
           <div
             className="rounded p-4"
             style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
           >
             <p style={{ fontFamily: sans, color: C.text, fontSize: 15, margin: 0, lineHeight: 1.6 }}>
-              Vamos en la Semana {WEEK_SCHEDULE.lastCompleted.week} — la última clase
+              Clase actual: {WEEK_SCHEDULE.currentWeek} — la última clase registrada
               fue el {WEEK_SCHEDULE.lastCompleted.date}. Las próximas clases son los
               viernes:
             </p>
@@ -1710,6 +1712,7 @@ function InicioView({ irA, isMobile, abrirSemanas = false }) {
       <p style={{ fontFamily: sans, color: C.muted, fontSize: isMobile ? 14.5 : 16, lineHeight: 1.4, margin: "2px 0 0 0" }}>
         De estudiante a intérprete judicial en ocho semanas.
       </p>
+      <p style={{fontFamily:sans,color:C.accent,fontSize:13,margin:"6px 0 0"}}>Clase actual: {WEEK_SCHEDULE.currentWeek}</p>
 
       {GRUPOS_INICIO.map((g, gi) => (
         <section
