@@ -16,10 +16,13 @@ import {
   ChevronDown,
   Menu,
   X,
+  ChevronLeft,
 } from "lucide-react";
 import ConsecutivaSection from "./components/Consecutiva/ConsecutivaSection.jsx";
 
 import { C, serif, sans, brand, mono } from "./theme.js";
+import TERMINOS_SEMANA from "./data/terminosSemana.js";
+import { traduccionSemana } from "./data/glosarioUnificado.js";
 import {
   GlosarioView,
   TarjetasView,
@@ -536,11 +539,123 @@ function Eyebrow({ children }) {
   );
 }
 
-function WeekView({ week }) {
+// Temas de la semana: cada uno se despliega con sus términos, traducción y definición.
+function TemarioSemana({ week, titulos }) {
+  const [abierto, setAbierto] = useState(null);
+  const temas = TERMINOS_SEMANA[week] || titulos.map((t) => ({ title: t, terms: [] }));
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {temas.map((tema, i) => {
+        const open = abierto === i;
+        const n = tema.terms.length;
+        return (
+          <div
+            key={tema.title}
+            className="pj-in"
+            style={{
+              animationDelay: `${40 + i * 25}ms`,
+              backgroundColor: C.card,
+              border: `1px solid ${open ? C.accent : C.border}`,
+              borderRadius: 12,
+              overflow: "hidden",
+              transition: "border-color .2s ease",
+            }}
+          >
+            <button
+              onClick={() => n && setAbierto(open ? null : i)}
+              aria-expanded={n ? open : undefined}
+              className="pj-nav"
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "12px 14px",
+                background: open ? C.accentSoft : "none",
+                border: "none",
+                textAlign: "left",
+                cursor: n ? "pointer" : "default",
+              }}
+            >
+              <span style={{ fontFamily: serif, fontSize: 15, fontWeight: 600, color: C.clayText, minWidth: 18 }}>{i + 1}</span>
+              <span style={{ flex: 1, fontFamily: sans, fontSize: 15.5, fontWeight: 500, color: C.text }}>{tema.title}</span>
+              {n > 0 && (
+                <span style={{ fontFamily: sans, fontSize: 13, color: C.label, whiteSpace: "nowrap" }}>
+                  {n} {n === 1 ? "término" : "términos"}
+                </span>
+              )}
+              {n > 0 && (
+                <ChevronDown
+                  size={17}
+                  color={C.label}
+                  style={{ flexShrink: 0, transition: "transform .3s cubic-bezier(.2,.7,.3,1)", transform: open ? "rotate(180deg)" : "none" }}
+                />
+              )}
+            </button>
+            {n > 0 && (
+              <div className={open ? "pj-despliega abierto" : "pj-despliega"}>
+                <div className="pj-dentro">
+                  <div style={{ borderTop: `1px solid ${C.border}` }}>
+                    {tema.terms.map((t, k) => (
+                      <div
+                        key={t.term + k}
+                        className="pj-cascada"
+                        style={{
+                          animationDelay: `${Math.min(k, 10) * 25}ms`,
+                          padding: "11px 14px 12px 44px",
+                          borderTop: k ? `1px solid ${C.border}` : "none",
+                        }}
+                      >
+                        <p style={{ margin: 0, fontFamily: sans, fontSize: 15, lineHeight: 1.4 }}>
+                          <span style={{ fontWeight: 600, color: C.accent }}>{t.term}</span>
+                          <span style={{ color: C.label }}> · </span>
+                          <span style={{ color: C.text }}>{traduccionSemana(t.term, t.es)}</span>
+                        </p>
+                        {t.definition && (
+                          <p style={{ margin: "4px 0 0 0", fontFamily: sans, fontSize: 14, lineHeight: 1.5, color: C.muted }}>
+                            {t.definition}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function WeekView({ week, onVolver }) {
   const content = WEEK_CONTENT[week];
 
   return (
     <div>
+      <button
+        onClick={onVolver}
+        className="pj-btn"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          margin: "0 0 12px -4px",
+          padding: "6px 12px 6px 8px",
+          border: `1px solid ${C.border}`,
+          borderRadius: 999,
+          backgroundColor: C.card,
+          color: C.accent,
+          fontFamily: sans,
+          fontSize: 14,
+          fontWeight: 500,
+          cursor: "pointer",
+        }}
+      >
+        <ChevronLeft size={17} />
+        Semanas
+      </button>
       <Eyebrow>Programa semanal · Semana {week}</Eyebrow>
       <h1
         className="flex items-center gap-2"
@@ -555,7 +670,7 @@ function WeekView({ week }) {
       </h1>
       <p style={{ fontFamily: sans, color: C.muted, fontSize: 16, marginTop: 4 }}>
         {content && content.sections
-          ? "Temas que se vieron en clase"
+          ? "Toca un tema para ver sus términos, traducción y definición."
           : content && content.activities
           ? "Ética profesional y práctica de sight translation"
           : "Aún no hay contenido cargado para esta semana."}
@@ -573,27 +688,7 @@ function WeekView({ week }) {
           >
             Temario de la clase
           </h2>
-          <div
-            className="rounded overflow-hidden"
-            style={{ backgroundColor: C.card, border: `1px solid ${C.border}` }}
-          >
-            {content.sections.map((s, i) => (
-              <div
-                key={s.title}
-                className="px-3 py-2 flex items-baseline gap-3"
-                style={{ borderTop: i ? `1px solid ${C.border}` : "none" }}
-              >
-                <span style={{ fontFamily: serif, fontSize: 15, color: C.clayText, flexShrink: 0, minWidth: 18 }}>
-                  {i + 1}
-                </span>
-                <span style={{ fontFamily: sans, fontSize: 15, color: C.text }}>{s.title}</span>
-              </div>
-            ))}
-          </div>
-          <p style={{ fontFamily: sans, fontSize: 14, color: C.muted, margin: "10px 0 0 0", lineHeight: 1.5 }}>
-            Los términos de esta clase ahora viven en el Glosario (Procesos penales), con las
-            equivalencias verificadas del libro.
-          </p>
+          <TemarioSemana week={week} titulos={content.sections.map((x) => x.title)} />
         </section>
       ) : content && content.activities ? (
         <>
@@ -1411,7 +1506,7 @@ function SplashScreen() {
       <img className="pj-splash-logo" src={LOGO_URI} alt="" style={{ width: 112, height: 112 }} />
       <p
         className="pj-splash-texto"
-        style={{ fontFamily: brand, fontWeight: 600, fontSize: 32, color: C.navy, margin: "18px 0 0 0" }}
+        style={{ fontFamily: brand, fontWeight: 600, fontSize: 32, color: C.accent, margin: "18px 0 0 0" }}
       >
         Palabra Justa
       </p>
@@ -1522,14 +1617,15 @@ function TamanoLetra({ nivel, setNivel }) {
 const GRUPOS_INICIO = [
   {
     titulo: "Estudia",
+    tinte: "#F4F8FE", // azul muy suave
     items: [
       { id: "glosario", icon: ListChecks, titulo: "Glosario", texto: "Términos jurídicos" },
       { id: "caso", icon: Scale, titulo: "Caso de la semana", texto: "Un caso para analizar" },
-      { id: "recursos", icon: Library, titulo: "Recursos", texto: "Enlaces y materiales" },
     ],
   },
   {
     titulo: "Practica vocabulario",
+    tinte: "#FFFAF0", // dorado muy suave
     items: [
       { id: "quiz", icon: ClipboardCheck, titulo: "Quiz", texto: "Opción múltiple" },
       { id: "flashcards", icon: Layers, titulo: "Tarjetas", texto: "Repaso rápido" },
@@ -1540,16 +1636,22 @@ const GRUPOS_INICIO = [
   },
   {
     titulo: "Interpreta",
+    tinte: "#F3F5F9", // azul marino muy suave
     items: [
       { id: "consecutiva", icon: Headphones, titulo: "Consecutiva", texto: "Grábate traduciendo ejemplos" },
       { id: "sight", icon: Eye, titulo: "Sight Translation", texto: "Traduce un texto a la vista" },
       { id: "canones", icon: ScrollText, titulo: "Cánones", texto: "Ética del intérprete" },
     ],
   },
+  {
+    titulo: "Material de apoyo",
+    tinte: "#F7F7F8", // gris muy suave
+    items: [{ id: "recursos", icon: Library, titulo: "Recursos", texto: "Enlaces y materiales" }],
+  },
 ];
 
-function InicioView({ irA, isMobile }) {
-  const [semanasAbiertas, setSemanasAbiertas] = useState(false);
+function InicioView({ irA, isMobile, abrirSemanas = false }) {
+  const [semanasAbiertas, setSemanasAbiertas] = useState(abrirSemanas);
   let orden = 0;
   const retraso = () => ({ animationDelay: `${60 + orden++ * 35}ms` });
 
@@ -1601,7 +1703,7 @@ function InicioView({ irA, isMobile }) {
   return (
     <div>
       {!isMobile && (
-        <h1 style={{ fontFamily: serif, fontWeight: 600, color: C.navy, fontSize: 32, margin: 0 }}>
+        <h1 style={{ fontFamily: serif, fontWeight: 600, color: C.accent, fontSize: 32, margin: 0 }}>
           Palabra Justa
         </h1>
       )}
@@ -1610,9 +1712,19 @@ function InicioView({ irA, isMobile }) {
       </p>
 
       {GRUPOS_INICIO.map((g, gi) => (
-        <section key={g.titulo} className="pj-in" style={{ ...retraso(), marginTop: isMobile ? (gi ? 10 : 12) : 22 }}>
-          {encabezado(g.titulo)}
-          <div style={rejilla}>
+        <section
+          key={g.titulo}
+          className="pj-in"
+          style={{
+            ...retraso(),
+            marginTop: isMobile ? (gi ? 8 : 10) : gi ? 12 : 20,
+            backgroundColor: g.tinte,
+            borderRadius: 14,
+            padding: isMobile ? "7px 8px 7px 8px" : "12px 14px 14px 14px",
+          }}
+        >
+          {!(isMobile && g.items.length === 1) && encabezado(g.titulo)}
+          <div style={isMobile && g.items.length === 1 ? { display: "grid" } : rejilla}>
             {gi === 0 && (
               <button
                 className="pj-tile pj-in"
@@ -1620,22 +1732,7 @@ function InicioView({ irA, isMobile }) {
                 aria-expanded={semanasAbiertas}
                 style={{ ...mosaico(semanasAbiertas), ...retraso() }}
               >
-                <span
-                  className="pj-ic"
-                  style={{
-                    width: isMobile ? 28 : 36,
-                    height: isMobile ? 28 : 36,
-                    borderRadius: 9,
-                    backgroundColor: C.claySoft,
-                    color: C.clayText,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  <BookOpen size={isMobile ? 16 : 19} />
-                </span>
+                {icono(BookOpen)}
                 {textos("Contenido por semana", "Temas de cada clase")}
                 <ChevronDown
                   size={isMobile ? 16 : 17}
@@ -1649,12 +1746,25 @@ function InicioView({ irA, isMobile }) {
                 />
               </button>
             )}
-            {g.items.map(({ id, icon: Icon, titulo, texto }) => (
-              <button key={id} className="pj-tile pj-in" onClick={() => irA(id)} style={{ ...mosaico(false), ...retraso() }}>
-                {icono(Icon)}
-                {textos(titulo, texto)}
-              </button>
-            ))}
+            {g.items.map(({ id, icon: Icon, titulo, texto }) =>
+              isMobile && g.items.length === 1 ? (
+                <button
+                  key={id}
+                  className="pj-tile pj-in"
+                  onClick={() => irA(id)}
+                  style={{ ...mosaico(false), ...retraso(), flexDirection: "row", alignItems: "center", gap: 10 }}
+                >
+                  {icono(Icon)}
+                  <span style={{ fontFamily: sans, fontSize: 13.5, fontWeight: 600, color: C.text }}>{titulo}</span>
+                  <span style={{ fontFamily: sans, fontSize: 13, color: C.label }}>· {g.titulo}</span>
+                </button>
+              ) : (
+                <button key={id} className="pj-tile pj-in" onClick={() => irA(id)} style={{ ...mosaico(false), ...retraso() }}>
+                  {icono(Icon)}
+                  {textos(titulo, texto)}
+                </button>
+              )
+            )}
           </div>
           {gi === 0 && (
             <div className={semanasAbiertas ? "pj-despliega abierto" : "pj-despliega"}>
@@ -1707,6 +1817,11 @@ export default function App() {
   const [section, setSection] = useState("inicio");
   const [navOpen, setNavOpen] = useState(false);
   const [semanasAbiertas, setSemanasAbiertas] = useState(false);
+  const [volverASemanas, setVolverASemanas] = useState(false);
+  // Al salir del Inicio, el panel de semanas vuelve a abrirse cerrado la próxima vez.
+  useEffect(() => {
+    if (section !== "inicio") setVolverASemanas(false);
+  }, [section]);
   const [nivelLetra, setNivelLetra] = useEscala();
   const navRef = useRef(null);
   const [showSplash, setShowSplash] = useState(true);
@@ -1773,7 +1888,7 @@ export default function App() {
                 style={{
                   fontFamily: brand,
                   fontWeight: 700,
-                  color: C.navy,
+                  color: C.accent,
                   fontSize: isMobile ? 19 : 20,
                   letterSpacing: "-0.2px",
                   whiteSpace: "nowrap",
@@ -1977,11 +2092,24 @@ export default function App() {
         }}
       >
         <div key={section} className="pj-fade" style={{ zoom: ESCALAS[nivelLetra] }}>
-        {section === "inicio" && <InicioView irA={setSection} isMobile={isMobile} />}
+        {section === "inicio" && (
+          <InicioView
+            irA={(id) => {
+              setVolverASemanas(false);
+              setSection(id);
+            }}
+            isMobile={isMobile}
+            abrirSemanas={volverASemanas}
+          />
+        )}
         {section.startsWith("semana-") && (
           <WeekView
             key={section}
             week={Number(section.split("-")[1])}
+            onVolver={() => {
+              setVolverASemanas(true);
+              setSection("inicio");
+            }}
           />
         )}
         {section === "caso" && <CaseView data={CASE_OF_THE_WEEK} />}
