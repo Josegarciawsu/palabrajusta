@@ -23,10 +23,11 @@ export function useRecorder() {
 
   useEffect(() => limpiar, []);
 
-  async function iniciar() {
+  async function iniciar(preparedStream) {
     setError("");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = preparedStream || await navigator.mediaDevices.getUserMedia({ audio: true });
+      recursos.current = { stream };
       const mr = new MediaRecorder(stream);
       chunks.current = [];
       mr.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
@@ -63,6 +64,7 @@ export function useRecorder() {
       mr.start();
       rec.current = mr;
       setGrabando(true);
+      return true;
     } catch (e) {
       limpiar();
       setError(
@@ -70,6 +72,7 @@ export function useRecorder() {
           ? "El navegador bloqueó el micrófono. Permite el acceso en la barra de direcciones y vuelve a intentarlo."
           : "No se pudo acceder al micrófono. Revisa que esté conectado."
       );
+      return false;
     }
   }
 

@@ -14,36 +14,73 @@ export default function JudicialTrainer({onBack}){
  const [history,setHistory]=useState(read),[session,setSession]=useState({}),[finished,setFinished]=useState(false),[saved,setSaved]=useState(false),[fluency,setFluency]=useState('');
  const [prefs,setPrefs]=useState(leerPreferencias);
  const [highlight,setHighlight]=useState(null);
+ const [phase,setPhase]=useState('idle'),[remaining,setRemaining]=useState(0);
+ const timer=useRef(null),prepared=useRef(null);
+ const clearTimer=()=>{clearInterval(timer.current);timer.current=null;};
+ function countdown(seconds,done){clearTimer();setRemaining(Math.ceil(seconds));const end=Date.now()+seconds*1000;timer.current=setInterval(()=>{const left=Math.max(0,Math.ceil((end-Date.now())/1000));setRemaining(left);if(left===0){clearTimer();done?.();}},200);}
+ const releasePrepared=()=>{prepared.current?.getTracks().forEach(t=>t.stop());prepared.current=null;};
  const activeWord=useRef(null);
  useEffect(()=>{if(shown&&highlight)activeWord.current?.scrollIntoView({block:'nearest',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});},[shown,highlight]);
  const recognition=useRef(null),textRef=useRef(''),urlRef=useRef(null),generation=useRef(0);
  const recorder=useRecorder();const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
  useEffect(()=>{if(audio&&text.trim()&&!recorder.grabando&&!transcribing){const result=assessTurn(turn,text);setRows(result);setSession(prev=>({...prev,[turn.id]:{id:turn.id,text,rows:result}}));setSaved(false);}},[audio,text,transcribing,recorder.grabando]);
- useEffect(()=>{cargarVoces().then(setVoices);return()=>{generation.current++;detener();recognition.current?.abort();if(urlRef.current)URL.revokeObjectURL(urlRef.current);};},[]);
+ useEffect(()=>{cargarVoces().then(setVoices);return()=>{clearTimer();releasePrepared();generation.current++;detener();recognition.current?.abort();if(urlRef.current)URL.revokeObjectURL(urlRef.current);};},[]);
  const score=rows&&scoreUnits(rows),allRows=Object.values(session).flatMap(x=>x.rows),totalScore=scoreUnits(allRows);
- function reset(){setHighlight(null);generation.current++;detener();recognition.current?.abort();recognition.current=null;setTranscribing(false);setSpeaking(false);setText('');textRef.current='';setNotes('');setRows(null);setShown(false);setListened(false);setSaved(false);setError('');if(urlRef.current)URL.revokeObjectURL(urlRef.current);urlRef.current=null;setAudio(null);}
- async function listen(){setError('');if(!window.speechSynthesis){setError('Este navegador no puede reproducir la voz. Puedes mostrar el texto y practicar por escrito.');return;}const g=generation.current;setSpeaking(true);setListened(true);await hablar(turn.source,turn.language,vozElegida(voices,turn.language,prefs),prefs.velocidad,position=>{if(g===generation.current)setHighlight(position);});if(g===generation.current){setSpeaking(false);setHighlight(null);}}
- async function record(){setError('');setText('');textRef.current='';setRows(null);if(urlRef.current)URL.revokeObjectURL(urlRef.current);urlRef.current=null;setAudio(null);await recorder.iniciar();}
+ function reset(){clearTimer();releasePrepared();setPhase('idle');setRemaining(0);setHighlight(null);generation.current++;detener();recognition.current?.abort();recognition.current=null;setTranscribing(false);setSpeaking(false);setText('');textRef.current='';setNotes('');setRows(null);setShown(false);setListened(false);setSaved(false);setError('');if(urlRef.current)URL.revokeObjectURL(urlRef.current);urlRef.current=null;setAudio(null);}
+ async function cancel(){generation.current++;clearTimer();releasePrepared();detener();recognition.current?.abort();if(recorder.grabando)await recorder.detener();setTranscribing(false);setSpeaking(false);setHighlight(null);setPhase('idle');setRemaining(0);}
+ async function listen(){
+  setError('');if(!window.speechSynthesis){setError('Audio no disponible.');return;}
+  const g=++generation.current;setPhase('preparing');
+  let acquired;try{acquired=await navigator.mediaDevices.getUserMedia({audio:true});}catch{if(g===generation.current){setPhase('idle');setError('Permite el micrófono para empezar.');}return;}
+  if(g!==generation.current){acquired.getTracks().forEach(t=>t.stop());return;}
+  prepared.current=acquired;
+  setText('');textRef.current='';setRows(null);if(urlRef.current)URL.revokeObjectURL(urlRef.current);urlRef.current=null;setAudio(null);
+  const estimate=Math.ceil((turn.source.trim().split(/\s+/).length/(turn.language==='en'?170:155))*60/(prefs.velocidad||0.95));
+  const started=Date.now();setPhase('listening');setSpeaking(true);setListened(true);countdown(estimate);
+  await hablar(turn.source,turn.language,vozElegida(voices,turn.language,prefs),prefs.velocidad,pos=>{if(g===generation.current)setHighlight(pos);});
+  if(g!==generation.current)return;
+  clearTimer();setSpeaking(false);setHighlight(null);
+  const duration=(Date.now()-started)/1000;
+  const extra=Math.max(10,duration*(turn.language==='en'?0.30:0.25));
+  setPhase('ready');countdown(3,async()=>{
+   if(g!==generation.current)return;
+   const stream=prepared.current;prepared.current=null;
+   const ok=await recorder.iniciar(stream);
+   if(g!==generation.current){stream?.getTracks().forEach(t=>t.stop());return;}
+   if(!ok){setPhase('idle');return;}
+   setPhase('recording');countdown(Math.ceil(duration+extra),()=>stop());
+  });
+ }
  // Start speech recognition only once the recorder successfully acquired the microphone.
  useEffect(()=>{if(!recorder.grabando||!Recognition)return;let r;try{r=new Recognition();recognition.current=r;r.lang=turn.language==='en'?'es-MX':'en-US';r.continuous=true;r.interimResults=false;r.onresult=e=>{let addition='';for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)addition+=e.results[i][0].transcript+' ';textRef.current=(textRef.current+' '+addition).trim();setText(textRef.current);setRows(null);};r.onerror=e=>{if(e.error!=='aborted')setError('La transcripción no está disponible. Escucha tu grabación y escribe lo que dijiste.');};r.onend=()=>setTranscribing(false);r.start();setTranscribing(true);}catch{setError('No fue posible transcribir. La grabación sigue activa; puedes escribir tu respuesta después.');}return()=>{r?.stop();};},[recorder.grabando]);
- async function stop(){recognition.current?.stop();setTranscribing(false);const blob=await recorder.detener();if(blob){if(urlRef.current)URL.revokeObjectURL(urlRef.current);const url=URL.createObjectURL(blob);urlRef.current=url;setAudio(url);}}
+ async function stop(){
+  clearTimer();setPhase('evaluating');const g=generation.current;
+  const r=recognition.current;
+  const finalText=r?new Promise(resolve=>{const previous=r.onend;let timeout;const finish=()=>{clearTimeout(timeout);previous?.();resolve();};r.onend=finish;timeout=setTimeout(finish,1500);try{r.stop();}catch{finish();}}):Promise.resolve();
+  const blob=await recorder.detener();await finalText;
+  if(g!==generation.current)return;
+  setTranscribing(false);setPhase('idle');setRemaining(0);
+  if(blob){if(urlRef.current)URL.revokeObjectURL(urlRef.current);const url=URL.createObjectURL(blob);urlRef.current=url;setAudio(url);}
+ }
+
  function evaluate(){const result=assessTurn(turn,text);setRows(result);setSession(s=>({...s,[turn.id]:{id:turn.id,text,rows:result}}));setSaved(false);}
  function revise(id,status){const result=rows.map(r=>r.id===id?{...r,status}:r);setRows(result);setSession(s=>({...s,[turn.id]:{id:turn.id,text,rows:result}}));setSaved(false);}
  function next(){if(idx===turns.length-1){detener();setFinished(true);}else{reset();setIdx(i=>i+1);}}
  function save(){const data={id:Date.now(),date:new Date().toISOString(),direction,mode,segments:Object.values(session),score:totalScore.value,fluency:fluency===''?null:Number(fluency)};try{const h=[data,...read()].slice(0,30);localStorage.setItem(KEY,JSON.stringify(h));setHistory(h);setSaved(true);}catch{setError('No se pudo guardar el intento: el almacenamiento del navegador está lleno o bloqueado.');}}
- const busy=recorder.grabando||speaking||transcribing;
+ const busy=phase!=='idle'||recorder.grabando||speaking||transcribing;
  const reviewList=history.flatMap(h=>h.segments.flatMap(s=>s.rows.filter(r=>r.status!=='matched').map(r=>({...r,segment:s.id}))));
  return <div style={{fontFamily:F.cuerpo,color:C.tinta,display:'grid',gap:18,fontSize:16,lineHeight:1.6}}>
  <Boton variante="fantasma" disabled={busy} onClick={()=>{reset();onBack();}}>Volver al inicio</Boton>
- <div><Titulo>Escucha e interpreta</Titulo><p style={{margin:'8px 0'}}>Consulta con el defensor público</p><p style={{margin:0}}>Escucha, toma notas y graba tu interpretación.</p></div>
+ <div><Titulo>Escucha e interpreta</Titulo>{!direction&&<p style={{margin:0}}>Escucha. Tras 3 segundos, interpreta: se grabará y evaluará automáticamente.</p>}</div>
  {!finished&&<>
  <div role="group" aria-label="Dirección de interpretación" style={{display:'flex',gap:10,flexWrap:'wrap'}}>{[['en','Inglés → Español'],['es','Español → Inglés']].map(([value,label])=><Boton key={value} aria-pressed={direction===value} disabled={busy} variante={direction===value?'primario':'secundario'} onClick={()=>{reset();setDirection(value);setIdx(0);setSession({});setFluency('');}}>{label}</Boton>)}</div>
  {direction&&<>
- <Tarjeta style={{display:'grid',gap:14}}><strong>{direction==='en'?'Inglés → Español':'Español → Inglés'}</strong><span>Segmento {idx+1} de {turns.length} · {turn.speaker}</span><Titulo nivel={2}>{turn.title}</Titulo><strong>Interpreta al {turn.language==='en'?'español':'inglés'}</strong><div style={{display:'flex',gap:10,flexWrap:'wrap'}}><Boton onClick={speaking?()=>{generation.current++;detener();setSpeaking(false);setHighlight(null);}:listen} disabled={recorder.grabando||transcribing||(mode==='exam'&&listened&&!speaking)}>{speaking?'Detener audio':'Escuchar'}</Boton>{<Boton variante="secundario" aria-pressed={shown} aria-controls="judicial-source" onClick={()=>{setShown(!shown);setListened(true);}}>{shown?'Ocultar texto':'Mostrar texto'}</Boton>}</div>{shown&&<blockquote id="judicial-source" style={{margin:0,padding:16,borderLeft:`4px solid ${C.azul}`}} lang={turn.language}>{highlight?<>{turn.source.slice(0,highlight.start)}<mark ref={activeWord} style={{background:"#FFE08A",color:"#18334D",borderRadius:4,padding:"2px 0"}}>{turn.source.slice(highlight.start,highlight.end)}</mark>{turn.source.slice(highlight.end)}</>:turn.source}</blockquote>}
+ <Tarjeta style={{display:'grid',gap:14}}><strong>{direction==='en'?'Inglés → Español':'Español → Inglés'}</strong><span>Segmento {idx+1} de {turns.length} · {turn.speaker}</span><Titulo nivel={2}>{turn.title}</Titulo><strong>Interpreta al {turn.language==='en'?'español':'inglés'}</strong><div style={{display:'flex',gap:10,flexWrap:'wrap'}}><Boton onClick={listen} disabled={busy}>Escuchar</Boton>{busy&&<Boton variante="secundario" onClick={cancel}>Cancelar</Boton>}{<Boton variante="secundario" aria-pressed={shown} aria-controls="judicial-source" onClick={()=>{setShown(!shown);setListened(true);}}>{shown?'Ocultar texto':'Mostrar texto'}</Boton>}</div>{shown&&<blockquote id="judicial-source" style={{margin:0,padding:16,borderLeft:`4px solid ${C.azul}`}} lang={turn.language}>{highlight?<>{turn.source.slice(0,highlight.start)}<mark ref={activeWord} style={{background:"#FFE08A",color:"#18334D",borderRadius:4,padding:"2px 0"}}>{turn.source.slice(highlight.start,highlight.end)}</mark>{turn.source.slice(highlight.end)}</>:turn.source}</blockquote>}
  <details><summary>Tomar notas</summary><label>Notas<textarea rows={3} value={notes} onChange={e=>setNotes(e.target.value)} style={{display:'block',width:'100%',padding:12,fontSize:16,boxSizing:'border-box'}}/></label></details>
- <Boton onClick={recorder.grabando?stop:record} disabled={speaking||(!listened&&!recorder.grabando)}>{recorder.grabando?`Terminar (${recorder.segundos} s)`:'Grabar'}</Boton>
+ {phase!=='idle'&&<div role="status" style={{textAlign:'center',padding:12,fontSize:24,fontWeight:700}}>{phase==='preparing'?'Preparando…':phase==='evaluating'?'Evaluando…':`${phase==='listening'?'Escuchando':phase==='ready'?'Prepárate':'Grabando'} · ${remaining} s`}</div>}
+ {phase==='recording'&&<Boton onClick={stop}>Terminar y evaluar</Boton>}
  <details style={{fontSize:14,color:C.suave}}><summary>Privacidad</summary><p style={{margin:0}}>{Recognition?'La transcripción puede enviar tu voz al proveedor del navegador.':'Escribe tu respuesta después de grabar.'}</p></details>
- {audio&&!text.trim()&&<p>Escribe tu respuesta para evaluar.</p>}{audio&&<div><strong>Escucha tu interpretación</strong><audio controls autoPlay src={audio} style={{width:'100%'}}/></div>}
+ {audio&&!text.trim()&&<p>Escribe tu respuesta para evaluar.</p>}{audio&&<div><strong>Escucha tu interpretación</strong><audio controls src={audio} style={{width:'100%'}}/></div>}
  <details><summary>Ajustar voz</summary><div style={{display:'grid',gap:12,marginTop:12}}><label>Voz<select disabled={busy} value={vozElegida(voices,turn.language,prefs)?.name||''} onChange={e=>{const p={...prefs,[turn.language]:e.target.value};setPrefs(p);guardarPreferencias(p);}} style={{display:'block',maxWidth:'100%',width:'100%',fontSize:16,padding:10}}>{vocesPara(voices,turn.language).map(({voz},i)=><option key={voz.name+voz.lang} value={voz.name}>{voz.name}{i===0?' · recomendada':''}</option>)}</select></label><label>Velocidad<select disabled={busy} value={prefs.velocidad||0.95} onChange={e=>{const p={...prefs,velocidad:Number(e.target.value)};setPrefs(p);guardarPreferencias(p);}} style={{display:'block',fontSize:16,padding:10}}><option value={0.85}>Lenta</option><option value={0.95}>Normal</option><option value={1.05}>Rápida</option></select></label><p style={{fontSize:14,margin:0}}>Voces disponibles en tu teléfono.</p></div></details><label>Tu respuesta<textarea lang={turn.language==='en'?'es':'en'} rows={5} value={text} disabled={recorder.grabando||transcribing} onChange={e=>{textRef.current=e.target.value;setText(e.target.value);setRows(null);setSession(s=>{const n={...s};delete n[turn.id];return n;});}} placeholder="Escribe o revisa tu respuesta." style={{display:'block',width:'100%',padding:12,fontSize:16,boxSizing:'border-box'}}/></label>
  <div style={{display:'flex',gap:10,flexWrap:'wrap'}}><Boton onClick={evaluate} disabled={busy||!text.trim()}>{rows?'Actualizar evaluación':'Terminar'}</Boton><Boton variante="secundario" disabled={busy||!rows} onClick={next}>{idx===turns.length-1?'Ver resultado de la sesión':'Siguiente segmento'}</Boton></div>
  {(error||recorder.error)&&<p role="alert" style={{color:C.coral}}>{error||recorder.error}</p>}</Tarjeta>
