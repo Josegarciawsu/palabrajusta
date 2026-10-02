@@ -87,11 +87,11 @@ export default function ConsecutivaSection() {
       <div style={{ display: "grid", gap: 8 }}>
         <Titulo>Interpretación consecutiva</Titulo>
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: C.suave, maxWidth: 620 }}>
-          Practica por unidades de puntuación y revisa tus omisiones. Las notas de esta app son de entrenamiento; no representan una calificación oficial del examen.
+          Practica y revisa tus errores. Nota orientativa.
         </p>
       </div>
 
-      <Tarjeta style={{ display: "grid", gap: 12 }}><Titulo nivel={2}>Práctica judicial evaluada</Titulo><p style={{ margin: 0 }}>Reunión con el defensor público: escucha, graba e interpreta en ambas direcciones. Revisa términos jurídicos, negaciones y consecuencias.</p><Boton onClick={() => setJudicial(true)}>Abrir práctica judicial</Boton></Tarjeta>
+      <Tarjeta style={{ display: "grid", gap: 12 }}><Titulo nivel={2}>Práctica judicial</Titulo><p style={{ margin: 0 }}>Escucha, interpreta y graba. Revisa tus términos jurídicos.</p><Boton onClick={() => setJudicial(true)}>Abrir práctica judicial</Boton></Tarjeta>
 
       <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
         {PASOS.map(([t, d], i) => (
