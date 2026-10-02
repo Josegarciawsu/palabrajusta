@@ -1,0 +1,29 @@
+.judicial-scene {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 4vw, 28px);
+  background: #f7f3ec;
+  border-radius: 14px;
+  overflow: hidden;
+  min-width: 0;
+}
+.judicial-character {
+  position: relative;
+  width: clamp(132px, 40vw, 176px);
+  aspect-ratio: 1;
+  flex-shrink: 0;
+}
+.judicial-portrait {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-size: 300% 300%;
+  background-repeat: no-repeat;
+}
+.judicial-speaking { animation: judicial-mouth .38s steps(1, end) infinite; }
+@keyframes judicial-mouth { 0%, 100% { opacity: 0; } 45% { opacity: 1; } }
+.judicial-scene-status { display: grid; padding: 12px 12px 12px 0; min-width: 0; line-height: 1.3; }
+.judicial-scene-status strong { font-size: 16px; }
+.judicial-scene-time { font-size: clamp(32px, 9vw, 46px); font-weight: 700; font-variant-numeric: tabular-nums; }
+.judicial-scene-time small { font-size: 16px; font-weight: 400; }
+@media (prefers-reduced-motion: reduce) { .judicial-speaking { animation: none; opacity: 0; } }
