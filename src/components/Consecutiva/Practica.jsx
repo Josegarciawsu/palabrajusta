@@ -122,6 +122,8 @@ function SelectorVoz({ idioma, voces, prefs, onPrefs, texto }) {
 }
 
 export default function Practica({ ejercicio, intento, onCambio, onTerminar, onSalir }) {
+  const [mostrarTexto, setMostrarTexto] = useState(false);
+  const [resaltado, setResaltado] = useState(null);
   const [idx, setIdx] = useState(() => {
     const i = ejercicio.turnos.findIndex((_, n) => !intento.grabados[n]);
     return i === -1 ? ejercicio.turnos.length - 1 : i;
@@ -150,6 +152,7 @@ export default function Practica({ ejercicio, intento, onCambio, onTerminar, onS
 
   async function escuchar() {
     onCambio({ ...intento, repeticiones: { ...intento.repeticiones, [idx]: reps + 1 } });
+    setResaltado(null);
     setSonando(true);
     if (turno.audio) {
       const a = audioRef.current || new Audio();
@@ -162,7 +165,8 @@ export default function Practica({ ejercicio, intento, onCambio, onTerminar, onS
       a.onerror = () => setSonando(false);
       a.play().catch(() => setSonando(false));
     } else {
-      await hablar(turno.plano, turno.idioma, vozElegida(voces, turno.idioma, prefs), prefs.velocidad);
+      await hablar(turno.plano, turno.idioma, vozElegida(voces, turno.idioma, prefs), prefs.velocidad, setResaltado);
+      setResaltado(null);
       setSonando(false);
     }
   }
@@ -232,7 +236,7 @@ export default function Practica({ ejercicio, intento, onCambio, onTerminar, onS
           </p>
           <Titulo nivel={2}>Escucha e interpreta al {destino(turno.idioma)}</Titulo>
           <p style={{ margin: "6px 0 0", color: C.suave, fontSize: 14 }}>
-            El texto queda oculto, como en el examen. Solo escuchas.
+            Escucha y graba tu interpretación.
           </p>
         </div>
 
@@ -255,6 +259,9 @@ export default function Practica({ ejercicio, intento, onCambio, onTerminar, onS
               <RotateCcw size={18} /> {sonando ? "Reproduciendo…" : "Pedir repetición"}
             </Boton>
           )}
+          <Boton variante="secundario" aria-pressed={mostrarTexto} onClick={() => setMostrarTexto(v => !v)}>
+            {mostrarTexto ? "Ocultar texto" : "Mostrar texto"}
+          </Boton>
           <Boton
             variante={grabando ? "peligro" : grabado ? "fantasma" : "primario"}
             onClick={alternarGrabacion}
@@ -265,6 +272,9 @@ export default function Practica({ ejercicio, intento, onCambio, onTerminar, onS
           </Boton>
         </div>
 
+        {mostrarTexto && <p lang={turno.idioma} style={{ margin: 0, padding: 16, background: C.fondo, fontSize: 17, lineHeight: 1.7 }}>
+          {resaltado ? <>{turno.plano.slice(0, resaltado.start)}<mark style={{ background: "#FFE08A", color: C.tinta }}>{turno.plano.slice(resaltado.start, resaltado.end)}</mark>{turno.plano.slice(resaltado.end)}</> : turno.plano}
+        </p>}
         {grabando && <IndicadorGrabacion segundos={segundos} nivel={nivel} />}
 
         {grabado && !grabando && (
@@ -319,7 +329,7 @@ export default function Practica({ ejercicio, intento, onCambio, onTerminar, onS
             Terminar y evaluar <ChevronRight size={18} />
           </Boton>
         ) : (
-          <Boton onClick={() => setIdx(idx + 1)} disabled={!grabado || grabando}>
+          <Boton onClick={() => { setResaltado(null); setIdx(idx + 1); }} disabled={!grabado || grabando}>
             Siguiente segmento <ChevronRight size={18} />
           </Boton>
         )}
