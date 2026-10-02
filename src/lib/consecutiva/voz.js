@@ -60,32 +60,48 @@ export function vozElegida(voces, idioma, prefs) {
   return (guardada || lista[0] || {}).voz || null;
 }
 
-// Divide en oraciones: Chrome corta los textos largos a los ~15 segundos.
-function oraciones(texto) {
-  return (texto.match(/[^.!?¿¡]+[.!?]+["')\]]*|[^.!?]+$/g) || [texto])
-    .map((s) => s.trim())
-    .filter(Boolean);
+// Preserve offsets for karaoke across sentence-sized utterances.
+export function speechParts(texto) {
+  return Array.from(texto.matchAll(/[^.!?]+[.!?]+["')\]]*|[^.!?]+$/g))
+    .map(m => ({ text: m[0].trim(), start: m.index + m[0].search(/\S/) }))
+    .filter(p => p.text);
 }
-
+let playback = 0;
+let finishPlayback = null;
 export function detener() {
+  playback++;
   window.speechSynthesis && window.speechSynthesis.cancel();
+  finishPlayback?.();
+  finishPlayback = null;
 }
-
-export function hablar(texto, idioma, voz, velocidad = 0.95) {
-  return new Promise((resolve) => {
+export function hablar(texto, idioma, voz, velocidad = 0.95, onProgress) {
+  detener();
+  const token = playback;
+  return new Promise(resolve => {
     const synth = window.speechSynthesis;
     if (!synth) return resolve();
-    synth.cancel();
-    const partes = oraciones(texto);
+    const parts = speechParts(texto);
     let i = 0;
+    const finish = () => { if (token === playback) finishPlayback = null; resolve(); };
+    finishPlayback = finish;
     const siguiente = () => {
-      if (i >= partes.length) return resolve();
-      const u = new SpeechSynthesisUtterance(partes[i++]);
+      if (token !== playback) return finish();
+      if (i >= parts.length) return finish();
+      const part = parts[i++];
+      const u = new SpeechSynthesisUtterance(part.text);
       u.lang = voz ? voz.lang : idioma === "es" ? "es-MX" : "en-US";
       if (voz) u.voice = voz;
       u.rate = velocidad;
+      // Sentence fallback for phones that do not emit word boundaries.
+      u.onstart = () => { if (token === playback) onProgress?.({ start: part.start, end: part.start + part.text.length }); };
+      u.onboundary = e => {
+        if (token !== playback || e.name !== 'word') return;
+        const local = e.charIndex;
+        const length = part.text.slice(local).match(/^\S+/)?.[0].length || 1;
+        onProgress?.({ start: part.start + local, end: part.start + local + length });
+      };
       u.onend = siguiente;
-      u.onerror = () => resolve();
+      u.onerror = finish;
       synth.speak(u);
     };
     siguiente();
