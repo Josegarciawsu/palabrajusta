@@ -16,6 +16,8 @@ import Practica from "./Practica.jsx";
 import Evaluacion from "./Evaluacion.jsx";
 import Resultados from "./Resultados.jsx";
 
+import JudicialTrainer from "./JudicialTrainer.jsx";
+
 const PASOS = [
   ["Interpreta", "Escuchas cada segmento sin ver el texto, tomas notas y grabas tu interpretación."],
   ["Califícate", "Revisas cada unidad de puntuación: escribes lo que dijiste y decides si fue correcto, incorrecto u omisión."],
@@ -23,6 +25,7 @@ const PASOS = [
 ];
 
 export default function ConsecutivaSection() {
+  const [judicial, setJudicial] = useState(false);
   const grupos = useMemo(
     () => ({
       "en-es": EJERCICIOS_EN_ES.map(prepararEjercicio),
@@ -62,6 +65,8 @@ export default function ConsecutivaSection() {
     padding: "0 0 48px",
   };
 
+  if (judicial) return <JudicialTrainer onBack={() => setJudicial(false)} />;
+
   if (actual && ejercicio) {
     const props = { ejercicio, intento: actual, onCambio: actualizar, onSalir: salir };
     return (
@@ -82,10 +87,11 @@ export default function ConsecutivaSection() {
       <div style={{ display: "grid", gap: 8 }}>
         <Titulo>Interpretación consecutiva</Titulo>
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: C.suave, maxWidth: 620 }}>
-          Practica y califícate con el mismo método del examen: cada unidad de puntuación cuenta, y las omisiones
-          cuentan como error. Necesitas al menos 70 % en cada sección.
+          Practica por unidades de puntuación y revisa tus omisiones. Las notas de esta app son de entrenamiento; no representan una calificación oficial del examen.
         </p>
       </div>
+
+      <Tarjeta style={{ display: "grid", gap: 12 }}><Titulo nivel={2}>Práctica judicial evaluada</Titulo><p style={{ margin: 0 }}>Reunión con el defensor público: escucha, graba e interpreta en ambas direcciones. Revisa términos jurídicos, negaciones y consecuencias.</p><Boton onClick={() => setJudicial(true)}>Abrir práctica judicial</Boton></Tarjeta>
 
       <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
         {PASOS.map(([t, d], i) => (

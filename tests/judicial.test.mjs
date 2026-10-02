@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {judicialTurns,assessTurn,scoreUnits} from '../src/lib/consecutiva/judicial.js';
+for(const t of judicialTurns)assert.ok(assessTurn(t,t.reference).every(r=>r.status==='matched'),t.id);
+assert.equal(assessTurn(judicialTurns[3],'Does pleading guilty mean I deny the officer?')[0].status,'critical');
+assert.equal(assessTurn(judicialTurns[4],'Está admitiendo el cargo.')[1].status,'critical');
+assert.equal(assessTurn(judicialTurns[4],'No admite el cargo.')[1].status,'matched');
+assert.equal(assessTurn(judicialTurns[0],'Una reformulación desconocida')[0].status,'review');
+assert.equal(scoreUnits(assessTurn(judicialTurns[4],judicialTurns[4].reference)).value,100);
+assert.equal(assessTurn(judicialTurns[12],'Podemos reducir el cargo.').find(u=>u.label==='Discovery').status,'review');
+console.log('Judicial scoring checks passed.');

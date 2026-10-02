@@ -2039,6 +2039,7 @@ export default function App() {
             <div className="my-2" style={{ borderTop: `1px solid ${C.border}` }} />
           )}
 
+          <NavButton icon={Headphones} active={section === "consecutiva"} onClick={() => setSection("consecutiva")}>Práctica de interpretación</NavButton>
           <NavButton
             icon={Scale}
             active={section === "caso"}
