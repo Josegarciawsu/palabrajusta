@@ -92,7 +92,7 @@ export default function JudicialTrainer({onBack}){
  const reviewList=[...latest.values()].flatMap(s=>s.rows.filter(r=>r.status!=='matched').map(r=>({...r,segment:s.id})));
  const prior=history.flatMap(h=>h.segments).find(s=>s.id===turn?.id);
  function practiceSegment(id){const target=judicialTurns.find(t=>t.id===id);if(!target)return;reset();setDirection(target.language);setIdx(judicialTurns.filter(t=>t.language===target.language).findIndex(t=>t.id===id));setFinished(false);}
- return <div style={{fontFamily:F.cuerpo,color:C.tinta,display:'grid',gap:18,fontSize:16,lineHeight:1.6}}>
+ return <div className="judicial-trainer" style={{fontFamily:F.cuerpo,color:C.tinta,display:'grid',gap:18,fontSize:16,lineHeight:1.6}}>
  <Boton variante="fantasma" disabled={busy} onClick={()=>{reset();onBack();}}>Volver al inicio</Boton>
  <div><Titulo>Escucha e interpreta</Titulo>{!direction&&<p style={{margin:0}}>Elige intérprete e idioma. Pulsa Escuchar. Tras 3 segundos, interpreta: la app graba y evalúa.</p>}</div>
  {!interpreter&&<JudicialInterpreters onChoose={setInterpreter}/>}

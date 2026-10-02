@@ -10,9 +10,11 @@
 .judicial-character {
   position: relative;
   width: clamp(132px, 40vw, 176px);
-  aspect-ratio: 1;
   flex-shrink: 0;
 }
+.judicial-character::before { content: ''; display: block; padding-top: 100%; }
+.judicial-interpreter-portrait { display: block; position: relative; width: 100%; height: 0; padding-top: 100%; overflow: hidden; border-radius: 12px; box-sizing: content-box; }
+.judicial-character > .judicial-interpreter-portrait { position: absolute; inset: 0; height: 100%; padding-top: 0; }
 .judicial-portrait {
   position: absolute;
   inset: 0;
@@ -32,3 +34,17 @@
 @keyframes judicial-blur { from { filter: blur(0); opacity: 1; } to { filter: blur(2px); opacity: .75; } }
 @keyframes judicial-reveal { from { opacity: .3; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .judicial-blur .judicial-character, .judicial-report { animation: none; } }
+
+.judicial-trainer, .judicial-trainer * { box-sizing: border-box; }
+.judicial-trainer { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.judicial-trainer > *, .judicial-trainer section, .judicial-trainer details, .judicial-trainer label { min-width: 0; }
+.judicial-trainer select, .judicial-trainer textarea, .judicial-trainer audio { min-width: 0; max-width: 100%; }
+.judicial-trainer button { white-space: normal; text-align: center; justify-content: center; }
+.judicial-trainer .judicial-interpreter-portrait { box-sizing: content-box; }
+@media (max-width: 480px) {
+  .judicial-scene { gap: 12px; }
+  .judicial-character { width: min(42%, 144px); }
+  .judicial-scene-status { flex: 1; }
+  .judicial-scene-status strong { font-size: 14px; overflow-wrap: normal; }
+  .judicial-trainer .judicial-report { padding: 14px !important; }
+}

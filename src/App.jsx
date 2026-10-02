@@ -2101,6 +2101,8 @@ export default function App() {
       <main
         style={{
           flex: 1,
+          minWidth: 0,
+          boxSizing: "border-box",
           padding: isMobile ? 16 : 32,
           width: "100%",
           maxWidth: isMobile ? "100%" : section === "inicio" ? 820 : 672,
