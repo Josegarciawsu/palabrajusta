@@ -19,6 +19,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import ConsecutivaSection from "./components/Consecutiva/ConsecutivaSection.jsx";
+import JudicialTrainer from "./components/Consecutiva/JudicialTrainer.jsx";
 
 import { C, serif, sans, brand, mono } from "./theme.js";
 import TERMINOS_SEMANA from "./data/terminosSemana.js";
@@ -1638,7 +1639,7 @@ const GRUPOS_INICIO = [
     titulo: "Interpreta",
     tinte: "#F3F5F9", // azul marino muy suave
     items: [
-      { id: "consecutiva", icon: Headphones, titulo: "Consecutiva", texto: "Grábate traduciendo ejemplos" },
+      { id: "judicial", icon: Headphones, titulo: "Práctica judicial", texto: "Conducir sin licencia: interpreta y evalúa" },
       { id: "sight", icon: Eye, titulo: "Sight Translation", texto: "Traduce un texto a la vista" },
       { id: "canones", icon: ScrollText, titulo: "Cánones", texto: "Ética del intérprete" },
     ],
@@ -2039,7 +2040,7 @@ export default function App() {
             <div className="my-2" style={{ borderTop: `1px solid ${C.border}` }} />
           )}
 
-          <NavButton icon={Headphones} active={section === "consecutiva"} onClick={() => setSection("consecutiva")}>Práctica de interpretación</NavButton>
+          <NavButton icon={Headphones} active={section === "judicial"} onClick={() => setSection("judicial")}>Práctica de interpretación</NavButton>
           <NavButton
             icon={Scale}
             active={section === "caso"}
@@ -2125,6 +2126,7 @@ export default function App() {
         {section === "quiz" && <OpcionMultipleView />}
         {section === "escribir" && <EscribirView />}
         {section === "debiles" && <DificilesView />}
+        {section === "judicial" && <JudicialTrainer onBack={() => setSection("consecutiva")} />}
         {section === "consecutiva" && <ConsecutivaSection />}
         </div>
       </main>
