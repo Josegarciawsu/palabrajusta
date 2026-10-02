@@ -73,6 +73,7 @@ select:focus-visible,
 }
 
 .pj-judicial-featured { position: relative; overflow: hidden; font-weight: 700; }
-.pj-judicial-featured::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, transparent 32%, rgba(199,155,91,.28) 50%, transparent 68%); transform: translateX(-120%); animation: pj-judicial-shine 12s ease-in-out infinite; }
-@keyframes pj-judicial-shine { 0% { transform: translateX(-120%); } 12%, 100% { transform: translateX(120%); } }
+.pj-judicial-featured::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, transparent 32%, rgba(232,163,23,.15) 50%, transparent 68%); transform: translateX(120%); }
+.pj-judicial-shining::after { animation: pj-judicial-shine 1.8s ease-in-out both; }
+@keyframes pj-judicial-shine { from { transform: translateX(120%); } to { transform: translateX(-120%); } }
 @media (prefers-reduced-motion: reduce) { .pj-judicial-featured::after { animation: none; display: none; } }

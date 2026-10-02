@@ -454,13 +454,13 @@ const RESOURCES = {
 
 
 
-function NavButton({ active, onClick, children, icon: Icon, featured = false }) {
+function NavButton({ active, onClick, children, icon: Icon, featured = false, shine = false }) {
   return (
     <button
       onClick={onClick}
       data-nav-activo={active ? "true" : undefined}
       aria-current={active ? "page" : undefined}
-      className={`pj-nav w-full text-left px-3 py-2 flex items-center gap-2${featured ? " pj-judicial-featured" : ""}`}
+      className={`pj-nav w-full text-left px-3 py-2 flex items-center gap-2${featured ? " pj-judicial-featured" : ""}${shine ? " pj-judicial-shining" : ""}`}
       style={{
         fontFamily: sans,
         fontSize: 15,
@@ -1968,7 +1968,6 @@ export default function App() {
           }}
         >
           <IndicadorNav navRef={navRef} deps={[section, semanasAbiertas, navOpen, isMobile, nivelLetra]} />
-          <NavButton featured icon={Headphones} active={section === "judicial"} onClick={() => setSection("judicial")}>Práctica judicial (consecutiva)</NavButton>
           {!isMobile && (
             <NavButton
               icon={Home}
@@ -1978,6 +1977,7 @@ export default function App() {
               Inicio
             </NavButton>
           )}
+          <NavButton featured shine={section === "inicio"} key={`judicial-${section === "inicio"}-${navOpen}`} icon={Headphones} active={section === "judicial"} onClick={() => setSection("judicial")}>Práctica judicial (consecutiva)</NavButton>
           <button
             onClick={(e) => {
               e.stopPropagation();
