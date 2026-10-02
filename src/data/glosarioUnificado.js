@@ -80,3 +80,20 @@ fichas.sort((a, b) => orden(a.en).localeCompare(orden(b.en)));
 
 export const letraDe = (f) => orden(f.en)[0].toUpperCase();
 export default fichas;
+
+// Traducción para los términos de las semanas: la del libro manda cuando existe.
+const libroPorClave = new Map();
+LIBRO.forEach((t) => t.en.split(";").forEach((p) => {
+  const k = clave(p);
+  if (k && !libroPorClave.has(k)) libroPorClave.set(k, t.es);
+}));
+const delLibro = (en) => libroPorClave.get(clave(en.replace(/\([^)]*\)/g, " ")));
+
+export function traduccionSemana(term, esProfesor) {
+  const partes = term.split(" / ");
+  const esPartes = (esProfesor || "").split(" / ");
+  if (partes.length > 1 && partes.length === esPartes.length) {
+    return partes.map((p, i) => delLibro(p) || esPartes[i]).join(" / ");
+  }
+  return delLibro(term) || esProfesor;
+}
