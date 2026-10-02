@@ -1,5 +1,6 @@
 import characters from '../../assets/judicial-characters.webp';
 import './JudicialScene.css';
+import { InterpreterPortrait } from './JudicialInterpreters.jsx';
 
 const frames = [
   ['0%', '0%'], ['50%', '0%'], ['100%', '0%'],
@@ -13,7 +14,7 @@ function Portrait({ frame, className = '' }) {
   }} />;
 }
 
-export default function JudicialScene({ phase, remaining, language, speaking, evaluated }) {
+export default function JudicialScene({ phase, remaining, language, speaking, evaluated, interpreter='sofia' }) {
   const waiting = phase === 'ready';
   const recording = phase === 'recording';
   const evaluator = waiting || phase === 'evaluating' || evaluated;
@@ -27,7 +28,7 @@ export default function JudicialScene({ phase, remaining, language, speaking, ev
     : phase === 'evaluating' ? 'Evaluando…' : evaluated ? 'Evaluación' : person;
   return <div className={`judicial-scene${phase === 'evaluating' ? ' judicial-blur' : ''}`}>
     <div className="judicial-character" role="img" aria-label={person}>
-      <Portrait frame={frame} />
+      {recording || phase==='evaluating' ? <InterpreterPortrait interpreter={interpreter}/> : <Portrait frame={frame} />}
     </div>
     <div className="judicial-scene-status" role="status" aria-live="polite" aria-atomic="true">
       <strong>{label}</strong>

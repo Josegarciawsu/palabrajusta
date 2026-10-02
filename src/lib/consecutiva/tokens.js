@@ -14,6 +14,7 @@ export const C = {
   coral: T.error,
   coralSuave: T.errorSoft,
   ambar: T.clayText,
+  ambarSuave: T.claySoft,
 };
 
 export const F = {
