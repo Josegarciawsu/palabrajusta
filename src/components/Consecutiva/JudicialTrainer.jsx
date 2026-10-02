@@ -33,7 +33,7 @@ export default function JudicialTrainer({onBack}){
  const busy=recorder.grabando||speaking||transcribing;
  const reviewList=history.flatMap(h=>h.segments.flatMap(s=>s.rows.filter(r=>r.status!=='matched').map(r=>({...r,segment:s.id}))));
  return <div style={{fontFamily:F.cuerpo,color:C.tinta,display:'grid',gap:18,fontSize:16,lineHeight:1.6}}>
- <Boton variante="fantasma" disabled={busy} onClick={()=>{reset();onBack();}}>Volver a consecutiva</Boton>
+ <Boton variante="fantasma" disabled={busy} onClick={()=>{reset();onBack();}}>Volver al inicio</Boton>
  <div><Titulo>Escucha e interpreta</Titulo><p style={{margin:'8px 0'}}>Consulta con el defensor público</p><details style={{fontSize:14,color:C.suave}}><summary>Cómo se evalúa</summary><p>Nota de práctica. Confirma los resultados dudosos.</p></details></div>
  {!finished&&<>
  <details><summary style={{cursor:"pointer"}}>Dirección y modalidad</summary><Tarjeta><div style={{display:'flex',gap:12,flexWrap:'wrap'}}><label>Dirección<select aria-label="Dirección" disabled={busy} value={direction} onChange={e=>{reset();setDirection(e.target.value);setIdx(0);setSession({});}} style={{display:'block',fontSize:16,padding:10}}><option value="both">Conversación completa</option><option value="en">Inglés → Español</option><option value="es">Español → Inglés</option></select></label><label>Modalidad<select aria-label="Modalidad" disabled={busy||Object.keys(session).length>0} value={mode} onChange={e=>{reset();setMode(e.target.value);}} style={{display:'block',fontSize:16,padding:10}}><option value="practice">Práctica</option><option value="exam">Simulación</option></select></label></div></Tarjeta></details>

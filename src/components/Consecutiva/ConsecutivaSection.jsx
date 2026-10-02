@@ -16,7 +16,6 @@ import Practica from "./Practica.jsx";
 import Evaluacion from "./Evaluacion.jsx";
 import Resultados from "./Resultados.jsx";
 
-import JudicialTrainer from "./JudicialTrainer.jsx";
 
 const PASOS = [
   ["Interpreta", "Escuchas cada segmento sin ver el texto, tomas notas y grabas tu interpretación."],
@@ -25,7 +24,6 @@ const PASOS = [
 ];
 
 export default function ConsecutivaSection() {
-  const [judicial, setJudicial] = useState(false);
   const grupos = useMemo(
     () => ({
       "en-es": EJERCICIOS_EN_ES.map(prepararEjercicio),
@@ -65,8 +63,6 @@ export default function ConsecutivaSection() {
     padding: "0 0 48px",
   };
 
-  if (judicial) return <JudicialTrainer onBack={() => setJudicial(false)} />;
-
   if (actual && ejercicio) {
     const props = { ejercicio, intento: actual, onCambio: actualizar, onSalir: salir };
     return (
@@ -91,7 +87,6 @@ export default function ConsecutivaSection() {
         </p>
       </div>
 
-      <Tarjeta style={{ display: "grid", gap: 12 }}><Titulo nivel={2}>Práctica judicial</Titulo><p style={{ margin: 0 }}>Escucha, interpreta y graba. Revisa tus términos jurídicos.</p><Boton onClick={() => setJudicial(true)}>Abrir práctica judicial</Boton></Tarjeta>
 
       <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
         {PASOS.map(([t, d], i) => (
