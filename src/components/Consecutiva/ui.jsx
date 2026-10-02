@@ -29,9 +29,10 @@ export function Boton({ variante = "primario", children, style, ...props }) {
   );
 }
 
-export function Tarjeta({ children, style }) {
+export function Tarjeta({ children, style, ...props }) {
   return (
     <div
+      {...props}
       style={{
         background: C.superficie,
         border: `1px solid ${C.borde}`,

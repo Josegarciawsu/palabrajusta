@@ -3,7 +3,7 @@ import { normalizar } from './match.js';
 const legal=(label,accepted,wrong=[],critical=false)=>({label,accepted,wrong,critical,kind:'legal'});
 const meaning=(label,accepted,wrong=[],critical=false)=>({label,accepted,wrong,critical,kind:'meaning'});
 const units=[
-[legal('Public defender',['defensor publico','abogado de oficio']),meaning('Confirm personal information',['nombre completo','fecha de nacimiento','domicilio actual'])],
+[legal('Public defender',['defensor publico','abogado de oficio']),meaning('Full name',['nombre completo']),meaning('Date of birth',['fecha de nacimiento']),meaning('Current address',['domicilio actual','direccion actual'])],
 [meaning('Full name',['luis alberto santos garcia']),meaning('Date of birth',['march 14 1992','14 march 1992']),meaning('Address',['245 madison avenue'])],
 [legal('Misdemeanor',['delito menor']),legal('Without a valid license',['sin una licencia valida','sin licencia valida']),legal('Plea options',['opciones de declaracion','opciones para declararse']),meaning('The decision is yours',['decision es suya','usted decide'])],
 [legal('Not guilty',['pleading not guilty','plead not guilty'],['pleading guilty'],true),meaning('Officer’s account',['officer says','officer said','officers account'])],
@@ -39,22 +39,31 @@ export function assessTurn(turn,text){
  return turn.units.map(u=>{
   const accepted=u.accepted.find(p=>contains(normalized,p));
   const wrong=u.wrong.find(p=>{
-   const phrase=norm(p), match=` ${normalized} `.indexOf(` ${phrase} `);
-   if(match<0)return false;
-   // A negative accepted phrase contains its affirmative counterpart.
-   if(accepted && contains(accepted,p))return false;
-   const prefix=normalized.slice(0,match).trim().split(' ').slice(-3).join(' ');
-   return !/\b(no|not|dont|doesnt|cannot|cant)\b/.test(prefix);
+   const phrase=` ${norm(p)} `, padded=` ${normalized} `;
+   for(let match=padded.indexOf(phrase);match>=0;match=padded.indexOf(phrase,match+1)){
+    // Exclude only the affirmative span inside a valid negative equivalence.
+    const covered=u.accepted.some(a=>{
+     const valid=` ${norm(a)} `;
+     for(let start=padded.indexOf(valid);start>=0;start=padded.indexOf(valid,start+1))
+      if(match>=start&&match+phrase.length<=start+valid.length)return true;
+     return false;
+    });
+    if(covered)continue;
+    const prefix=padded.slice(0,match).trim().split(' ').slice(-3).join(' ');
+    if(!/\b(no|not|dont|doesnt|cannot|cant)\b/.test(prefix))return true;
+   }
+   return false;
   });
   return {...u,status:wrong?'critical':accepted?'matched':'review',matched:accepted||null,reason:wrong?`Posible cambio de sentido: «${wrong}».`:accepted?`Equivalencia detectada: «${accepted}».`:'No se detectó una equivalencia. Revisa si fue omisión o una reformulación válida.'};
  });
 }
-export function scoreUnits(rows){
+export function scoreUnits(rows,integrity=null){
  const groups={legal:{correct:0,total:0},meaning:{correct:0,total:0}};
  for(const row of rows){groups[row.kind].total++;if(row.status==='matched')groups[row.kind].correct++;}
  const legalScore=groups.legal.total?groups.legal.correct/groups.legal.total:null;
  const meaningScore=groups.meaning.total?groups.meaning.correct/groups.meaning.total:null;
- const available=(legalScore===null?0:60)+(meaningScore===null?0:30);
- const value=available?Math.round(((legalScore??0)*60+(meaningScore??0)*30)/available*100):0;
- return {value,groups,pending:rows.filter(r=>r.status==='review').length,critical:rows.filter(r=>r.status==='critical').length};
+ const integrityScore=[0,50,100].includes(integrity)?integrity/100:null;
+ const available=(legalScore===null?0:60)+(meaningScore===null?0:30)+(integrityScore===null?0:10);
+ const value=available?Math.round(((legalScore??0)*60+(meaningScore??0)*30+(integrityScore??0)*10)/available*100):0;
+ return {value,groups,integrity:integrityScore===null?null:integrity,preliminary:integrityScore===null||rows.some(r=>r.status==='review'),pending:rows.filter(r=>r.status==='review').length,critical:rows.filter(r=>r.status==='critical').length};
 }

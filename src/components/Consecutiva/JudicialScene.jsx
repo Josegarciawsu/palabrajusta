@@ -1,4 +1,5 @@
 import characters from '../../assets/judicial-characters.webp';
+import professor from '../../assets/judicial-professor.webp';
 import './JudicialScene.css';
 
 const frames = [
@@ -17,19 +18,17 @@ export default function JudicialScene({ phase, remaining, language, speaking, ev
   const waiting = phase === 'ready';
   const recording = phase === 'recording';
   const evaluator = waiting || phase === 'evaluating' || evaluated;
-  const source = language === 'en' ? 0 : 2;
+  const source = language === 'en' ? 1 : 3;
   const frame = waiting ? (remaining >= 3 ? 4 : remaining === 2 ? 5 : 6)
     : recording ? 8 : evaluator ? 7 : source;
-  const talking = phase === 'listening' && speaking;
   const person = evaluator ? 'Evaluador' : recording ? 'Intérprete'
     : language === 'en' ? 'Defensor público' : 'Acusado';
   const label = phase === 'ready' ? 'Prepárate' : recording ? 'Tu turno'
     : phase === 'listening' ? 'Escuchando' : phase === 'preparing' ? 'Preparando…'
     : phase === 'evaluating' ? 'Evaluando…' : evaluated ? 'Evaluación' : person;
-  return <div className="judicial-scene">
+  return <div className={`judicial-scene${phase === 'evaluating' ? ' judicial-blur' : ''}`}>
     <div className="judicial-character" role="img" aria-label={person}>
-      <Portrait frame={frame} />
-      {talking && <Portrait frame={language === 'en' ? 1 : 3} className="judicial-speaking" />}
+      {evaluator && !waiting ? <img src={professor} className="judicial-professor" alt=""/> : <Portrait frame={frame} />}
     </div>
     <div className="judicial-scene-status" role="status" aria-live="polite" aria-atomic="true">
       <strong>{label}</strong>

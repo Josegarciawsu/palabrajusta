@@ -7,4 +7,12 @@ assert.equal(assessTurn(judicialTurns[4],'No admite el cargo.')[1].status,'match
 assert.equal(assessTurn(judicialTurns[0],'Una reformulación desconocida')[0].status,'review');
 assert.equal(scoreUnits(assessTurn(judicialTurns[4],judicialTurns[4].reference)).value,100);
 assert.equal(assessTurn(judicialTurns[12],'Podemos reducir el cargo.').find(u=>u.label==='Discovery').status,'review');
+assert.equal(assessTurn(judicialTurns[0],'Soy su defensor público. Confirme su nombre completo.').filter(r=>r.status==='matched').length,2);
+assert.equal(assessTurn(judicialTurns[4],'No admite el cargo. Usted también admite el cargo.')[1].status,'critical');
+const weighted=[{kind:'legal',status:'matched'},{kind:'meaning',status:'omission'}];
+assert.equal(scoreUnits(weighted,100).value,70);
+assert.equal(scoreUnits(weighted,0).value,60);
+assert.equal(scoreUnits(weighted).integrity,null);
+assert.equal(scoreUnits(weighted).preliminary,true);
+assert.equal(scoreUnits([{kind:'legal',status:'matched'},{kind:'meaning',status:'matched'}],100).value,100);
 console.log('Judicial scoring checks passed.');
